@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e2dd0a08ace9b8a4ea36a21a5f0dc8fc
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 293814
+  packageName: BulletHell Elemental Template
+  packageVersion: 1.5.0
+  assetPath: Assets/BulletHellTemplate/ThirdPartyResources/Font/NotoSansCJK/Sources/Range/common.txt
+  uploadId: 816960

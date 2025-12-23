@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 91021a8b0d8c4ff43927c7d1c4cbf522
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 293814
+  packageName: BulletHell Elemental Template
+  packageVersion: 1.5.0
+  assetPath: Assets/BulletHellTemplate/ThirdPartyResources/Font/NotoSansCJK/Sources/Range/TC_word-list.txt
+  uploadId: 816960

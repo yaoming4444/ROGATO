@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3c32ab233e015f34384ac561912d7b27
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 293814
+  packageName: BulletHell Elemental Template
+  packageVersion: 1.5.0
+  assetPath: Assets/BulletHellTemplate/ThirdPartyResources/Font/NotoSansCJK/Sources/Range/Latin-Complete.txt
+  uploadId: 816960
