@@ -8,29 +8,36 @@ namespace GameCore.UI
         [SerializeField] private ChestDropTable dropTable;
         [SerializeField] private ChestRewardPopup popup;
 
+        [Header("Chest Button Animation")]
+        [SerializeField] private ChestAnimDriver chestAnim;
+
         public void OpenChest()
         {
             var gi = GameCore.GameInstance.I;
-            if (gi == null || popup == null || dropTable == null) return;
+            if (gi == null || dropTable == null || popup == null) return;
 
-            // 1) списали сундук
-            if (!gi.SpendChest(1, immediateSave: true))
-            {
-                Debug.Log("[Chest] No chests");
+            // play chest animation (button always active => reliable)
+            if (chestAnim) chestAnim.PlayOpen();
+
+            if (!gi.SpendChest(1, immediateSave: false))
                 return;
-            }
 
-            // 2) ролл
+            gi.AddExp(5, immediateSave: false);
+
             var rolled = ChestService.Roll(dropTable);
             if (rolled.Item == null)
             {
                 Debug.LogWarning("[Chest] Rolled null item (db pool empty?)");
+                gi.SaveAllNow();
                 return;
             }
 
-            // 3) показать UI (внутри будет сравнение)
             popup.Show(rolled.Item);
+
+            gi.SaveAllNow();
         }
     }
 }
+
+
 

@@ -261,6 +261,25 @@ namespace GameCore
             if (immediateSave) SaveAllNow();
         }
 
+        /// <summary>
+        /// Adds EXP to the player. Optionally triggers immediate save.
+        /// If you later add an EXP-to-level curve, this method is the best place to handle level ups.
+        /// </summary>
+        public void AddExp(int amount, bool immediateSave = false)
+        {
+            if (State == null) return;
+            if (amount <= 0) return;
+
+            State.Exp += amount;
+
+            // OPTIONAL: auto-level up if you introduce a requirement:
+            // while (State.Exp >= GetExpToNextLevel(State.Level)) { State.Exp -= GetExpToNextLevel(State.Level); State.Level++; }
+
+            Touch(); // MarkDirty + StateChanged
+
+            if (immediateSave) SaveAllNow();
+        }
+
         // ===================== EQUIPMENT =====================
 
         /// <summary>

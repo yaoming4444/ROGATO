@@ -41,6 +41,8 @@ namespace GameCore.UI
         [SerializeField] private Button sellButton;
         [SerializeField] private Button closeButton;
 
+        private int _revealTriggerHash;
+
         // Item currently shown by this popup
         private ItemDef _newItem;
 
@@ -54,6 +56,8 @@ namespace GameCore.UI
             // Popup should start hidden.
             Hide();
         }
+
+   
 
         /// <summary>
         /// Shows the popup for the given item.
