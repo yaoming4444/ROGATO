@@ -5,31 +5,15 @@ using GameCore.Items;
 
 namespace GameCore.UI
 {
-    /// <summary>
-    /// UI popup that shows:
-    /// - the newly dropped item
-    /// - the currently equipped item in the same slot (if any)
-    /// - action buttons: Equip/Replace, Sell, Close
-    ///
-    /// This class does NOT roll items and does NOT spend chests.
-    /// It only displays a given ItemDef and calls GameInstance methods on button clicks.
-    ///
-    /// How to use:
-    /// 1) Create a popup GameObject under Canvas
-    /// 2) Hook all serialized fields in Inspector
-    /// 3) Keep popup GameObject inactive by default
-    /// 4) Call popup.Show(itemDef) when a chest is opened and an item is rolled
-    /// </summary>
     public class ChestRewardPopup : MonoBehaviour
     {
-        [Header("New Item UI")]
+        [Header("NEW item block (always visible)")]
         [SerializeField] private Image newIcon;
         [SerializeField] private Image newRarity;
         [SerializeField] private TMP_Text newName;
         [SerializeField] private TMP_Text newStats;
 
-        [Header("Current Equipped UI")]
-        // Whole right-side block (so we can hide it when slot is empty)
+        [Header("CURRENT item block (only if comparison)")]
         [SerializeField] private GameObject currentBlock;
         [SerializeField] private Image curIcon;
         [SerializeField] private Image curRarity;
@@ -37,51 +21,57 @@ namespace GameCore.UI
         [SerializeField] private TMP_Text curStats;
 
         [Header("Buttons")]
-        [SerializeField] private Button equipButton;
-        [SerializeField] private Button sellButton;
-        [SerializeField] private Button closeButton;
+        [SerializeField] private Button equipButton; // always visible
+        [SerializeField] private Button sellButton;  // only when comparison
 
-        private int _revealTriggerHash;
-
-        // Item currently shown by this popup
         private ItemDef _newItem;
 
         private void Awake()
         {
-            // Wire up button callbacks once.
+            // ВАЖНО: НЕ Hide() здесь!
+            // Иначе при первом SetActive(true) Awake вызовется и обнулит _newItem.
+
             if (equipButton) equipButton.onClick.AddListener(OnEquip);
             if (sellButton) sellButton.onClick.AddListener(OnSell);
-            if (closeButton) closeButton.onClick.AddListener(Hide);
 
-            // Popup should start hidden.
-            Hide();
+            // Просто сбросим вид, но не выключаем объект.
+            ResetView();
         }
 
-   
+        private void ResetView()
+        {
+            if (currentBlock) currentBlock.SetActive(false);
+            if (sellButton) sellButton.gameObject.SetActive(false);
 
-        /// <summary>
-        /// Shows the popup for the given item.
-        /// Also checks what is currently equipped in the same slot and shows comparison UI.
-        /// </summary>
+            // можно почистить тексты, чтобы не мигали старые
+            if (newName) newName.text = "";
+            if (newStats) newStats.text = "";
+            if (curName) curName.text = "";
+            if (curStats) curStats.text = "";
+        }
+
         public void Show(ItemDef newItem)
         {
             _newItem = newItem;
             if (_newItem == null) return;
 
-            gameObject.SetActive(true);
+            // если объект был выключен - включаем
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
 
-            // ----- NEW ITEM UI -----
+            ResetView();
+
+            // ===================== NEW (ALWAYS) =====================
             if (newIcon)
             {
                 newIcon.enabled = true;
-                newIcon.sprite = _newItem.Icon;
+                newIcon.sprite = _newItem.Icon; // может быть null - это нормально
                 newIcon.color = Color.white;
             }
 
             if (newRarity)
             {
-                // Rarity badge is optional
-                newRarity.enabled = _newItem.IconRarity != null;
+                newRarity.enabled = (_newItem.IconRarity != null);
                 newRarity.sprite = _newItem.IconRarity;
                 newRarity.color = Color.white;
             }
@@ -92,14 +82,15 @@ namespace GameCore.UI
             if (newStats)
                 newStats.text = FormatStats(_newItem);
 
-            // ----- CURRENT EQUIPPED ITEM UI -----
+            // ===================== CURRENT (ONLY IF EXISTS) =====================
             var gi = GameCore.GameInstance.I;
             var cur = gi != null ? gi.GetEquippedDef(_newItem.Slot) : null;
 
-            bool empty = (cur == null);
-            if (currentBlock) currentBlock.SetActive(!empty);
+            bool hasCurrent = (cur != null);
 
-            if (!empty)
+            if (currentBlock) currentBlock.SetActive(hasCurrent);
+
+            if (hasCurrent)
             {
                 if (curIcon)
                 {
@@ -110,7 +101,7 @@ namespace GameCore.UI
 
                 if (curRarity)
                 {
-                    curRarity.enabled = cur.IconRarity != null;
+                    curRarity.enabled = (cur.IconRarity != null);
                     curRarity.sprite = cur.IconRarity;
                     curRarity.color = Color.white;
                 }
@@ -122,27 +113,28 @@ namespace GameCore.UI
                     curStats.text = FormatStats(cur);
             }
 
-            // ----- BUTTON TEXT -----
-            // If slot empty -> "EQUIP", else -> "REPLACE"
+            // ===================== BUTTONS =====================
             if (equipButton)
             {
-                var t = equipButton.GetComponentInChildren<TMP_Text>();
-                if (t) t.text = empty ? "EQUIP" : "REPLACE";
+                var t = equipButton.GetComponentInChildren<TMP_Text>(true);
+                if (t) t.text = hasCurrent ? "REPLACE" : "EQUIP";
             }
 
             if (sellButton)
             {
-                var t = sellButton.GetComponentInChildren<TMP_Text>();
+                sellButton.gameObject.SetActive(hasCurrent);
+
+                var t = sellButton.GetComponentInChildren<TMP_Text>(true);
                 if (t) t.text = $"SELL (+{_newItem.SellGems} gems)";
             }
         }
 
-        /// <summary>
-        /// Equip/Replace action:
-        /// - Writes itemId into the slot in PlayerState
-        /// - Triggers UI refresh events
-        /// - Saves local+server immediately (immediateSave=true)
-        /// </summary>
+        public void Hide()
+        {
+            _newItem = null;
+            gameObject.SetActive(false);
+        }
+
         private void OnEquip()
         {
             var gi = GameCore.GameInstance.I;
@@ -152,11 +144,6 @@ namespace GameCore.UI
             Hide();
         }
 
-        /// <summary>
-        /// Sell action:
-        /// - Adds gems to the player
-        /// - Saves immediately
-        /// </summary>
         private void OnSell()
         {
             var gi = GameCore.GameInstance.I;
@@ -166,29 +153,15 @@ namespace GameCore.UI
             Hide();
         }
 
-        /// <summary>
-        /// Hide popup and clear current item reference.
-        /// </summary>
-        public void Hide()
-        {
-            _newItem = null;
-            gameObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Simple formatting for base stats.
-        /// In the future you can add:
-        /// - stat deltas (green/red)
-        /// - power score
-        /// - extra stats
-        /// </summary>
         private string FormatStats(ItemDef it)
         {
-            if (it == null) return "";
             var s = it.Stats;
             return $"ATK: {s.Atk}\nDEF: {s.Def}\nHP: {s.Hp}";
         }
     }
 }
+
+
+
 
 

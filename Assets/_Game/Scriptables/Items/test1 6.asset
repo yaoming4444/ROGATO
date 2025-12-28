@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6bd8e2cdfbad2b240b70f642f0060673, type: 3}
-  m_Name: ItemDef_
+  m_Name: test1 6
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Items.ItemDef
-  id: wpn_pistol_g_01
-  displayName: Weapon
-  slot: 0
+  id: wpn_belt_g_01
+  displayName: Belt
+  slot: 6
   rarity: 0
   stats:
     Atk: 10
     Def: 20
     Hp: 30
   extraStats: []
-  icon: {fileID: 21300000, guid: f75bf02f0e4a26946a94de1178ad1352, type: 3}
-  iconRarity: {fileID: 21300000, guid: dcfccfc7b49536046935da8ac12257dc, type: 3}
   sellGems: 1
+  icon: {fileID: 21300000, guid: c26cc51a8aa4c13408c720657c599338, type: 3}
+  iconRarity: {fileID: 21300000, guid: dcfccfc7b49536046935da8ac12257dc, type: 3}

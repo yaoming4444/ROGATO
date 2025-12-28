@@ -294,7 +294,12 @@ namespace GameCore
         public ItemDef GetEquippedDef(EquipSlot slot)
         {
             var id = GetEquippedId(slot);
-            return string.IsNullOrWhiteSpace(id) ? null : ItemDatabase.I.GetById(id);
+            if (string.IsNullOrWhiteSpace(id)) return null;
+
+            var db = ItemDatabase.I;
+            if (db == null) return null; // <-- FIX: DB not ready yet
+
+            return db.GetById(id);
         }
 
         public bool IsSlotEmpty(EquipSlot slot)

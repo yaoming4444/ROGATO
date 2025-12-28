@@ -5,48 +5,34 @@ using GameCore.Items;
 
 namespace GameCore.UI
 {
-    /// <summary>
-    /// UI view for one equipment slot.
-    ///
-    /// Responsibilities:
-    /// - Knows which EquipSlot it represents (e.g. Head/Body/Weapon)
-    /// - Subscribes to GameInstance.StateChanged
-    /// - Updates icon/rarity/label based on currently equipped itemId
-    ///
-    /// It does not equip items by itself; it's just a view.
-    /// (You can later add OnClick to open inventory or open chest UI.)
-    /// </summary>
     public class ItemSlotView : MonoBehaviour
     {
         [Header("Slot")]
-        // Which slot this view represents
         [SerializeField] private EquipSlot slot;
 
-        [Header("UI")]
-        [SerializeField] private Image icon;
-        [SerializeField] private Image rarity;
-        [SerializeField] private TMP_Text labelText;
+        [Header("UI (Icon must be CHILD image, not the frame on parent)")]
+        [SerializeField] private Image icon;          // child icon image
+        [SerializeField] private Image rarity;        // optional badge
+        [SerializeField] private TMP_Text labelText;  // optional
+
+        [Header("Empty visuals")]
+        [SerializeField] private Sprite emptyIcon; // optional: plus icon
+        [SerializeField, Range(0f, 1f)] private float emptyAlpha = 0.35f;
 
         private void OnEnable()
         {
-            // Subscribe to state changes (currencies, equipment, etc.)
             if (GameCore.GameInstance.I != null)
                 GameCore.GameInstance.I.StateChanged += OnStateChanged;
 
-            // Force an immediate refresh when enabled
             OnStateChanged(GameCore.GameInstance.I?.State);
         }
 
         private void OnDisable()
         {
-            // Unsubscribe (avoid memory leaks / double subscriptions)
             if (GameCore.GameInstance.I != null)
                 GameCore.GameInstance.I.StateChanged -= OnStateChanged;
         }
 
-        /// <summary>
-        /// Refreshes the UI when the PlayerState changes.
-        /// </summary>
         private void OnStateChanged(GameCore.PlayerState s)
         {
             if (s == null)
@@ -55,7 +41,6 @@ namespace GameCore.UI
                 return;
             }
 
-            // Resolve equipped item
             var id = GameCore.GameInstance.I.GetEquippedId(slot);
 
             if (string.IsNullOrWhiteSpace(id))
@@ -64,50 +49,48 @@ namespace GameCore.UI
                 return;
             }
 
-            var def = ItemDatabase.I.GetById(id);
+            var def = ItemDatabase.I != null ? ItemDatabase.I.GetById(id) : null;
             if (def == null)
             {
-                // If itemId is unknown (DB changed), treat as empty.
                 SetEmpty();
                 return;
             }
 
-            // ----- Filled UI -----
+            // Filled
             if (icon)
             {
+                icon.enabled = true;
                 icon.sprite = def.Icon;
-                icon.enabled = (def.Icon != null);
+                icon.color = Color.white;
             }
 
             if (rarity)
             {
                 rarity.sprite = def.IconRarity;
                 rarity.enabled = (def.IconRarity != null);
+                if (rarity.enabled) rarity.color = Color.white;
             }
 
             if (labelText)
                 labelText.text = def.DisplayName;
         }
 
-        /// <summary>
-        /// Empty UI state.
-        ///
-        /// IMPORTANT UX NOTE:
-        /// Right now you disable the icon image completely.
-        /// If you want "slots visible even when empty", you should:
-        /// - keep a background frame always visible, OR
-        /// - set an 'empty sprite' (plus icon), OR
-        /// - reduce alpha instead of disabling.
-        /// </summary>
         private void SetEmpty()
         {
+            // IMPORTANT: We do NOT touch the parent's frame image here.
+            // We only change the CHILD icon.
+
             if (icon)
             {
-                icon.sprite = null;
+                icon.enabled = true; // keep slot "alive"
+                icon.sprite = emptyIcon; // if null, it will just show nothing
 
-                // Current behavior: icon completely disappears when empty.
-                // Alternative: keep it enabled and set a placeholder sprite or alpha.
-                icon.enabled = false; // or keep true and set transparency
+                var c = icon.color;
+                c.a = (emptyIcon != null) ? 1f : emptyAlpha; // if no placeholder - dim
+                icon.color = c;
+
+                // if you want totally hidden icon when empty:
+                // icon.enabled = (emptyIcon != null);
             }
 
             if (rarity)
@@ -121,6 +104,7 @@ namespace GameCore.UI
         }
     }
 }
+
 
 
 

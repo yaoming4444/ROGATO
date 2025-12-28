@@ -14,3 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Items.ItemDatabase
   items:
   - {fileID: 11400000, guid: 4735ce8154d780a4d86febea1f17b9ba, type: 2}
+  - {fileID: 11400000, guid: 287b25a5982385c458f65c02f8d85419, type: 2}
+  - {fileID: 11400000, guid: 7439bc1ce220def41a1913171bc7ac23, type: 2}
+  - {fileID: 11400000, guid: 5f9d5620d9421e84e8fc7ec01c7b3bfd, type: 2}
+  - {fileID: 11400000, guid: 897009e5d39c7be48b0cd2b2e4d0989d, type: 2}
+  - {fileID: 11400000, guid: 3034bc4e294c0fc4e858cd6c4fe1125f, type: 2}
+  - {fileID: 11400000, guid: 278acf84db4bed042a687496b4df9ac4, type: 2}
+  - {fileID: 11400000, guid: a09c31464f216e24baa3afefe5b7f7cb, type: 2}
+  - {fileID: 11400000, guid: c092896d42fb71546982fb9433c8e2a6, type: 2}
+  - {fileID: 11400000, guid: 72a8ebfb244b9684596d7f58729bff32, type: 2}
+  - {fileID: 11400000, guid: 4a6c411eaf6c5e6419f2d8bab692509a, type: 2}
+  - {fileID: 11400000, guid: bcfa866bfb9e6584bb8367db4280f66c, type: 2}

@@ -29,7 +29,7 @@ namespace GameCore
         // -------- Currencies --------
         public long Gold = 100;
         public int Gems = 0;
-        public int Chests = 10;
+        public int Chests = 200;
 
         // -------- Cosmetics --------
         public string SelectedSkinId = "default";
@@ -58,7 +58,7 @@ namespace GameCore
                 Exp = 0,
                 Gold = 100,
                 Gems = 0,
-                Chests = 10,
+                Chests = 200,
                 SelectedSkinId = "default",
                 ChestLevel = 1,
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
