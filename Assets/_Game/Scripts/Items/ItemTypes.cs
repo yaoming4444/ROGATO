@@ -3,8 +3,19 @@ using UnityEngine;
 
 namespace GameCore.Items
 {
+    /// <summary>
+    /// Item rarity ordered from lowest to highest.
+    /// IMPORTANT: Some logic assumes numeric ordering (Downgrade/Upgrade).
+    /// </summary>
     public enum Rarity { G, F, E, D, C, B, A, S, SS }
 
+    /// <summary>
+    /// Equipment slots.
+    ///
+    /// IMPORTANT:
+    /// - PlayerState.Equipped is an array indexed by (int)EquipSlot.
+    /// - Do not reorder existing values after you ship, otherwise saves will break.
+    /// </summary>
     public enum EquipSlot
     {
         Weapon = 0,
@@ -16,11 +27,14 @@ namespace GameCore.Items
         Belt = 6,
         Ring = 7,
         Amulet = 8,
-        Cape = 9,
-        Relic = 10,
-        Artifact = 11
+        Artifact = 9,
+        Companion = 10,
+        Badge = 11
     }
 
+    /// <summary>
+    /// Basic "flat" stats (integers).
+    /// </summary>
     [Serializable]
     public struct ItemStats
     {
@@ -28,28 +42,29 @@ namespace GameCore.Items
         public int Def;
         public int Hp;
 
+        // Adds two stat structs together.
         public static ItemStats operator +(ItemStats a, ItemStats b)
             => new ItemStats { Atk = a.Atk + b.Atk, Def = a.Def + b.Def, Hp = a.Hp + b.Hp };
     }
 
-    // Дополнительные статы (как в Bombie)
+    /// <summary>
+    /// Extra stat types (percentage or special bonuses).
+    /// </summary>
     public enum ExtraStatType
     {
-        CritChance,      // крит шанс (%)
-        CritDamage,      // крит урон (%)
-        DodgeChance,     // додж (%)
-        ComboChance,     // комбо (%)
-        IgnoreArmor,     // игнор защиты (%)
-        SkillCritChance, // крит навыка (%)
-        SkillCritDamage, // крит урона навыка (%)
-        IgnoreDodge,     // игнор доджа (%)
-        HpPercent,       // +HP (%)
+        CritChance,      // +Crit chance (%)
+        CritDamage,      // +Crit damage (%)
+        DodgeChance,     // +Dodge chance (%)
+
         AtkPercent,      // +ATK (%)
+        HpPercent,       // +HP (%)
         DefPercent       // +DEF (%)
     }
 
-    // Один бонус: тип + значение.
-    // Для процентов храним в "процентах" (1.5 = 1.5%)
+    /// <summary>
+    /// One extra bonus: Type + Value.
+    /// For percentage stats store the number in "percent units" (1.5 = 1.5%).
+    /// </summary>
     [Serializable]
     public struct ExtraStat
     {
@@ -57,5 +72,6 @@ namespace GameCore.Items
         public float Value;
     }
 }
+
 
 

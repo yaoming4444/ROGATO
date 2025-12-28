@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -8,9 +7,22 @@ using IDosGames;
 
 namespace GameCore
 {
+    /// <summary>
+    /// Save/Load utilities for PlayerState:
+    /// - Local JSON file (persistentDataPath)
+    /// - Server custom data via iDosGames SDK (UpdateCustomUserData / cached read)
+    ///
+    /// IMPORTANT:
+    /// - Server load uses "cached" custom user data.
+    ///   The cache is updated only after UserDataService.RequestUserAllData().
+    /// - Make sure you use the SAME KEY for saving and reading cached data.
+    /// </summary>
     public static class SaveSystem
     {
+        // Server custom data key (string).
         public const string ServerKey = "player_state_v1";
+
+        // Local file name in Application.persistentDataPath.
         private const string LocalFileName = "player_state.json";
 
         private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
@@ -23,6 +35,7 @@ namespace GameCore
         public static string LocalPath => Path.Combine(Application.persistentDataPath, LocalFileName);
 
         // -------- JSON --------
+
         public static string ToJson(PlayerState state, bool pretty = false)
         {
             return pretty
@@ -48,6 +61,7 @@ namespace GameCore
         }
 
         // -------- LOCAL --------
+
         public static PlayerState LoadLocalOrDefault()
         {
             if (!File.Exists(LocalPath))
@@ -75,16 +89,23 @@ namespace GameCore
             }
         }
 
+        /// <summary>
+        /// Current behavior:
+        /// - Prefer server cached data (if exists)
+        /// - Otherwise fallback to local/default
+        ///
+        /// If you want "newer save wins", add comparison by LastSavedUnix.
+        /// </summary>
         public static PlayerState LoadServerOrLocalOrDefault()
         {
-            // 1) сервер (из кэша после GetUserAllData)
+            // 1) server (from cache after GetUserAllData)
             if (TryLoadServerCached(out var server))
             {
                 Debug.Log("[SaveSystem] Loaded state from SERVER (cached)");
                 return server;
             }
 
-            // 2) локал fallback
+            // 2) local fallback
             var local = LoadLocalOrDefault();
             Debug.Log("[SaveSystem] Server empty -> fallback to LOCAL/DEFAULT");
             return local;
@@ -98,6 +119,7 @@ namespace GameCore
                 return;
             }
 
+            // Update save timestamp every time we write
             state.LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             try
@@ -126,6 +148,7 @@ namespace GameCore
         }
 
         // -------- SERVER SAVE (iDos) --------
+
         public static void SaveServer(PlayerState state)
         {
             if (state == null)
@@ -134,6 +157,7 @@ namespace GameCore
                 return;
             }
 
+            // Update timestamp before writing
             state.LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             var json = ToJson(state, pretty: false);
@@ -143,6 +167,7 @@ namespace GameCore
 
             try
             {
+                // iDosGames SDK call
                 UserDataService.UpdateCustomUserData(ServerKey, json);
                 Debug.Log("[SaveSystem] UpdateCustomUserData called");
             }
@@ -153,18 +178,19 @@ namespace GameCore
         }
 
         // -------- SERVER LOAD (cached) --------
-        // ВАЖНО: кэш обновляется после UserDataService.RequestUserAllData()
-        // dataKey у тебя это enum/тип CustomUserDataKey
+        // IMPORTANT:
+        // Cache is updated only after UserDataService.RequestUserAllData()
         public static bool TryLoadServerCached(out PlayerState serverState)
         {
             serverState = null;
 
             try
             {
-                // ТУТ ВЫБЕРИ ПРАВИЛЬНЫЙ КЛЮЧ:
-                // Если у тебя есть готовый ключ в enum — используй его.
-                // Например: CustomUserDataKey.player_state_v1
-                // (имя может отличаться)
+                // IMPORTANT:
+                // Make sure the key used here matches SaveServer() key.
+                // If SDK supports string overload, prefer: GetCachedCustomUserData(ServerKey)
+                //
+                // Currently uses enum key:
                 var json = UserDataService.GetCachedCustomUserData(CustomUserDataKey.player_state_v1);
 
                 if (string.IsNullOrWhiteSpace(json))
@@ -187,10 +213,9 @@ namespace GameCore
                 return false;
             }
         }
-
-
     }
 }
+
 
 
 

@@ -5,16 +5,35 @@ using IDosGames;
 
 namespace GameCore
 {
+    /// <summary>
+    /// Global runtime singleton that stores current PlayerState and exposes game actions:
+    /// - currencies, level, chests
+    /// - equipment operations
+    /// - autosave (local + server)
+    ///
+    /// Lifecycle:
+    /// - AutoCreate() ensures a persistent GameInstance exists before any scene loads.
+    /// - Awake() performs "fast bootstrap" from local/default for instant UI.
+    /// - After login + UserDataService.RequestUserAllData() completes,
+    ///   call OnAuthorizedAndDataReady() to load the server cached save.
+    ///
+    /// Events:
+    /// - StateChanged: fired when any part of state changes (currencies, level, etc.)
+    /// - EquipmentChanged: fired when equipment changes specifically (slot UI refresh)
+    /// </summary>
     public class GameInstance : MonoBehaviour
     {
         public static GameInstance I { get; private set; }
 
+        /// <summary>
+        /// Current runtime state. Always call EnsureValid() after loading.
+        /// </summary>
         public PlayerState State { get; private set; }
 
-        // Когда поменялось что-то в стейте (валюты/уровень/сундук/скин и тд)
+        // Fired when any state values changed (currencies/level/chests/skin/etc.)
         public event Action<PlayerState> StateChanged;
 
-        // Когда поменялась экипировка (перерисовать слоты/статы)
+        // Fired when equipment changed (to refresh slot UI/stats)
         public event Action EquipmentChanged;
 
         [Header("Autosave Local")]
@@ -22,10 +41,13 @@ namespace GameCore
         [SerializeField] private float localInterval = 10f;
 
         [Header("Autosave Server")]
-        [SerializeField] private bool serverAutosave = false; // включай после логина
+        [SerializeField] private bool serverAutosave = false; // enable after login
         [SerializeField] private float serverInterval = 60f;
 
+        // Dirty means state was changed and should be saved later.
         private bool _dirty;
+
+        // Timers for autosave intervals
         private float _localTimer;
         private float _serverTimer;
 
@@ -33,6 +55,7 @@ namespace GameCore
         private static void AutoCreate()
         {
             if (I != null) return;
+
             var go = new GameObject("[GameInstance]");
             go.AddComponent<GameInstance>();
             DontDestroyOnLoad(go);
@@ -40,6 +63,7 @@ namespace GameCore
 
         private void Awake()
         {
+            // Singleton enforcement
             if (I != null && I != this)
             {
                 Destroy(gameObject);
@@ -49,7 +73,8 @@ namespace GameCore
             I = this;
             DontDestroyOnLoad(gameObject);
 
-            // быстрый старт до авторизации: local/default
+            // Fast bootstrap for UI: load local save (or default)
+            // This allows the UI to show something immediately even before login.
             ApplyState(SaveSystem.LoadLocalOrDefault(), notify: true);
 
             _dirty = false;
@@ -63,6 +88,7 @@ namespace GameCore
         {
             if (!_dirty) return;
 
+            // Local autosave loop
             if (localAutosave)
             {
                 _localTimer += Time.unscaledDeltaTime;
@@ -70,6 +96,7 @@ namespace GameCore
                     SaveLocalNow();
             }
 
+            // Server autosave loop
             if (serverAutosave)
             {
                 _serverTimer += Time.unscaledDeltaTime;
@@ -81,22 +108,29 @@ namespace GameCore
         // ===================== APPLY / LOGIN =====================
 
         /// <summary>
-        /// Вызывать ПОСЛЕ логина, когда GetUserAllData уже отработал (кэш заполнен).
-        /// Сервер -> источник истины, fallback: local/default.
+        /// Call AFTER login, when GetUserAllData already completed (server cache is filled).
+        /// Server -> source of truth, fallback: local/default.
+        ///
+        /// If you want "newer save wins", modify SaveSystem to compare LastSavedUnix.
         /// </summary>
         public void OnAuthorizedAndDataReady(bool enableServerAutosave = true)
         {
             var loaded = SaveSystem.LoadServerOrLocalOrDefault();
             ApplyState(loaded, notify: true);
 
-            // сохраним локально как “кэш”
+            // Write local copy after server load (for quick startup next time)
             SaveSystem.SaveLocal(State);
 
+            // Enable server autosaves only when the user is authorized
             serverAutosave = enableServerAutosave;
 
             Debug.Log($"[GameInstance] Authorized: state applied. Gold={State.Gold} Level={State.Level} ChestLv={State.ChestLevel} Last={State.LastSavedUnix}");
         }
 
+        /// <summary>
+        /// Applies a new state instance and optionally triggers UI refresh events.
+        /// Also resets autosave timers and dirty flag.
+        /// </summary>
         private void ApplyState(PlayerState newState, bool notify)
         {
             State = newState ?? PlayerState.CreateDefault();
@@ -115,6 +149,9 @@ namespace GameCore
 
         // ===================== SAVE =====================
 
+        /// <summary>
+        /// Marks state as dirty so autosave can persist changes.
+        /// </summary>
         public void MarkDirty()
         {
             _dirty = true;
@@ -141,6 +178,11 @@ namespace GameCore
 
         // ===================== CORE MUTATIONS =====================
 
+        /// <summary>
+        /// Common helper:
+        /// - mark dirty
+        /// - notify StateChanged (so UI can update)
+        /// </summary>
         private void Touch(bool notify = true)
         {
             MarkDirty();
@@ -221,9 +263,15 @@ namespace GameCore
 
         // ===================== EQUIPMENT =====================
 
+        /// <summary>
+        /// Returns itemId for slot or "" if empty.
+        /// </summary>
         public string GetEquippedId(EquipSlot slot)
             => State?.GetEquippedId(slot) ?? "";
 
+        /// <summary>
+        /// Returns ItemDef for equipped itemId (via ItemDatabase) or null if empty/not found.
+        /// </summary>
         public ItemDef GetEquippedDef(EquipSlot slot)
         {
             var id = GetEquippedId(slot);
@@ -234,7 +282,12 @@ namespace GameCore
             => string.IsNullOrWhiteSpace(GetEquippedId(slot));
 
         /// <summary>
-        /// Экипировать itemId в слот. (перезапишет текущий предмет)
+        /// Equip itemId into slot (overwrites current).
+        /// Validates:
+        /// - item exists in DB
+        /// - item.Slot matches target slot
+        ///
+        /// Also triggers EquipmentChanged and StateChanged.
         /// </summary>
         public bool EquipItem(EquipSlot slot, string itemId, bool immediateSave = false)
         {
@@ -263,6 +316,9 @@ namespace GameCore
             return true;
         }
 
+        /// <summary>
+        /// Clears a slot.
+        /// </summary>
         public void Unequip(EquipSlot slot, bool immediateSave = false)
         {
             if (State == null) return;
@@ -276,7 +332,12 @@ namespace GameCore
         }
 
         /// <summary>
-        /// Продать предмет (не обязан быть экипнут).
+        /// Sell an item (does not require it to be equipped).
+        /// Adds gems and saves optionally.
+        ///
+        /// NOTE:
+        /// Currently you don't have "inventory ownership", so selling does not remove anything.
+        /// Later you can add OwnedItems[] and remove from there.
         /// </summary>
         public void SellItem(ItemDef item, bool immediateSave = false)
         {
@@ -291,7 +352,9 @@ namespace GameCore
         }
 
         /// <summary>
-        /// Для твоего сундука: если слот пустой — автоэкип, иначе вернёт false (чтобы UI показал сравнение).
+        /// Helper for chest flow:
+        /// If target slot is empty -> equip automatically.
+        /// If not empty -> returns false so UI can show comparison (Replace/Sell).
         /// </summary>
         public bool TryAutoEquipIfEmpty(ItemDef newItem, bool immediateSave = false)
         {
@@ -310,13 +373,30 @@ namespace GameCore
             return true;
         }
 
+        /// <summary>
+        /// Manual event trigger if some external system changed the state.
+        /// Use carefully; prefer calling methods that already call Touch()/MarkDirty().
+        /// </summary>
         public void NotifyStateChangedExternal()
         {
             StateChanged?.Invoke(State);
         }
 
+        public void DevResetProgress(bool enableServerAutosave = true)
+        {
+            var fresh = PlayerState.CreateDefault();
+            ApplyState(fresh, notify: true);
+
+            SaveSystem.DeleteLocal();
+            SaveAllNow();
+
+            serverAutosave = enableServerAutosave;
+
+            Debug.Log("[GameInstance] DEV RESET DONE (local+server overwritten)");
+        }
     }
 }
+
 
 
 

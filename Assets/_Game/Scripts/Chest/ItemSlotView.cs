@@ -5,9 +5,21 @@ using GameCore.Items;
 
 namespace GameCore.UI
 {
+    /// <summary>
+    /// UI view for one equipment slot.
+    ///
+    /// Responsibilities:
+    /// - Knows which EquipSlot it represents (e.g. Head/Body/Weapon)
+    /// - Subscribes to GameInstance.StateChanged
+    /// - Updates icon/rarity/label based on currently equipped itemId
+    ///
+    /// It does not equip items by itself; it's just a view.
+    /// (You can later add OnClick to open inventory or open chest UI.)
+    /// </summary>
     public class ItemSlotView : MonoBehaviour
     {
         [Header("Slot")]
+        // Which slot this view represents
         [SerializeField] private EquipSlot slot;
 
         [Header("UI")]
@@ -17,18 +29,24 @@ namespace GameCore.UI
 
         private void OnEnable()
         {
+            // Subscribe to state changes (currencies, equipment, etc.)
             if (GameCore.GameInstance.I != null)
                 GameCore.GameInstance.I.StateChanged += OnStateChanged;
 
+            // Force an immediate refresh when enabled
             OnStateChanged(GameCore.GameInstance.I?.State);
         }
 
         private void OnDisable()
         {
+            // Unsubscribe (avoid memory leaks / double subscriptions)
             if (GameCore.GameInstance.I != null)
                 GameCore.GameInstance.I.StateChanged -= OnStateChanged;
         }
 
+        /// <summary>
+        /// Refreshes the UI when the PlayerState changes.
+        /// </summary>
         private void OnStateChanged(GameCore.PlayerState s)
         {
             if (s == null)
@@ -37,44 +55,59 @@ namespace GameCore.UI
                 return;
             }
 
-            var id = s.GetEquippedId(slot);
+            // Resolve equipped item
+            var id = GameCore.GameInstance.I.GetEquippedId(slot);
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 SetEmpty();
                 return;
             }
 
-            var def = ItemDatabase.I != null ? ItemDatabase.I.GetById(id) : null;
+            var def = ItemDatabase.I.GetById(id);
             if (def == null)
             {
+                // If itemId is unknown (DB changed), treat as empty.
                 SetEmpty();
                 return;
             }
 
+            // ----- Filled UI -----
             if (icon)
             {
-                icon.enabled = true;
                 icon.sprite = def.Icon;
-                icon.color = Color.white;
+                icon.enabled = (def.Icon != null);
             }
 
             if (rarity)
             {
-                rarity.enabled = def.IconRarity != null;
                 rarity.sprite = def.IconRarity;
-                rarity.color = Color.white;
+                rarity.enabled = (def.IconRarity != null);
             }
 
             if (labelText)
-                labelText.text = $"{def.Rarity}";
+                labelText.text = def.DisplayName;
         }
 
+        /// <summary>
+        /// Empty UI state.
+        ///
+        /// IMPORTANT UX NOTE:
+        /// Right now you disable the icon image completely.
+        /// If you want "slots visible even when empty", you should:
+        /// - keep a background frame always visible, OR
+        /// - set an 'empty sprite' (plus icon), OR
+        /// - reduce alpha instead of disabling.
+        /// </summary>
         private void SetEmpty()
         {
             if (icon)
             {
                 icon.sprite = null;
-                icon.enabled = false; // или оставь true и ставь прозрачность
+
+                // Current behavior: icon completely disappears when empty.
+                // Alternative: keep it enabled and set a placeholder sprite or alpha.
+                icon.enabled = false; // or keep true and set transparency
             }
 
             if (rarity)
@@ -88,5 +121,6 @@ namespace GameCore.UI
         }
     }
 }
+
 
 
