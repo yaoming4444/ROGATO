@@ -1,7 +1,8 @@
+using GameCore.Items;
+using GameCore.Progression;
+using IDosGames;
 using System;
 using UnityEngine;
-using GameCore.Items;
-using IDosGames;
 
 namespace GameCore
 {
@@ -11,15 +12,9 @@ namespace GameCore
     /// - equipment operations
     /// - autosave (local + server)
     ///
-    /// Lifecycle:
-    /// - AutoCreate() ensures a persistent GameInstance exists before any scene loads.
-    /// - Awake() performs "fast bootstrap" from local/default for instant UI.
-    /// - After login + UserDataService.RequestUserAllData() completes,
-    ///   call OnAuthorizedAndDataReady() to load the server cached save.
-    ///
-    /// Events:
-    /// - StateChanged: fired when any part of state changes (currencies, level, etc.)
-    /// - EquipmentChanged: fired when equipment changes specifically (slot UI refresh)
+    /// NEW:
+    /// - Loads LevelProgression from Resources (because GameInstance is runtime-created)
+    /// - AddExp() now uses LevelProgression to auto level-up with thresholds
     /// </summary>
     public class GameInstance : MonoBehaviour
     {
@@ -43,6 +38,12 @@ namespace GameCore
         [Header("Autosave Server")]
         [SerializeField] private bool serverAutosave = false; // enable after login
         [SerializeField] private float serverInterval = 60f;
+
+        [Header("Progression")]
+        [Tooltip("If null (runtime-created instance), it will be loaded from Resources/LevelProgression.asset")]
+        [SerializeField] private LevelProgression levelProgression;
+
+        private const string LevelProgResourcePath = "LevelProgression";
 
         // Dirty means state was changed and should be saved later.
         private bool _dirty;
@@ -73,8 +74,15 @@ namespace GameCore
             I = this;
             DontDestroyOnLoad(gameObject);
 
+            // Auto-load LevelProgression because GameInstance is runtime-created (no Inspector refs)
+            if (levelProgression == null)
+            {
+                levelProgression = Resources.Load<LevelProgression>(LevelProgResourcePath);
+                if (levelProgression == null)
+                    Debug.LogError($"[GameInstance] LevelProgression not found: Resources/{LevelProgResourcePath}.asset");
+            }
+
             // Fast bootstrap for UI: load local save (or default)
-            // This allows the UI to show something immediately even before login.
             ApplyState(SaveSystem.LoadLocalOrDefault(), notify: true);
 
             _dirty = false;
@@ -110,8 +118,6 @@ namespace GameCore
         /// <summary>
         /// Call AFTER login, when GetUserAllData already completed (server cache is filled).
         /// Server -> source of truth, fallback: local/default.
-        ///
-        /// If you want "newer save wins", modify SaveSystem to compare LastSavedUnix.
         /// </summary>
         public void OnAuthorizedAndDataReady(bool enableServerAutosave = true)
         {
@@ -124,7 +130,7 @@ namespace GameCore
             // Enable server autosaves only when the user is authorized
             serverAutosave = enableServerAutosave;
 
-            Debug.Log($"[GameInstance] Authorized: state applied. Gold={State.Gold} Level={State.Level} ChestLv={State.ChestLevel} Last={State.LastSavedUnix}");
+            Debug.Log($"[GameInstance] Authorized: state applied. Gold={State.Gold} Level={State.Level} Exp={State.Exp} ChestLv={State.ChestLevel} Last={State.LastSavedUnix}");
         }
 
         /// <summary>
@@ -262,8 +268,11 @@ namespace GameCore
         }
 
         /// <summary>
-        /// Adds EXP to the player. Optionally triggers immediate save.
-        /// If you later add an EXP-to-level curve, this method is the best place to handle level ups.
+        /// Adds EXP to the player and auto-levels up using LevelProgression thresholds.
+        /// Behavior:
+        /// - Exp is TOTAL exp (not "exp inside level")
+        /// - When total exp reaches threshold for next level -> Level increments
+        /// - Exp is NOT reduced on level up (like many idle games)
         /// </summary>
         public void AddExp(int amount, bool immediateSave = false)
         {
@@ -272,8 +281,15 @@ namespace GameCore
 
             State.Exp += amount;
 
-            // OPTIONAL: auto-level up if you introduce a requirement:
-            // while (State.Exp >= GetExpToNextLevel(State.Level)) { State.Exp -= GetExpToNextLevel(State.Level); State.Level++; }
+            // Auto-level-up via LevelProgression (if exists)
+            if (levelProgression != null)
+            {
+                // while we can level up
+                while (levelProgression.CanLevelUp(State.Level, State.Exp))
+                {
+                    State.Level += 1;
+                }
+            }
 
             Touch(); // MarkDirty + StateChanged
 
@@ -282,22 +298,16 @@ namespace GameCore
 
         // ===================== EQUIPMENT =====================
 
-        /// <summary>
-        /// Returns itemId for slot or "" if empty.
-        /// </summary>
         public string GetEquippedId(EquipSlot slot)
             => State?.GetEquippedId(slot) ?? "";
 
-        /// <summary>
-        /// Returns ItemDef for equipped itemId (via ItemDatabase) or null if empty/not found.
-        /// </summary>
         public ItemDef GetEquippedDef(EquipSlot slot)
         {
             var id = GetEquippedId(slot);
             if (string.IsNullOrWhiteSpace(id)) return null;
 
             var db = ItemDatabase.I;
-            if (db == null) return null; // <-- FIX: DB not ready yet
+            if (db == null) return null;
 
             return db.GetById(id);
         }
@@ -305,14 +315,6 @@ namespace GameCore
         public bool IsSlotEmpty(EquipSlot slot)
             => string.IsNullOrWhiteSpace(GetEquippedId(slot));
 
-        /// <summary>
-        /// Equip itemId into slot (overwrites current).
-        /// Validates:
-        /// - item exists in DB
-        /// - item.Slot matches target slot
-        ///
-        /// Also triggers EquipmentChanged and StateChanged.
-        /// </summary>
         public bool EquipItem(EquipSlot slot, string itemId, bool immediateSave = false)
         {
             if (State == null) return false;
@@ -340,9 +342,6 @@ namespace GameCore
             return true;
         }
 
-        /// <summary>
-        /// Clears a slot.
-        /// </summary>
         public void Unequip(EquipSlot slot, bool immediateSave = false)
         {
             if (State == null) return;
@@ -355,14 +354,6 @@ namespace GameCore
             if (immediateSave) SaveAllNow();
         }
 
-        /// <summary>
-        /// Sell an item (does not require it to be equipped).
-        /// Adds gems and saves optionally.
-        ///
-        /// NOTE:
-        /// Currently you don't have "inventory ownership", so selling does not remove anything.
-        /// Later you can add OwnedItems[] and remove from there.
-        /// </summary>
         public void SellItem(ItemDef item, bool immediateSave = false)
         {
             if (State == null || item == null) return;
@@ -375,11 +366,6 @@ namespace GameCore
             if (immediateSave) SaveAllNow();
         }
 
-        /// <summary>
-        /// Helper for chest flow:
-        /// If target slot is empty -> equip automatically.
-        /// If not empty -> returns false so UI can show comparison (Replace/Sell).
-        /// </summary>
         public bool TryAutoEquipIfEmpty(ItemDef newItem, bool immediateSave = false)
         {
             if (State == null || newItem == null) return false;
@@ -397,10 +383,6 @@ namespace GameCore
             return true;
         }
 
-        /// <summary>
-        /// Manual event trigger if some external system changed the state.
-        /// Use carefully; prefer calling methods that already call Touch()/MarkDirty().
-        /// </summary>
         public void NotifyStateChangedExternal()
         {
             StateChanged?.Invoke(State);
@@ -420,6 +402,7 @@ namespace GameCore
         }
     }
 }
+
 
 
 

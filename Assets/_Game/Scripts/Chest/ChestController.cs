@@ -44,7 +44,7 @@ namespace GameCore.UI
                 return;
 
             // 2) даём опыт
-            gi.AddExp(5, immediateSave: false);
+            gi.AddExp(10, immediateSave: false);
 
             // 3) роллим предмет
             var rolled = ChestService.Roll(dropTable);
