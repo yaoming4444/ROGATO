@@ -26,6 +26,8 @@ namespace GameCore.UI
 
         private ItemDef _newItem;
 
+        public System.Action OnDecisionMade; // Equip èëè Sell // Chest Animation
+
         private void Awake()
         {
             // ÂÀÆÍÎ: ÍÅ Hide() çäåñü!
@@ -142,6 +144,7 @@ namespace GameCore.UI
 
             gi.EquipItem(_newItem.Slot, _newItem.Id, immediateSave: true);
             Hide();
+            OnDecisionMade?.Invoke();
         }
 
         private void OnSell()
@@ -151,6 +154,7 @@ namespace GameCore.UI
 
             gi.SellItem(_newItem, immediateSave: true);
             Hide();
+            OnDecisionMade?.Invoke();
         }
 
         private string FormatStats(ItemDef it)

@@ -2,20 +2,6 @@ using UnityEngine;
 
 namespace GameCore.Items
 {
-    /// <summary>
-    /// One item definition (ScriptableObject).
-    /// You create many of these and put them into ItemDatabase.
-    ///
-    /// Fields:
-    /// - Id: unique string used for saving/loading (stored in PlayerState.Equipped)
-    /// - DisplayName: UI name
-    /// - Slot: which equipment slot it fits into
-    /// - Rarity: used for chest rolling and UI
-    /// - Stats: base stats added to player
-    /// - ExtraStats: optional extra bonuses (like crit chance, etc.)
-    /// - SellGems: how many gems you get when selling
-    /// - Icon/IconRarity: UI visuals
-    /// </summary>
     [CreateAssetMenu(menuName = "Game/Items/ItemDef", fileName = "ItemDef_")]
     public class ItemDef : ScriptableObject
     {
@@ -27,6 +13,10 @@ namespace GameCore.Items
         [SerializeField] private EquipSlot slot;
         [SerializeField] private Rarity rarity;
 
+        [Header("Power (for income / score)")]
+        [Min(0)]
+        [SerializeField] private int power = 0;
+
         [Header("Base Stats")]
         [SerializeField] private ItemStats stats;
 
@@ -34,6 +24,7 @@ namespace GameCore.Items
         [SerializeField] private ExtraStat[] extraStats;
 
         [Header("Economy")]
+        [Min(0)]
         [SerializeField] private int sellGems = 1;
 
         [Header("UI")]
@@ -44,25 +35,30 @@ namespace GameCore.Items
         public string DisplayName => displayName;
         public EquipSlot Slot => slot;
         public Rarity Rarity => rarity;
+
+        public int Power => power;
+
         public ItemStats Stats => stats;
         public int SellGems => sellGems;
+
         public Sprite Icon => icon;
         public Sprite IconRarity => iconRarity;
+
         public ExtraStat[] ExtraStats => extraStats;
 
 #if UNITY_EDITOR
-        /// <summary>
-        /// Editor-only: if id is empty, automatically set it to asset name.
-        /// This helps avoid forgetting to assign ids manually.
-        /// </summary>
         private void OnValidate()
         {
-            if (!string.IsNullOrWhiteSpace(id)) return;
-            id = name.Trim();
+            if (string.IsNullOrWhiteSpace(id))
+                id = name.Trim();
+
+            if (power < 0) power = 0;
+            if (sellGems < 0) sellGems = 0;
         }
 #endif
     }
 }
+
 
 
 
