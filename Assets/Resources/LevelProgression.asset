@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: LevelProgression
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Progression.LevelProgression
   startLevel: 1
-  expToNext: 96000000960000009600000096000000960000009600000096000000
+  expToNext: 96000000960000009600000096000000960000005802000096000000

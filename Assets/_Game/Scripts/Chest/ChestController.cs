@@ -11,12 +11,20 @@ namespace GameCore.UI
         [Header("Chest Button Animation")]
         [SerializeField] private ChestAnimDriver chestAnim;
 
+        private bool _busy;              // защита от спама кликов
+        private ItemDef _pendingItem;    // предмет, который ждЄт показа попапа
+
         private void Awake()
         {
+            // попап лучше держать выключенным по умолчанию в сцене,
+            // но на вс€кий случай выключим здесь.
+            if (popup != null && popup.gameObject.activeSelf)
+                popup.gameObject.SetActive(false);
+
             // „тобы после Equip/Sell возвращать сундук в Idle
             if (popup != null)
             {
-                popup.OnDecisionMade -= OnPopupDecision; // на вс€кий случай от дублей
+                popup.OnDecisionMade -= OnPopupDecision;
                 popup.OnDecisionMade += OnPopupDecision;
             }
         }
@@ -29,12 +37,18 @@ namespace GameCore.UI
 
         private void OnPopupDecision()
         {
+            // игрок прин€л решение => возвращаем сундук в idle и снимаем busy
             if (chestAnim != null)
                 chestAnim.ResetToIdle();
+
+            _pendingItem = null;
+            _busy = false;
         }
 
         public void OpenChest()
         {
+            if (_busy) return;
+
             var gi = GameCore.GameInstance.I;
             if (gi == null || dropTable == null || popup == null)
                 return;
@@ -42,6 +56,8 @@ namespace GameCore.UI
             // 1) сначала тратим сундук
             if (!gi.SpendChest(1, immediateSave: false))
                 return;
+
+            _busy = true;
 
             // 2) даЄм опыт
             gi.AddExp(10, immediateSave: false);
@@ -53,21 +69,40 @@ namespace GameCore.UI
             {
                 Debug.LogWarning("[Chest] Rolled null item (db pool empty?)");
                 gi.SaveAllNow();
+                _busy = false;
                 return;
             }
 
-            // 4) запускаем анимацию сундука + иконка поверх (в конце анимации)
-            if (chestAnim != null)
-                chestAnim.PlayOpen(item.Icon);
+            _pendingItem = item;
 
-            // 5) показываем попап
-            popup.Show(item);
+            // 4) на вс€кий случай спр€чем попап (если вдруг был открыт)
+            if (popup.gameObject.activeSelf)
+                popup.Hide();
+
+            // 5) запускаем анимацию сундука; попап покажем “ќЋ№ ќ ѕќ—Ћ≈ окончани€
+            if (chestAnim != null)
+            {
+                chestAnim.PlayOpen(item.Icon, onOpened: () =>
+                {
+                    // защита: вдруг уже сбросили/сменили
+                    if (_pendingItem == null) { _busy = false; return; }
+
+                    popup.Show(_pendingItem);
+                    // busy снимем только когда игрок нажмЄт Equip/Sell (OnDecisionMade)
+                });
+            }
+            else
+            {
+                // если анимации нет Ч показываем сразу
+                popup.Show(item);
+            }
 
             // 6) сохран€ем
             gi.SaveAllNow();
         }
     }
 }
+
 
 
 

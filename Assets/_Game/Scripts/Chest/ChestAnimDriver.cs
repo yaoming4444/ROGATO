@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,8 @@ public class ChestAnimDriver : MonoBehaviour
 
     private Coroutine _c;
 
+    public bool IsPlayingOpen { get; private set; }
+
     private void Awake()
     {
         if (!anim) anim = GetComponent<Animator>();
@@ -23,19 +26,24 @@ public class ChestAnimDriver : MonoBehaviour
     }
 
     /// <summary>
-    /// Запускаем анимацию открытия и (опционально) покажем иконку после openDuration.
-    /// В конце мы НЕ возвращаемся в idle — остаёмся на последнем кадре Open.
+    /// Запускаем анимацию открытия.
+    /// После openDuration:
+    /// - показываем иконку (если включено)
+    /// - вызываем onOpened()
+    /// В idle НЕ возвращаемся — остаёмся на последнем кадре Open.
     /// </summary>
-    public void PlayOpen(Sprite droppedSprite)
+    public void PlayOpen(Sprite droppedSprite, Action onOpened = null)
     {
         if (!anim) return;
 
         if (_c != null) StopCoroutine(_c);
-        _c = StartCoroutine(CoOpen(droppedSprite));
+        _c = StartCoroutine(CoOpen(droppedSprite, onOpened));
     }
 
-    private IEnumerator CoOpen(Sprite droppedSprite)
+    private IEnumerator CoOpen(Sprite droppedSprite, Action onOpened)
     {
+        IsPlayingOpen = true;
+
         HideDropIcon();
 
         // Жёсткий reset, чтобы open стартовал с нуля
@@ -47,10 +55,15 @@ public class ChestAnimDriver : MonoBehaviour
         // ждём конец открытия
         yield return new WaitForSecondsRealtime(openDuration);
 
-        // останемся на последнем кадре ChestOpen (ничего не делаем)
-        // и покажем иконку поверх сундука
+        // останемся на последнем кадре ChestOpen
         if (showIconAfterOpen)
             ShowDropIcon(droppedSprite);
+
+        IsPlayingOpen = false;
+        _c = null;
+
+        // сигнал наружу: "анимация закончилась, можно показывать попап"
+        onOpened?.Invoke();
     }
 
     public void ResetToIdle()
@@ -61,6 +74,7 @@ public class ChestAnimDriver : MonoBehaviour
             _c = null;
         }
 
+        IsPlayingOpen = false;
         HideDropIcon();
 
         if (!anim) return;
@@ -86,5 +100,6 @@ public class ChestAnimDriver : MonoBehaviour
         dropIcon.sprite = null;
     }
 }
+
 
 
