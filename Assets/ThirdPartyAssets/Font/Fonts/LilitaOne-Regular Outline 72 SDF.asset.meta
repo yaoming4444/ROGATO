@@ -1,5 +1,11 @@
 fileFormatVersion: 2
 guid: b741db7ac3d1c423aad5b49a9780ca2d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
   productId: 293814
@@ -8,9 +14,3 @@ AssetOrigin:
   assetPath: Assets/BulletHellTemplate/ThirdPartyResources/Font/Fonts/LilitaOne-Regular
     Outline 72 SDF.asset
   uploadId: 816960
-NativeFormatImporter:
-  externalObjects: {}
-  mainObjectFileID: 0
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 

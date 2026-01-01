@@ -1,5 +1,11 @@
 fileFormatVersion: 2
 guid: 5c5ee151f9307453bad78be36b51a077
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
   productId: 293814
@@ -8,9 +14,3 @@ AssetOrigin:
   assetPath: Assets/BulletHellTemplate/ThirdPartyResources/Font/Resources/LilitaOne-Regular
     Outline 64 SDF.asset
   uploadId: 816960
-NativeFormatImporter:
-  externalObjects: {}
-  mainObjectFileID: 0
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
