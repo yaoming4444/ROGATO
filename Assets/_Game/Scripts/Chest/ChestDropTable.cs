@@ -4,98 +4,125 @@ using UnityEngine;
 
 namespace GameCore.Items
 {
-    /// <summary>
-    /// ScriptableObject that defines chest rarity chances per "Chest Level".
-    ///
-    /// You can create this asset via:
-    /// Assets -> Create -> Game -> Chest -> ChestDropTable
-    ///
-    /// At runtime we call RollRarity(chestLevel) to roll an item rarity based on:
-    ///  - the current player's ChestLevel
-    ///  - the configured chance weights for that level
-    ///
-    /// NOTE:
-    /// - "Chance" is treated as a weight (not necessarily summing to 100).
-    /// - If the level is not found, we fallback to the closest/first entry.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Game/Chest/ChestDropTable", fileName = "ChestDropTable")]
+    [CreateAssetMenu(menuName = "Game/Chests/Chest Drop Table", fileName = "ChestDropTable")]
     public class ChestDropTable : ScriptableObject
     {
         [Serializable]
-        public struct RarityChance
+        public struct RarityWeight
         {
-            public Rarity Rarity;
-
-            // Weight in percent-like units (we treat it as a weight).
-            // Example: 80 + 15 + 5 = 100, but it can be any positive values.
-            [Range(0, 100)] public float Chance; // %
+            public Rarity rarity;
+            [Min(0f)] public float weight; // можно считать как "проценты", можно как "веса"
         }
 
         [Serializable]
-        public struct LevelEntry
+        public class LevelEntry
         {
-            public int Level;
+            [Min(1)] public int level = 1;
 
-            // A list of rarity weights for this chest level.
-            public List<RarityChance> Chances;
+            [Header("Upgrade cost to reach THIS level (optional)")]
+            [Min(0)] public int upgradeCostGems = 0;
+
+            [Header("Rarity rules")]
+            public Rarity minRarity = Rarity.G; // на высоких уровн€х ставишь например E/A/S и т.д.
+
+            [Tooltip("Weights for each rarity. Rarities below minRarity are ignored.")]
+            public List<RarityWeight> weights = new();
         }
 
-        [Header("Levels")]
-        [SerializeField] private List<LevelEntry> levels = new List<LevelEntry>();
+        [SerializeField] private List<LevelEntry> levels = new();
 
-        /// <summary>
-        /// Rolls a rarity for a given chest level.
-        /// Logic:
-        /// 1) Find matching LevelEntry.
-        /// 2) Compute total positive weight sum.
-        /// 3) Roll random in [0..sum)
-        /// 4) Walk cumulative weights and pick the first that crosses the roll.
-        ///
-        /// If configuration is invalid/empty, returns the lowest rarity (G) as a safe fallback.
-        /// </summary>
-        public Rarity RollRarity(int chestLevel)
+        public int MaxLevel => levels == null ? 1 : Mathf.Max(1, levels.Count > 0 ? levels[^1].level : 1);
+
+        public bool IsMaxLevel(int lvl) => lvl >= MaxLevel;
+
+        public LevelEntry GetLevel(int lvl)
         {
-            if (levels == null || levels.Count == 0)
-                return Rarity.G;
+            if (levels == null || levels.Count == 0) return null;
 
-            // Find best matching entry.
-            // If exact level not found, we fallback to first entry (simple behavior).
-            LevelEntry entry = levels[0];
+            // берЄм самый близкий <= lvl (если lvl больше max Ч вернЄм max)
+            LevelEntry best = levels[0];
             for (int i = 0; i < levels.Count; i++)
             {
-                if (levels[i].Level == chestLevel)
-                {
-                    entry = levels[i];
-                    break;
-                }
+                var e = levels[i];
+                if (e == null) continue;
+                if (e.level <= lvl) best = e;
+                else break;
             }
+            return best;
+        }
 
-            // If this entry has no chances, fallback.
-            if (entry.Chances == null || entry.Chances.Count == 0)
+        public int GetUpgradeCostGems(int targetLevel)
+        {
+            var e = GetLevel(targetLevel);
+            return e != null ? e.upgradeCostGems : 0;
+        }
+
+        public Rarity GetMinRarity(int lvl)
+        {
+            var e = GetLevel(lvl);
+            return e != null ? e.minRarity : Rarity.G;
+        }
+
+        public Rarity RollRarity(int chestLevel)
+        {
+            var e = GetLevel(chestLevel);
+            if (e == null || e.weights == null || e.weights.Count == 0)
                 return Rarity.G;
 
-            // Sum all non-negative weights.
+            // собираем только допустимые (>= minRarity)
             float sum = 0f;
-            for (int i = 0; i < entry.Chances.Count; i++)
-                sum += Mathf.Max(0f, entry.Chances[i].Chance);
+            for (int i = 0; i < e.weights.Count; i++)
+            {
+                var w = e.weights[i];
+                if ((int)w.rarity < (int)e.minRarity) continue;
+                if (w.weight <= 0f) continue;
+                sum += w.weight;
+            }
 
             if (sum <= 0f)
-                return Rarity.G;
+                return e.minRarity; // если всЄ нули Ч хот€ бы minRarity
 
-            // Roll in [0..sum)
-            float r = UnityEngine.Random.Range(0f, sum);
+            float roll = UnityEngine.Random.value * sum;
             float acc = 0f;
 
-            for (int i = 0; i < entry.Chances.Count; i++)
+            for (int i = 0; i < e.weights.Count; i++)
             {
-                acc += Mathf.Max(0f, entry.Chances[i].Chance);
-                if (r <= acc) return entry.Chances[i].Rarity;
+                var w = e.weights[i];
+                if ((int)w.rarity < (int)e.minRarity) continue;
+                if (w.weight <= 0f) continue;
+
+                acc += w.weight;
+                if (roll <= acc)
+                    return w.rarity;
             }
 
-            // Fallback (should not happen, but safe)
-            return entry.Chances[entry.Chances.Count - 1].Rarity;
+            return e.minRarity;
+        }
+
+        // ƒл€ UI: шанс в % (нормализованный)
+        public float GetChancePercent(int chestLevel, Rarity rarity)
+        {
+            var e = GetLevel(chestLevel);
+            if (e == null || e.weights == null || e.weights.Count == 0) return 0f;
+            if ((int)rarity < (int)e.minRarity) return 0f;
+
+            float sum = 0f;
+            float val = 0f;
+
+            foreach (var w in e.weights)
+            {
+                if ((int)w.rarity < (int)e.minRarity) continue;
+                if (w.weight <= 0f) continue;
+
+                sum += w.weight;
+                if (w.rarity == rarity) val += w.weight;
+            }
+
+            if (sum <= 0f) return 0f;
+            return (val / sum) * 100f;
         }
     }
 }
+
 
 

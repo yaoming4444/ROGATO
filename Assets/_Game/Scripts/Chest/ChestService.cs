@@ -33,22 +33,20 @@ namespace GameCore.Items
         /// </summary>
         public static RolledItem Roll(ChestDropTable table)
         {
-            // Random slot (currently hard-coded 0..12).
-            // NOTE: If you add/remove slots, it is safer to use PlayerState.SlotCount.
-            var slot = (EquipSlot)Random.Range(0, 12);
+            var slot = (EquipSlot)UnityEngine.Random.Range(0, 12);
 
-            // Chest level comes from PlayerState.
-            var chestLevel = GameCore.GameInstance.I.State.ChestLevel;
+            var gi = GameCore.GameInstance.I;
+            var chestLevel = gi != null ? gi.State.ChestLevel : 1;
 
-            // Roll rarity based on chest level.
             var rarity = table.RollRarity(chestLevel);
+            var minRarity = table.GetMinRarity(chestLevel);
 
-            // Try to get random item from the DB pool (slot+rarity).
-            // If pool is empty, downgrade rarity and retry up to 9 times.
             var item = ItemDatabase.I.GetRandomFromPool(slot, rarity);
 
-            for (int i = 0; i < 9 && item == null; i++)
+            // даунгрейдим, но НЕ ниже minRarity
+            for (int i = 0; i < 20 && item == null; i++)
             {
+                if ((int)rarity <= (int)minRarity) break;
                 rarity = Downgrade(rarity);
                 item = ItemDatabase.I.GetRandomFromPool(slot, rarity);
             }

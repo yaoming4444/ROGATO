@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: ChestDropTable
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Items.ChestDropTable
   levels:
-  - Level: 1
-    Chances:
-    - Rarity: 0
-      Chance: 100
+  - level: 1
+    upgradeCostGems: 0
+    minRarity: 0
+    weights:
+    - rarity: 0
+      weight: 100

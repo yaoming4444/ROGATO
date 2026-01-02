@@ -267,6 +267,26 @@ namespace GameCore
             if (immediateSave) SaveAllNow();
         }
 
+        public bool TryUpgradeChest(ChestDropTable table, bool immediateSave = false)
+        {
+            if (State == null || table == null) return false;
+
+            int cur = Mathf.Max(1, State.ChestLevel);
+            if (table.IsMaxLevel(cur)) return false;
+
+            int next = cur + 1;
+            int cost = table.GetUpgradeCostGems(next);
+
+            if (!SpendGems(cost, immediateSave: false))
+                return false;
+
+            State.ChestLevel = next;
+
+            Touch();              // dirty + StateChanged
+            if (immediateSave) SaveAllNow();
+            return true;
+        }
+
         /// <summary>
         /// Adds EXP to the player and auto-levels up using LevelProgression thresholds.
         /// Behavior:
