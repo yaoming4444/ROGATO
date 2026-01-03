@@ -52,6 +52,9 @@ namespace GameCore
         private float _localTimer;
         private float _serverTimer;
 
+        // Chest
+        public bool AutoSellEnabled => State != null && State.AutoSellEnabled;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
         {
@@ -285,6 +288,17 @@ namespace GameCore
             Touch();              // dirty + StateChanged
             if (immediateSave) SaveAllNow();
             return true;
+        }
+
+        public void SetAutoSellEnabled(bool enabled, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.AutoSellEnabled = enabled;
+            MarkDirty();
+            StateChanged?.Invoke(State);
+
+            if (immediateSave) SaveAllNow();
         }
 
         /// <summary>

@@ -121,6 +121,22 @@ namespace GameCore.Items
             if (sum <= 0f) return 0f;
             return (val / sum) * 100f;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (levels == null) return;
+
+            // Сортируем по level
+            levels.Sort((a, b) =>
+            {
+                int la = a != null ? a.level : int.MaxValue;
+                int lb = b != null ? b.level : int.MaxValue;
+                return la.CompareTo(lb);
+            });
+        }
+#endif
+
     }
 }
 

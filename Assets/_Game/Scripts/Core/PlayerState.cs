@@ -36,6 +36,7 @@ namespace GameCore
 
         // -------- Equipment & Chest --------
         public int ChestLevel = 1;
+        public bool AutoSellEnabled = false;
 
         // Stores itemId for each slot. Empty string means slot is empty.
         public string[] Equipped;
@@ -57,10 +58,11 @@ namespace GameCore
                 Level = 1,
                 Exp = 0,
                 Gold = 100,
-                Gems = 0,
+                Gems = 30,
                 Chests = 200,
                 SelectedSkinId = "default",
                 ChestLevel = 1,
+                AutoSellEnabled = false,
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 

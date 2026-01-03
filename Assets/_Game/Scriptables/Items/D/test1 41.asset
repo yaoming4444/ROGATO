@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bd8e2cdfbad2b240b70f642f0060673, type: 3}
+  m_Name: test1 41
+  m_EditorClassIdentifier: Assembly-CSharp::GameCore.Items.ItemDef
+  id: wpn_gloves_g_04
+  displayName: Gloves
+  slot: 5
+  rarity: 3
+  power: 20
+  stats:
+    Atk: 10
+    Def: 20
+    Hp: 30
+  extraStats: []
+  sellGems: 1
+  icon: {fileID: 21300000, guid: b24b88b28c170c541bd1ba7328631066, type: 3}
+  iconRarity: {fileID: 21300000, guid: 75c0293400e921343ab97194e441f2fd, type: 3}
