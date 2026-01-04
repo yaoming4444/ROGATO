@@ -1,27 +1,13 @@
 using GameCore.Items;
-using GameCore.Visual;
 using System;
+using UnityEngine;
 
 namespace GameCore
 {
-    /// <summary>
-    /// Serializable player save data (local + server).
-    ///
-    /// Stored fields:
-    /// - progression: Level, Exp
-    /// - currencies: Gold, Gems, Chests
-    /// - cosmetics: SelectedSkinId
-    /// - chest progression: ChestLevel
-    /// - equipment: Equipped[] holds itemIds (empty string means "no item")
-    /// - LastSavedUnix: unix timestamp used to decide which save is newer
-    ///
-    /// IMPORTANT:
-    /// Equipped array indexes must match EquipSlot enum values.
-    /// </summary>
     [Serializable]
     public class PlayerState
     {
-        public int Version = 2;
+        public int Version = 3;
 
         // -------- Core progression --------
         public int Level = 1;
@@ -35,42 +21,77 @@ namespace GameCore
         // -------- Cosmetics --------
         public string SelectedSkinId = "default";
 
-        // -------- Equipment & Chest --------
+        // -------- Chest --------
         public int ChestLevel = 1;
         public bool AutoSellEnabled = false;
 
         // Stores itemId for each slot. Empty string means slot is empty.
         public string[] Equipped;
 
-        // NEW: visual equipment (Spine skin names). Empty = nothing equipped for that visual slot.
-        public string[] VisualEquipped;
-
         // Unix timestamp of last save; used for "newer save wins" logic.
         public long LastSavedUnix = 0;
 
         // Number of slots in EquipSlot enum.
         public static int SlotCount => Enum.GetValues(typeof(EquipSlot)).Length;
-        public static int VisualSlotCount => Enum.GetValues(typeof(VisualSlot)).Length;
 
-        // PlayerState.cs
-        public string visual_back;
-        public string visual_helmet;
-        public string visual_top;
-        public string visual_bottom;
-        public string visual_boots;
-        public string visual_gloves;
-        public string visual_gearLeft;
-        public string visual_gearRight;
+        // ============================================================
+        // VISUAL (Spine skin names) Ч храним строки (полные имена скинов)
+        // ============================================================
+        // IMPORTANT:
+        // Ёто ƒќЋ∆Ќџ Ѕџ“№ реальные имена скинов из Spine, например:
+        // "top/top_c_10", "boots/boots_c_3", "skin/skin_c_1", etc.
+        //
+        // ≈сли хочешь УпрефиксыФ Ч тоже можно, но тогда биндер должен
+        // искать StartsWith(). я советую хранить полное им€.
 
+        public string visual_back = "";
+        public string visual_beard = "";
+        public string visual_boots = "";
+        public string visual_bottom = "";
+        public string visual_brow = "";
+        public string visual_eyes = "";
+        public string visual_gloves = "";
+
+        public string visual_hair_short = "";
+        public string visual_hair_hat = "";
+        public string visual_helmet = "";
+
+        public string visual_mouth = "";
+        public string visual_eyewear = "";
+
+        public string visual_gear_left = "";
+        public string visual_gear_right = "";
+
+        public string visual_top = "";
+        public string visual_skin = "";
+
+        // ============================================================
+        // COLOR (skin color) Ч Color32 (RGBA) чтобы нормально сериализовалось
+        // ============================================================
+        public byte skinColorR = 255;
+        public byte skinColorG = 255;
+        public byte skinColorB = 255;
+        public byte skinColorA = 255;
+
+        public Color32 GetSkinColor32() => new Color32(skinColorR, skinColorG, skinColorB, skinColorA);
+
+        public void SetSkinColor32(Color32 c)
+        {
+            skinColorR = c.r;
+            skinColorG = c.g;
+            skinColorB = c.b;
+            skinColorA = c.a;
+        }
 
         /// <summary>
         /// Creates a fresh default state for first launch / dev reset.
+        /// ¬ј∆Ќќ: тут задаЄм дефолтные скины сразу на все части.
         /// </summary>
         public static PlayerState CreateDefault()
         {
             var s = new PlayerState
             {
-                Version = 2,
+                Version = 3,
                 Level = 1,
                 Exp = 0,
                 Gold = 100,
@@ -79,8 +100,36 @@ namespace GameCore
                 SelectedSkinId = "default",
                 ChestLevel = 1,
                 AutoSellEnabled = false,
-                LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+
+                // ====== DEFAULT VISUALS ======
+                // ѕоставь тут свои реальные дефолтные скины.
+                // ≈сли ты хочешь "все части индекс 1" Ч чаще всего это *_c_1 (но проверь имена в Spine).
+                visual_back = "back/back_c_1",
+                visual_beard = "beard/beard_c_1",
+                visual_boots = "boots/boots_c_1",
+                visual_bottom = "bottom/bottom_c_1",
+                visual_brow = "brow/brow_c_1",
+                visual_eyes = "eyes/eyes_c_1",
+                visual_gloves = "gloves/gloves_c_1",
+
+                visual_hair_short = "hair_short/hair_short_c_1",
+                visual_hair_hat = "hair_hat/hair_hat_c_1",
+                visual_helmet = "",
+
+                visual_mouth = "mouth/mouth_c_1",
+                visual_eyewear = "",
+
+                visual_gear_left = "",
+                visual_gear_right = "",
+
+                visual_top = "top/top_c_1",
+                visual_skin = "skin/skin_c_1",
             };
+
+            // ====== DEFAULT SKIN COLOR ======
+            // пример УтЄплый светлыйФ Ч можешь помен€ть на любой
+            s.SetSkinColor32(new Color32(255, 220, 200, 255));
 
             s.EnsureValid();
             return s;
@@ -92,6 +141,7 @@ namespace GameCore
         /// - null Equipped
         /// - incorrect array length (when enum changed)
         /// - null strings inside array
+        /// - null visual strings
         /// </summary>
         public void EnsureValid()
         {
@@ -101,48 +151,46 @@ namespace GameCore
             for (int i = 0; i < Equipped.Length; i++)
                 Equipped[i] ??= "";
 
-            // NEW
-            if (VisualEquipped == null || VisualEquipped.Length != VisualSlotCount)
-                VisualEquipped = new string[VisualSlotCount];
+            // на вс€кий: чтобы после загрузки не было nullТов
+            visual_back ??= "";
+            visual_beard ??= "";
+            visual_boots ??= "";
+            visual_bottom ??= "";
+            visual_brow ??= "";
+            visual_eyes ??= "";
+            visual_gloves ??= "";
 
-            for (int i = 0; i < VisualEquipped.Length; i++)
-                VisualEquipped[i] ??= "";
+            visual_hair_short ??= "";
+            visual_hair_hat ??= "";
+            visual_helmet ??= "";
+
+            visual_mouth ??= "";
+            visual_eyewear ??= "";
+
+            visual_gear_left ??= "";
+            visual_gear_right ??= "";
+
+            visual_top ??= "";
+            visual_skin ??= "";
+
+            // если вдруг кто-то сохранил A=0
+            if (skinColorA == 0) skinColorA = 255;
         }
 
-        /// <summary>
-        /// Reads equipped itemId for a slot.
-        /// Returns "" if empty.
-        /// </summary>
         public string GetEquippedId(EquipSlot slot)
         {
             EnsureValid();
             return Equipped[(int)slot] ?? "";
         }
 
-        /// <summary>
-        /// Sets equipped itemId for a slot.
-        /// Use "" (or null) to clear slot.
-        /// </summary>
         public void SetEquippedId(EquipSlot slot, string itemId)
         {
             EnsureValid();
             Equipped[(int)slot] = itemId ?? "";
         }
-
-        // NEW: visual
-        public string GetVisualSkin(VisualSlot slot)
-        {
-            EnsureValid();
-            return VisualEquipped[(int)slot] ?? "";
-        }
-
-        public void SetVisualSkin(VisualSlot slot, string skinName)
-        {
-            EnsureValid();
-            VisualEquipped[(int)slot] = skinName ?? "";
-        }
     }
 }
+
 
 
 
