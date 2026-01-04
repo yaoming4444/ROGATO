@@ -1,5 +1,6 @@
-using System;
 using GameCore.Items;
+using GameCore.Visual;
+using System;
 
 namespace GameCore
 {
@@ -41,11 +42,26 @@ namespace GameCore
         // Stores itemId for each slot. Empty string means slot is empty.
         public string[] Equipped;
 
+        // NEW: visual equipment (Spine skin names). Empty = nothing equipped for that visual slot.
+        public string[] VisualEquipped;
+
         // Unix timestamp of last save; used for "newer save wins" logic.
         public long LastSavedUnix = 0;
 
         // Number of slots in EquipSlot enum.
         public static int SlotCount => Enum.GetValues(typeof(EquipSlot)).Length;
+        public static int VisualSlotCount => Enum.GetValues(typeof(VisualSlot)).Length;
+
+        // PlayerState.cs
+        public string visual_back;
+        public string visual_helmet;
+        public string visual_top;
+        public string visual_bottom;
+        public string visual_boots;
+        public string visual_gloves;
+        public string visual_gearLeft;
+        public string visual_gearRight;
+
 
         /// <summary>
         /// Creates a fresh default state for first launch / dev reset.
@@ -84,6 +100,13 @@ namespace GameCore
 
             for (int i = 0; i < Equipped.Length; i++)
                 Equipped[i] ??= "";
+
+            // NEW
+            if (VisualEquipped == null || VisualEquipped.Length != VisualSlotCount)
+                VisualEquipped = new string[VisualSlotCount];
+
+            for (int i = 0; i < VisualEquipped.Length; i++)
+                VisualEquipped[i] ??= "";
         }
 
         /// <summary>
@@ -104,6 +127,19 @@ namespace GameCore
         {
             EnsureValid();
             Equipped[(int)slot] = itemId ?? "";
+        }
+
+        // NEW: visual
+        public string GetVisualSkin(VisualSlot slot)
+        {
+            EnsureValid();
+            return VisualEquipped[(int)slot] ?? "";
+        }
+
+        public void SetVisualSkin(VisualSlot slot, string skinName)
+        {
+            EnsureValid();
+            VisualEquipped[(int)slot] = skinName ?? "";
         }
     }
 }

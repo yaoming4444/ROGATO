@@ -1,5 +1,6 @@
 using GameCore.Items;
 using GameCore.Progression;
+using GameCore.Visual;
 using IDosGames;
 using System;
 using UnityEngine;
@@ -54,6 +55,8 @@ namespace GameCore
 
         // Chest
         public bool AutoSellEnabled => State != null && State.AutoSellEnabled;
+
+        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
