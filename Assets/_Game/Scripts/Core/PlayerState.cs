@@ -106,7 +106,7 @@ namespace GameCore
                 // Поставь тут свои реальные дефолтные скины.
                 // Если ты хочешь "все части индекс 1" — чаще всего это *_c_1 (но проверь имена в Spine).
                 visual_back = "back/back_c_1",
-                visual_beard = "beard/beard_c_1",
+                visual_beard = "",
                 visual_boots = "boots/boots_c_1",
                 visual_bottom = "bottom/bottom_c_1",
                 visual_brow = "brow/brow_c_1",

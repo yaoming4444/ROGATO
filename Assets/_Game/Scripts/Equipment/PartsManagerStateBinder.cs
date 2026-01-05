@@ -23,17 +23,22 @@ namespace GameCore.Visual
 
         private void OnEnable()
         {
-            if (GameCore.GameInstance.I != null)
-                GameCore.GameInstance.I.StateChanged += OnStateChanged;
+            EnsureInit();
 
-            ApplyFromState();
+            var gi = GameCore.GameInstance.I;
+            if (gi != null)
+                gi.StateChanged += OnStateChanged;
+
+            ApplyFromState(); // <-- важно: применить при открытии окна
         }
 
         private void OnDisable()
         {
-            if (GameCore.GameInstance.I != null)
-                GameCore.GameInstance.I.StateChanged -= OnStateChanged;
+            var gi = GameCore.GameInstance.I;
+            if (gi != null)
+                gi.StateChanged -= OnStateChanged;
         }
+
 
         private void OnStateChanged(GameCore.PlayerState s) => ApplyFromState();
 

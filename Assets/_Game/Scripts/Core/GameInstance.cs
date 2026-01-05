@@ -2,6 +2,7 @@ using GameCore.Items;
 using GameCore.Progression;
 using GameCore.Visual;
 using IDosGames;
+using LayerLab.ArtMaker; // <-- PartsType
 using System;
 using UnityEngine;
 
@@ -12,10 +13,6 @@ namespace GameCore
     /// - currencies, level, chests
     /// - equipment operations
     /// - autosave (local + server)
-    ///
-    /// NEW:
-    /// - Loads LevelProgression from Resources (because GameInstance is runtime-created)
-    /// - AddExp() now uses LevelProgression to auto level-up with thresholds
     /// </summary>
     public class GameInstance : MonoBehaviour
     {
@@ -55,8 +52,6 @@ namespace GameCore
 
         // Chest
         public bool AutoSellEnabled => State != null && State.AutoSellEnabled;
-
-        
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
@@ -201,6 +196,101 @@ namespace GameCore
             if (notify) StateChanged?.Invoke(State);
         }
 
+        /// <summary>
+        /// Форснуть обновление всех подписчиков (оба PartsManagerStateBinder в сцене).
+        /// Используй, если ты сделал несколько изменений без notify, а потом хочешь 1 раз обновить UI.
+        /// </summary>
+        public void RaiseStateChanged()
+        {
+            if (State == null) return;
+            MarkDirty();
+            StateChanged?.Invoke(State);
+        }
+
+        // ===================== VISUAL MUTATIONS (ВАЖНО ДЛЯ 2 СКЕЛЕТОНОВ) =====================
+
+        /// <summary>
+        /// Меняет конкретный визуальный слот в State (visual_*).
+        /// skinNameOrEmpty:
+        /// - "" (пусто) = по дефолту "снять" (в биндере ты сделаешь EquipParts(type, -1))
+        /// - "top/top_c_10" и т.п. = надеть
+        /// notify:
+        /// - true = сразу поднимет StateChanged (оба скелета обновятся)
+        /// - false = удобно для batch, потом вызови RaiseStateChanged()
+        /// </summary>
+        public void SetVisual(PartsType type, string skinNameOrEmpty, bool notify = true)
+        {
+            if (State == null) return;
+
+            skinNameOrEmpty ??= "";
+
+            switch (type)
+            {
+                case PartsType.Back: State.visual_back = skinNameOrEmpty; break;
+                case PartsType.Beard: State.visual_beard = skinNameOrEmpty; break;
+                case PartsType.Boots: State.visual_boots = skinNameOrEmpty; break;
+                case PartsType.Bottom: State.visual_bottom = skinNameOrEmpty; break;
+                case PartsType.Brow: State.visual_brow = skinNameOrEmpty; break;
+                case PartsType.Eyes: State.visual_eyes = skinNameOrEmpty; break;
+                case PartsType.Gloves: State.visual_gloves = skinNameOrEmpty; break;
+
+                case PartsType.Hair_Short: State.visual_hair_short = skinNameOrEmpty; break;
+                case PartsType.Hair_Hat: State.visual_hair_hat = skinNameOrEmpty; break;
+                case PartsType.Helmet: State.visual_helmet = skinNameOrEmpty; break;
+
+                case PartsType.Mouth: State.visual_mouth = skinNameOrEmpty; break;
+                case PartsType.Eyewear: State.visual_eyewear = skinNameOrEmpty; break;
+
+                case PartsType.Gear_Left: State.visual_gear_left = skinNameOrEmpty; break;
+                case PartsType.Gear_Right: State.visual_gear_right = skinNameOrEmpty; break;
+
+                case PartsType.Top: State.visual_top = skinNameOrEmpty; break;
+                case PartsType.Skin: State.visual_skin = skinNameOrEmpty; break;
+
+                default:
+                    // None / unsupported
+                    return;
+            }
+
+            MarkDirty();
+            if (notify) StateChanged?.Invoke(State);
+        }
+
+        public void ClearVisual(PartsType type, bool notify = true)
+        {
+            SetVisual(type, "", notify);
+        }
+
+        /// <summary>
+        /// Пример пачки: меняем несколько частей и 1 раз обновляем.
+        /// </summary>
+        public void SetVisualBatch(string top = null, string boots = null, string helmet = null, bool notify = true)
+        {
+            if (State == null) return;
+
+            if (top != null) State.visual_top = top;
+            if (boots != null) State.visual_boots = boots;
+            if (helmet != null) State.visual_helmet = helmet;
+
+            MarkDirty();
+            if (notify) StateChanged?.Invoke(State);
+        }
+
+        /// <summary>
+        /// Смена цвета кожи (ты уже хранишь RGBA в PlayerState).
+        /// Биндер потом должен вызвать partsManager.ChangeSkinColor(st.GetSkinColor32()).
+        /// </summary>
+        public void SetSkinColor(Color32 c, bool notify = true)
+        {
+            if (State == null) return;
+
+            State.SetSkinColor32(c);
+            MarkDirty();
+            if (notify) StateChanged?.Invoke(State);
+        }
+
+        // ===================== ECONOMY / PROGRESSION =====================
+
         public void AddGold(long amount, bool immediateSave = false)
         {
             if (State == null) return;
@@ -306,10 +396,6 @@ namespace GameCore
 
         /// <summary>
         /// Adds EXP to the player and auto-levels up using LevelProgression thresholds.
-        /// Behavior:
-        /// - Exp is TOTAL exp (not "exp inside level")
-        /// - When total exp reaches threshold for next level -> Level increments
-        /// - Exp is NOT reduced on level up (like many idle games)
         /// </summary>
         public void AddExp(int amount, bool immediateSave = false)
         {
@@ -318,18 +404,13 @@ namespace GameCore
 
             State.Exp += amount;
 
-            // Auto-level-up via LevelProgression (if exists)
             if (levelProgression != null)
             {
-                // while we can level up
                 while (levelProgression.CanLevelUp(State.Level, State.Exp))
-                {
                     State.Level += 1;
-                }
             }
 
-            Touch(); // MarkDirty + StateChanged
-
+            Touch();
             if (immediateSave) SaveAllNow();
         }
 
@@ -420,9 +501,12 @@ namespace GameCore
             return true;
         }
 
+        /// <summary>
+        /// Старое имя оставил, чтобы твои старые вызовы не поломались.
+        /// </summary>
         public void NotifyStateChangedExternal()
         {
-            StateChanged?.Invoke(State);
+            RaiseStateChanged();
         }
 
         public void DevResetProgress(bool enableServerAutosave = true)
@@ -439,6 +523,7 @@ namespace GameCore
         }
     }
 }
+
 
 
 
