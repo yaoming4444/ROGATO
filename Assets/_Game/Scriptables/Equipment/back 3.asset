@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bde7700a1cdbc7d47bc940a7aa5c7365, type: 3}
+  m_Name: back 3
+  m_EditorClassIdentifier: Assembly-CSharp::EquipItemDef
+  itemId: back_c_4
+  displayName: Hand
+  slotType: 1
+  partId: back/back_c_4
+  icon: {fileID: 21300000, guid: da98d2421fd1f40b69ae5537ae0d0575, type: 3}
+  description: 
