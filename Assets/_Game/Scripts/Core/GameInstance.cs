@@ -34,8 +34,8 @@ namespace GameCore
         [SerializeField] private float localInterval = 10f;
 
         [Header("Autosave Server")]
-        [SerializeField] private bool serverAutosave = false; // enable after login
-        [SerializeField] private float serverInterval = 60f;
+        [SerializeField] private bool serverAutosave = true; // enable after login
+        [SerializeField] private float serverInterval = 30f;
 
         [Header("Progression")]
         [Tooltip("If null (runtime-created instance), it will be loaded from Resources/LevelProgression.asset")]

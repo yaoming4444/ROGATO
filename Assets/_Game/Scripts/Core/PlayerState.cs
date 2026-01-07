@@ -73,14 +73,46 @@ namespace GameCore
         public byte skinColorB = 255;
         public byte skinColorA = 255;
 
-        public Color32 GetSkinColor32() => new Color32(skinColorR, skinColorG, skinColorB, skinColorA);
+        // Hair
+        public byte hairColorR = 255;
+        public byte hairColorG = 255;
+        public byte hairColorB = 255;
+        public byte hairColorA = 255;
 
+        // Beard
+        public byte beardColorR = 255;
+        public byte beardColorG = 255;
+        public byte beardColorB = 255;
+        public byte beardColorA = 255;
+
+        // Brow
+        public byte browColorR = 255;
+        public byte browColorG = 255;
+        public byte browColorB = 255;
+        public byte browColorA = 255;
+
+        public Color32 GetSkinColor32() => new Color32(skinColorR, skinColorG, skinColorB, skinColorA);
         public void SetSkinColor32(Color32 c)
         {
-            skinColorR = c.r;
-            skinColorG = c.g;
-            skinColorB = c.b;
-            skinColorA = c.a;
+            skinColorR = c.r; skinColorG = c.g; skinColorB = c.b; skinColorA = c.a;
+        }
+
+        public Color32 GetHairColor32() => new Color32(hairColorR, hairColorG, hairColorB, hairColorA);
+        public void SetHairColor32(Color32 c)
+        {
+            hairColorR = c.r; hairColorG = c.g; hairColorB = c.b; hairColorA = c.a;
+        }
+
+        public Color32 GetBeardColor32() => new Color32(beardColorR, beardColorG, beardColorB, beardColorA);
+        public void SetBeardColor32(Color32 c)
+        {
+            beardColorR = c.r; beardColorG = c.g; beardColorB = c.b; beardColorA = c.a;
+        }
+
+        public Color32 GetBrowColor32() => new Color32(browColorR, browColorG, browColorB, browColorA);
+        public void SetBrowColor32(Color32 c)
+        {
+            browColorR = c.r; browColorG = c.g; browColorB = c.b; browColorA = c.a;
         }
 
         /// <summary>

@@ -39,7 +39,6 @@ namespace GameCore.Visual
                 gi.StateChanged -= OnStateChanged;
         }
 
-
         private void OnStateChanged(GameCore.PlayerState s) => ApplyFromState();
 
         private void EnsureInit()
@@ -64,7 +63,7 @@ namespace GameCore.Visual
 
             st.EnsureValid();
 
-            // APPLY ALL (ты хотел именно это)
+            // APPLY ALL
             ApplyOne(PartsType.Back, st.visual_back);
             ApplyOne(PartsType.Beard, st.visual_beard);
             ApplyOne(PartsType.Boots, st.visual_boots);
@@ -86,7 +85,16 @@ namespace GameCore.Visual
             ApplyOne(PartsType.Top, st.visual_top);
             ApplyOne(PartsType.Skin, st.visual_skin);
 
+            // =========================
+            // APPLY COLORS (ВАЖНО)
+            // ДЕЛАЕМ ПОСЛЕ сборки скина/слотов, чтобы все Slot'ы уже существовали
+            // =========================
             partsManager.ChangeSkinColor(st.GetSkinColor32());
+
+            // если этих методов ещё нет в PlayerState — добавь (мы обсуждали)
+            partsManager.ChangeHairColor(st.GetHairColor32());
+            partsManager.ChangeBeardColor(st.GetBeardColor32());
+            partsManager.ChangeBrowColor(st.GetBrowColor32());
 
             ForceGraphicRefresh();
         }
@@ -96,10 +104,9 @@ namespace GameCore.Visual
             var list = partsManager.GetCurrentSkinNames(type);
             if (list == null || list.Count == 0) return;
 
-            // ? ключевое изменение:
             if (string.IsNullOrWhiteSpace(skinNameOrPrefix))
             {
-                partsManager.EquipParts(type, -1);   // <- снять / пусто
+                partsManager.EquipParts(type, -1);   // снять / пусто
                 return;
             }
 
@@ -120,7 +127,6 @@ namespace GameCore.Visual
             partsManager.EquipParts(type, idx);
         }
 
-
         private void ForceGraphicRefresh()
         {
             // для UI иногда нужно
@@ -133,6 +139,7 @@ namespace GameCore.Visual
         }
     }
 }
+
 
 
 

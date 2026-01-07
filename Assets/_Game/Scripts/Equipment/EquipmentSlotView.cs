@@ -1,13 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class EquipmentSlotView : MonoBehaviour
 {
+    [Header("Config")]
     public EquipmentType slot;
 
-    [SerializeField] private Image equippedIcon;
-    [SerializeField] private Button unequipButton;
+    [Header("UI")]
+    [SerializeField] private Image icon;
+    [SerializeField] private Sprite defaultIcon;
+    [SerializeField] private Button button;
 
     private System.Action<EquipmentType> _onUnequip;
 
@@ -15,18 +17,34 @@ public class EquipmentSlotView : MonoBehaviour
     {
         _onUnequip = onUnequip;
 
-        if (equippedIcon)
+        // --- ICON ---
+        if (icon)
         {
-            equippedIcon.sprite = equipped ? equipped.icon : null;
-            equippedIcon.enabled = equipped != null;
+            icon.sprite = equipped != null && equipped.icon != null
+                ? equipped.icon
+                : defaultIcon;
+
+            icon.enabled = true;
         }
 
-        if (unequipButton)
+        // --- BUTTON ---
+        if (button)
         {
-            unequipButton.onClick.RemoveAllListeners();
-            unequipButton.onClick.AddListener(() => _onUnequip?.Invoke(slot));
-            unequipButton.gameObject.SetActive(equipped != null);
+            button.onClick.RemoveAllListeners();
+
+            bool hasItem = equipped != null;
+
+            // слот кликабелен ТОЛЬКО если надет предмет
+            button.interactable = hasItem;
+
+            if (hasItem)
+            {
+                button.onClick.AddListener(() =>
+                    _onUnequip?.Invoke(slot)
+                );
+            }
         }
     }
 }
+
 
