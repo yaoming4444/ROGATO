@@ -101,8 +101,13 @@ public class EquipmentWindowController : MonoBehaviour
         if (equipmentPanel) equipmentPanel.SetActive(tab == Tab.Equipment);
         if (facePanel) facePanel.SetActive(tab == Tab.Face);
 
-        if (tabEquipmentButton) tabEquipmentButton.interactable = tab != Tab.Equipment;
-        if (tabFaceButton) tabFaceButton.interactable = tab != Tab.Face;
+        // оставь интерактивными обе, либо делай выбранную неинтерактивной Ч на вкус
+        if (tabEquipmentButton) tabEquipmentButton.interactable = true;
+        if (tabFaceButton) tabFaceButton.interactable = true;
+
+        // выдел€ем выбранную (включит Selected Color)
+        if (tab == Tab.Equipment) SetTabSelected(tabEquipmentButton, true);
+        else SetTabSelected(tabFaceButton, true);
 
         if (rebuildInventory) BuildInventory();
 
@@ -111,6 +116,17 @@ public class EquipmentWindowController : MonoBehaviour
             RefreshSlots(equipmentSlots);
             RefreshSlots(faceSlots);
         }
+    }
+
+
+    private void SetTabSelected(Button btn, bool selected)
+    {
+        if (!btn) return;
+
+        // ¬ажно: чтобы работало Selected, кнопка должна быть "Selectable"
+        // (Button = Selectable)
+        if (selected)
+            btn.Select(); // даст Selected state
     }
 
     private void BuildInventory()

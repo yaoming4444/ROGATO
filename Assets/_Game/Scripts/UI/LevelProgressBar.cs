@@ -8,7 +8,7 @@ namespace GameCore.UI
     public class LevelProgressBar : MonoBehaviour
     {
         [Header("UI")]
-        [SerializeField] private Image fillImage;        // Image (Type = Filled)
+        [SerializeField] private Slider slider;          // <- Slider на родителе (как у тебя)
         [SerializeField] private TMP_Text levelText;
         [SerializeField] private TMP_Text progressText;
 
@@ -16,8 +16,20 @@ namespace GameCore.UI
 
         private void Awake()
         {
-            // Resources/LevelProgression.asset
             _prog = Resources.Load<LevelProgression>("LevelProgression");
+
+            // На всякий: если забыли проставить
+            if (slider == null) slider = GetComponent<Slider>();
+
+            if (slider != null)
+            {
+                slider.minValue = 0f;
+                slider.maxValue = 1f;
+                slider.wholeNumbers = false;
+
+                // чтобы игрок не мог двигать (если это просто индикатор)
+                slider.interactable = false;
+            }
         }
 
         private void OnEnable()
@@ -46,7 +58,7 @@ namespace GameCore.UI
 
             if (_prog.IsMaxLevel(lvl))
             {
-                if (fillImage) fillImage.fillAmount = 1f;
+                SetFill01(1f);
                 if (progressText) progressText.text = "MAX";
                 return;
             }
@@ -57,13 +69,28 @@ namespace GameCore.UI
             int cur = Mathf.Max(0, totalExp - prevReq);
             int need = Mathf.Max(1, nextReq - prevReq);
 
-            float fill = Mathf.Clamp01(cur / (float)need);
+            float fill01 = Mathf.Clamp01(cur / (float)need);
 
-            if (fillImage) fillImage.fillAmount = fill;
+            SetFill01(fill01);
             if (progressText) progressText.text = $"{cur}/{need}";
+        }
+
+        private void SetFill01(float v)
+        {
+            v = Mathf.Clamp01(v);
+
+            if (slider != null)
+            {
+                // Можно так:
+                slider.normalizedValue = v;
+
+                // или так (одно и то же при min=0 max=1):
+                // slider.value = v;
+            }
         }
     }
 }
+
 
 
 
