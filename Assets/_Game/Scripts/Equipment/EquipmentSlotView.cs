@@ -9,6 +9,8 @@ public class EquipmentSlotView : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Image icon;
     [SerializeField] private Sprite defaultIcon;
+    [SerializeField] private Image backgroundImage; 
+    [SerializeField] private Sprite defaultBackgroundImage;
     [SerializeField] private Button button;
 
     private System.Action<EquipmentType> _onUnequip;
@@ -26,6 +28,17 @@ public class EquipmentSlotView : MonoBehaviour
 
             icon.enabled = true;
         }
+
+        // --- BG IMAGE --- 
+        if (backgroundImage) 
+        { 
+            backgroundImage.sprite = equipped != null && equipped.rarityBG != null 
+                ? equipped.rarityBG 
+                : defaultBackgroundImage;
+
+            backgroundImage.enabled = true; 
+        }
+
 
         // --- BUTTON ---
         if (button)

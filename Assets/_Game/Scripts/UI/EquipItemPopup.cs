@@ -16,6 +16,7 @@ public class EquipItemPopup : MonoBehaviour
     [Header("Rarity UI")]
     [SerializeField] private Image rarityBgImage;
     [SerializeField] private TMP_Text rarityText;
+    [SerializeField] private Image itemRarityBgImage;
 
     [Header("Rarity Colors (BG / Text)")]
     [SerializeField] private Color commonBg = new Color32(70, 70, 70, 255);
@@ -142,6 +143,8 @@ public class EquipItemPopup : MonoBehaviour
             if (rarityBgImage) rarityBgImage.color = Color.clear;
             return;
         }
+
+        itemRarityBgImage.sprite = item.rarityBG;
 
         if (rarityText)
             rarityText.text = item.rarity.ToString().ToUpperInvariant();

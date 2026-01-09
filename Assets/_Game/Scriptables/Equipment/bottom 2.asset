@@ -18,7 +18,8 @@ MonoBehaviour:
   partId: bottom/bottom_c_3
   icon: {fileID: 21300000, guid: dd156479a0c0544ef916d4622c2e3aab, type: 3}
   description: 
-  rarity: 0
+  rarity: 1
+  rarityBG: {fileID: 21300000, guid: e6eea4f7cbb9f46f79c0fe06180fa5b3, type: 3}
   statType: 3
   statBySlotLevel:
     serializedVersion: 2

@@ -63,41 +63,35 @@ namespace GameCore.Visual
 
             st.EnsureValid();
 
-            // APPLY ALL
-            ApplyOne(PartsType.Back, st.visual_back);
-            ApplyOne(PartsType.Beard, st.visual_beard);
-            ApplyOne(PartsType.Boots, st.visual_boots);
-            ApplyOne(PartsType.Bottom, st.visual_bottom);
-            ApplyOne(PartsType.Brow, st.visual_brow);
-            ApplyOne(PartsType.Eyes, st.visual_eyes);
-            ApplyOne(PartsType.Gloves, st.visual_gloves);
+            ApplyOne(PartsType.Back, st.GetVisualForRender(PartsType.Back, st.visual_back));
+            ApplyOne(PartsType.Beard, st.GetVisualForRender(PartsType.Beard, st.visual_beard));
+            ApplyOne(PartsType.Boots, st.GetVisualForRender(PartsType.Boots, st.visual_boots));
+            ApplyOne(PartsType.Bottom, st.GetVisualForRender(PartsType.Bottom, st.visual_bottom));
+            ApplyOne(PartsType.Brow, st.GetVisualForRender(PartsType.Brow, st.visual_brow));
+            ApplyOne(PartsType.Eyes, st.GetVisualForRender(PartsType.Eyes, st.visual_eyes));
+            ApplyOne(PartsType.Gloves, st.GetVisualForRender(PartsType.Gloves, st.visual_gloves));
 
-            ApplyOne(PartsType.Hair_Short, st.visual_hair_short);
-            ApplyOne(PartsType.Hair_Hat, st.visual_hair_hat);
-            ApplyOne(PartsType.Helmet, st.visual_helmet);
+            ApplyOne(PartsType.Hair_Short, st.GetVisualForRender(PartsType.Hair_Short, st.visual_hair_short));
+            ApplyOne(PartsType.Hair_Hat, st.GetVisualForRender(PartsType.Hair_Hat, st.visual_hair_hat));
+            ApplyOne(PartsType.Helmet, st.GetVisualForRender(PartsType.Helmet, st.visual_helmet));
 
-            ApplyOne(PartsType.Mouth, st.visual_mouth);
-            ApplyOne(PartsType.Eyewear, st.visual_eyewear);
+            ApplyOne(PartsType.Mouth, st.GetVisualForRender(PartsType.Mouth, st.visual_mouth));
+            ApplyOne(PartsType.Eyewear, st.GetVisualForRender(PartsType.Eyewear, st.visual_eyewear));
 
-            ApplyOne(PartsType.Gear_Left, st.visual_gear_left);
-            ApplyOne(PartsType.Gear_Right, st.visual_gear_right);
+            ApplyOne(PartsType.Gear_Left, st.GetVisualForRender(PartsType.Gear_Left, st.visual_gear_left));
+            ApplyOne(PartsType.Gear_Right, st.GetVisualForRender(PartsType.Gear_Right, st.visual_gear_right));
 
-            ApplyOne(PartsType.Top, st.visual_top);
-            ApplyOne(PartsType.Skin, st.visual_skin);
+            ApplyOne(PartsType.Top, st.GetVisualForRender(PartsType.Top, st.visual_top));
+            ApplyOne(PartsType.Skin, st.GetVisualForRender(PartsType.Skin, st.visual_skin));
 
-            // =========================
-            // APPLY COLORS (¬ј∆Ќќ)
-            // ƒ≈Ћј≈ћ ѕќ—Ћ≈ сборки скина/слотов, чтобы все Slot'ы уже существовали
-            // =========================
             partsManager.ChangeSkinColor(st.GetSkinColor32());
-
-            // если этих методов ещЄ нет в PlayerState Ч добавь (мы обсуждали)
             partsManager.ChangeHairColor(st.GetHairColor32());
             partsManager.ChangeBeardColor(st.GetBeardColor32());
             partsManager.ChangeBrowColor(st.GetBrowColor32());
 
             ForceGraphicRefresh();
         }
+
 
         private void ApplyOne(PartsType type, string skinNameOrPrefix)
         {

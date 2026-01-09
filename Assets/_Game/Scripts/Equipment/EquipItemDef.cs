@@ -35,6 +35,7 @@ public class EquipItemDef : ScriptableObject
 
     [Header("Rarity (NEW)")]
     public EquipRarity rarity = EquipRarity.Common;
+    public Sprite rarityBG;
 
     [Header("Stats (Visual Equipment)")]
     public EquipStatType statType = EquipStatType.None;

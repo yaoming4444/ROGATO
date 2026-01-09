@@ -1,4 +1,4 @@
-using GameCore.Items;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +8,7 @@ public class EquipmentWindowController : MonoBehaviour
     public enum Tab { Equipment, Face }
 
     [Header("Services")]
-    [SerializeField] private MonoBehaviour inventoryServiceBehaviour; // DevInventoryService_AllItems
-    [SerializeField] private VisualEquipmentService equipment;        // СЮДА ДАЙ ПРЕФАБНЫЙ (always on) сервис
+    [SerializeField] private MonoBehaviour inventoryServiceBehaviour; // DevInventoryService_AllItems (implements IInventoryService)
     [SerializeField] private EquipDatabase equipDatabase;
 
     [Header("Tabs")]
@@ -19,7 +18,7 @@ public class EquipmentWindowController : MonoBehaviour
 
     [Header("Tab Colors")]
     [SerializeField] private Color tabNormalColor = Color.white;
-    [SerializeField] private Color tabSelectedColor = new Color(1f, 0.6f, 0.1f, 1f); // оранж
+    [SerializeField] private Color tabSelectedColor = new Color(1f, 0.6f, 0.1f, 1f);
 
     [Header("Panels")]
     [SerializeField] private GameObject equipmentPanel;
@@ -39,6 +38,10 @@ public class EquipmentWindowController : MonoBehaviour
     private IInventoryService _inventory;
     private Tab _activeTab;
 
+    // мы больше не сериализуем equipment, берём singleton
+    private VisualEquipmentService _equipment;
+    private Coroutine _ensureRoutine;
+
     private static readonly HashSet<EquipmentType> EquipmentSlotSet = new()
     {
         EquipmentType.Helmet,
@@ -49,7 +52,7 @@ public class EquipmentWindowController : MonoBehaviour
         EquipmentType.Back,
         EquipmentType.Gear_Left,
         EquipmentType.Gear_Right,
-        EquipmentType.Eyewear,   // если у тебя eyewear в equipment вкладке
+        EquipmentType.Eyewear,
     };
 
     private static readonly HashSet<EquipmentType> FaceSlotSet = new()
@@ -65,10 +68,8 @@ public class EquipmentWindowController : MonoBehaviour
     private void Awake()
     {
         _inventory = inventoryServiceBehaviour as IInventoryService;
-
-        // ВАЖНО: всегда берём singleton
-        if (equipment == null)
-            equipment = VisualEquipmentService.I;
+        if (_inventory == null)
+            Debug.LogWarning("[EWC] inventoryServiceBehaviour does not implement IInventoryService");
 
         if (tabEquipmentButton) tabEquipmentButton.onClick.AddListener(() => SwitchTab(Tab.Equipment));
         if (tabFaceButton) tabFaceButton.onClick.AddListener(() => SwitchTab(Tab.Face));
@@ -76,25 +77,74 @@ public class EquipmentWindowController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (equipment == null)
-            equipment = VisualEquipmentService.I;
-
-        if (equipment != null)
-            equipment.OnChanged += OnEquipmentChanged;
-
-        // НЕ вызывай больше LoadFromState из окна.
-        // Сервис сам синкнется на StateChanged и OnEnable.
-        equipment?.SyncFromState();
-
+        // стартуем вкладку/UI сразу
         SwitchTab(startTab, rebuildInventory: true, refreshSlots: true);
+
+        // и отдельно гарантируем, что сервис визуалки будет найден (даже если DontDestroy ещё не поднялся)
+        if (_ensureRoutine != null) StopCoroutine(_ensureRoutine);
+        _ensureRoutine = StartCoroutine(EnsureVisualServiceAndBind());
     }
 
     private void OnDisable()
     {
-        if (equipment != null)
-            equipment.OnChanged -= OnEquipmentChanged;
+        if (_ensureRoutine != null)
+        {
+            StopCoroutine(_ensureRoutine);
+            _ensureRoutine = null;
+        }
+
+        if (_equipment != null)
+            _equipment.OnChanged -= OnEquipmentChanged;
     }
 
+    private IEnumerator EnsureVisualServiceAndBind()
+    {
+        // на Unity 6/2022+ порядок иногда такой, что DontDestroy создаётся чуть позже
+        // подождём немного кадров и найдём singleton
+        const int framesToWait = 30;
+
+        for (int i = 0; i < framesToWait; i++)
+        {
+            TryResolveVisualService();
+            if (_equipment != null) break;
+            yield return null;
+        }
+
+        if (_equipment == null)
+        {
+            Debug.LogWarning("[EWC] VisualEquipmentService singleton not found. Popup will open, but Equip/Unequip won't work until service exists.");
+            yield break;
+        }
+
+        // подписка
+        _equipment.OnChanged -= OnEquipmentChanged;
+        _equipment.OnChanged += OnEquipmentChanged;
+
+        // сервис сам умеет SyncFromState на StateChanged, но раз мы в UI — можно форснуть один раз
+        _equipment.SyncFromState();
+
+        // обновим слоты
+        OnEquipmentChanged();
+    }
+
+    private void TryResolveVisualService()
+    {
+        if (_equipment != null) return;
+
+        // 1) предпочитаем singleton
+        if (VisualEquipmentService.I != null)
+        {
+            _equipment = VisualEquipmentService.I;
+            return;
+        }
+
+        // 2) fallback: найти в сцене (если вдруг забыли сделать singleton)
+#if UNITY_2023_1_OR_NEWER
+        _equipment = Object.FindFirstObjectByType<VisualEquipmentService>(FindObjectsInactive.Include);
+#else
+        _equipment = Object.FindObjectOfType<VisualEquipmentService>(true);
+#endif
+    }
 
     private void OnEquipmentChanged()
     {
@@ -123,14 +173,12 @@ public class EquipmentWindowController : MonoBehaviour
     private void ApplyTabColors(Tab active)
     {
         SetButtonColor(tabEquipmentButton, active == Tab.Equipment ? tabSelectedColor : tabNormalColor);
-        SetButtonColor(tabFaceButton,      active == Tab.Face      ? tabSelectedColor : tabNormalColor);
+        SetButtonColor(tabFaceButton, active == Tab.Face ? tabSelectedColor : tabNormalColor);
     }
 
     private void SetButtonColor(Button btn, Color c)
     {
         if (!btn) return;
-
-        // красим TargetGraphic (обычно Image)
         if (btn.targetGraphic != null)
             btn.targetGraphic.color = c;
     }
@@ -161,46 +209,73 @@ public class EquipmentWindowController : MonoBehaviour
 
     private void OnInventoryItemClicked(EquipItemDef item)
     {
-        if (equipment == null || item == null) return;
+        if (item == null) return;
 
+        // Попап показываем ВСЕГДА (чтобы UI не “молчал”)
         if (popup != null)
         {
-            popup.ShowForInventoryItem(item, onConfirm: () => equipment.Equip(item));
+            popup.ShowForInventoryItem(item, onConfirm: () =>
+            {
+                TryResolveVisualService();
+                if (_equipment == null)
+                {
+                    Debug.LogWarning("[EWC] Can't Equip: VisualEquipmentService is null (singleton not ready?).");
+                    return;
+                }
+
+                _equipment.Equip(item);
+            });
             return;
         }
 
-        equipment.Equip(item);
+        // Без попапа — тоже пытаемся надеть
+        TryResolveVisualService();
+        if (_equipment == null)
+        {
+            Debug.LogWarning("[EWC] Can't Equip: VisualEquipmentService is null (singleton not ready?).");
+            return;
+        }
+
+        _equipment.Equip(item);
     }
 
     private void RefreshSlots(List<EquipmentSlotView> slots)
     {
-        if (equipment == null || slots == null) return;
+        if (slots == null) return;
+
+        TryResolveVisualService();
 
         foreach (var slotView in slots)
         {
             if (slotView == null) continue;
 
-            var equippedItem = equipment.GetEquipped(slotView.slot);
+            var equippedItem = (_equipment != null) ? _equipment.GetEquipped(slotView.slot) : null;
             slotView.Bind(equippedItem, OnSlotClickedUnequip);
         }
     }
 
     private void OnSlotClickedUnequip(EquipmentType slot)
     {
-        if (equipment == null) return;
+        TryResolveVisualService();
+        if (_equipment == null)
+        {
+            Debug.LogWarning("[EWC] Can't Unequip: VisualEquipmentService is null (singleton not ready?).");
+            return;
+        }
 
-        var equippedItem = equipment.GetEquipped(slot);
+        var equippedItem = _equipment.GetEquipped(slot);
         if (equippedItem == null) return;
 
         if (popup != null)
         {
-            popup.ShowForEquippedItem(equippedItem, onConfirm: () => equipment.Unequip(slot));
+            popup.ShowForEquippedItem(equippedItem, onConfirm: () => _equipment.Unequip(slot));
             return;
         }
 
-        equipment.Unequip(slot);
+        _equipment.Unequip(slot);
     }
 }
+
 
 
 

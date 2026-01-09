@@ -1,4 +1,5 @@
 using GameCore.Items;
+using LayerLab.ArtMaker;
 using System;
 using UnityEngine;
 
@@ -154,26 +155,23 @@ namespace GameCore
                 // ====== DEFAULT VISUALS ======
                 // Поставь тут свои реальные дефолтные скины.
                 // Если ты хочешь "все части индекс 1" — чаще всего это *_c_1 (но проверь имена в Spine).
-                visual_back = "back/back_c_1",
                 visual_beard = "",
-                visual_boots = "boots/boots_c_1",
-                visual_bottom = "bottom/bottom_c_1",
-                visual_brow = "brow/brow_c_1",
-                visual_eyes = "eyes/eyes_c_1",
-                visual_gloves = "gloves/gloves_c_1",
-
-                visual_hair_short = "hair_short/hair_short_c_1",
-                visual_hair_hat = "hair_hat/hair_hat_c_1",
-                visual_helmet = "",
-
-                visual_mouth = "mouth/mouth_c_1",
                 visual_eyewear = "",
-
                 visual_gear_left = "",
                 visual_gear_right = "",
+                visual_back = DEFAULT_BACK,
+                visual_boots = DEFAULT_BOOTS,
+                visual_bottom = DEFAULT_BOTTOM,
+                visual_brow = DEFAULT_BROW,
+                visual_eyes = DEFAULT_EYES,
+                visual_gloves = DEFAULT_GLOVES,
 
-                visual_top = "top/top_c_1",
-                visual_skin = "skin/skin_c_1",
+                visual_hair_short = DEFAULT_HAIR_SHORT,
+                visual_hair_hat = DEFAULT_HAIR_HAT,
+
+                visual_mouth = DEFAULT_MOUTH,
+                visual_top = DEFAULT_TOP,
+                visual_skin = DEFAULT_SKIN,
             };
 
             // ====== DEFAULT SKIN COLOR ======
@@ -281,8 +279,86 @@ namespace GameCore
             SetVisualSlotLevel(slot, next);
             return true;
         }
+
+        // ===== DEFAULT VISUAL PRESETS (source of truth) =====
+        // ДОЛЖНЫ совпадать с тем, что ты хочешь видеть когда слот "пустой"
+        public const string DEFAULT_BACK = "back/back_c_1";
+        public const string DEFAULT_BOOTS = "boots/boots_c_1";
+        public const string DEFAULT_BOTTOM = "bottom/bottom_c_1";
+        public const string DEFAULT_BROW = "brow/brow_c_1";
+        public const string DEFAULT_EYES = "eyes/eyes_c_1";
+        public const string DEFAULT_GLOVES = "gloves/gloves_c_1";
+        public const string DEFAULT_HAIR_SHORT = "hair_short/hair_short_c_1";
+        public const string DEFAULT_HAIR_HAT = "hair_hat/hair_hat_c_1";
+        public const string DEFAULT_MOUTH = "mouth/mouth_c_1";
+        public const string DEFAULT_TOP = "top/top_c_1";
+        public const string DEFAULT_SKIN = "skin/skin_c_1";
+
+        // какие PartsType считаем "обязательными", чтобы при "" показывать дефолт
+        public bool IsMandatoryVisual(PartsType type)
+        {
+            switch (type)
+            {
+                case PartsType.Skin:
+                case PartsType.Top:
+                case PartsType.Bottom:
+                case PartsType.Boots:
+                case PartsType.Gloves:
+                case PartsType.Back:
+                case PartsType.Eyes:
+                case PartsType.Brow:
+                case PartsType.Mouth:
+                case PartsType.Hair_Short:
+                case PartsType.Hair_Hat:
+                    return true;
+
+                default:
+                    return false; // Helmet/Eyewear/Beard/Gear_* и т.д. пусть снимаются в -1
+            }
+        }
+
+        public string GetDefaultVisual(PartsType type)
+        {
+            switch (type)
+            {
+                case PartsType.Back: return DEFAULT_BACK;
+                case PartsType.Boots: return DEFAULT_BOOTS;
+                case PartsType.Bottom: return DEFAULT_BOTTOM;
+                case PartsType.Brow: return DEFAULT_BROW;
+                case PartsType.Eyes: return DEFAULT_EYES;
+                case PartsType.Gloves: return DEFAULT_GLOVES;
+
+                case PartsType.Hair_Short: return DEFAULT_HAIR_SHORT;
+                case PartsType.Hair_Hat: return DEFAULT_HAIR_HAT;
+
+                case PartsType.Mouth: return DEFAULT_MOUTH;
+                case PartsType.Top: return DEFAULT_TOP;
+                case PartsType.Skin: return DEFAULT_SKIN;
+
+                default:
+                    return ""; // у необязательных дефолта нет
+            }
+        }
+
+        /// <summary>
+        /// ВАЖНО: это только для РЕНДЕРА.
+        /// Если в State пусто, но слот mandatory — вернем дефолт.
+        /// Для non-mandatory вернем "" (и биндер поставит -1).
+        /// </summary>
+        public string GetVisualForRender(PartsType type, string rawValue)
+        {
+            if (!string.IsNullOrWhiteSpace(rawValue))
+                return rawValue;
+
+            if (IsMandatoryVisual(type))
+                return GetDefaultVisual(type);
+
+            return "";
+        }
     }
+
 }
+
 
 
 

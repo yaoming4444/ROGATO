@@ -19,6 +19,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 8a60d90b0e54545019e8358d984bc53e, type: 3}
   description: 
   rarity: 0
+  rarityBG: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54, type: 3}
   statType: 3
   statBySlotLevel:
     serializedVersion: 2

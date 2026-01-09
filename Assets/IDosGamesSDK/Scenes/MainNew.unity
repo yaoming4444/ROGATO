@@ -3872,6 +3872,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 2af325761237b43dc868e77162e345b2,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 313890805}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -4000,6 +4011,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &313890805 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 313890802}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1001 &317021591
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7506,6 +7529,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: c06cedafba359425a83aca520a8d126c,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 557193107}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -7634,6 +7668,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &557193107 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 557193104}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &581297233
 GameObject:
   m_ObjectHideFlags: 0
@@ -9134,6 +9180,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 4ba234d5fd0474ec1b9e060a5396f970,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 679108458}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -9262,6 +9319,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &679108458 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 679108455}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &682114769
 GameObject:
   m_ObjectHideFlags: 0
@@ -10505,6 +10574,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 441dcbcb2e53540769a94d032e01f57b,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 769139184}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -10657,6 +10737,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &769139184 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 769139179}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &776808773
 GameObject:
   m_ObjectHideFlags: 0
@@ -11479,6 +11571,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: c11f668d21c824a0abd38c9683cdac65,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 806158734}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -11631,6 +11734,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &806158734 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 806158729}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &809557247
 GameObject:
   m_ObjectHideFlags: 0
@@ -13239,6 +13354,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 2ebdb774f3bb24b308af6d4dad9f0f21,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 937521138}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -13391,6 +13517,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &937521138 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 937521133}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &938651432
 GameObject:
   m_ObjectHideFlags: 0
@@ -15750,6 +15888,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 380ef44f6711f43e38a0d37e5dd27af1,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1123299056}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -15878,6 +16027,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &1123299056 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1123299053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1133230783
 GameObject:
   m_ObjectHideFlags: 0
@@ -16400,8 +16561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisualEquipmentService
   equipDatabase: {fileID: 11400000, guid: 5245b0db3923d4840b937124f801cc11, type: 2}
-  dbResourcePath: EquipDatabase
-  logSync: 0
+  syncFromStateOnStart: 1
 --- !u!4 &1171404521
 Transform:
   m_ObjectHideFlags: 0
@@ -16658,6 +16818,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 525f3f5833a6d4e24bfc9610dd93b578,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1185097384}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -16798,6 +16969,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &1185097384 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1185097380}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1209365296
 GameObject:
   m_ObjectHideFlags: 0
@@ -19452,6 +19635,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 3fa97c2090ba64569bc7ef34db9cc2ed,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1405588891}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -19604,6 +19798,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &1405588891 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1405588886}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1406192373
 GameObject:
   m_ObjectHideFlags: 0
@@ -21205,6 +21411,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 72567408c6c7046789a625029205e86f,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1532675976}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -21357,6 +21574,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &1532675976 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1532675971}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1001 &1532914818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23571,6 +23800,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 1662634736}
+    - target: {fileID: 7287414904623890955, guid: 4559948819ada4143a2e6a1d6ed9aaef,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DeActivateGameObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 7287414904623890955, guid: 4559948819ada4143a2e6a1d6ed9aaef,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: OpenPanel, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7758035658527027631, guid: 4559948819ada4143a2e6a1d6ed9aaef,
         type: 3}
@@ -23648,6 +23887,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1662634734}
+    - targetCorrespondingSourceObject: {fileID: 8396016266603260945, guid: 4559948819ada4143a2e6a1d6ed9aaef,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1662634736}
   m_SourcePrefab: {fileID: 100100000, guid: 4559948819ada4143a2e6a1d6ed9aaef, type: 3}
 --- !u!224 &1662634729 stripped
 RectTransform:
@@ -23687,11 +23930,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentWindowController
   inventoryServiceBehaviour: {fileID: 1662634732}
-  equipment: {fileID: 1171404520}
   equipDatabase: {fileID: 11400000, guid: 5245b0db3923d4840b937124f801cc11, type: 2}
   startTab: 0
   tabEquipmentButton: {fileID: 199756041}
   tabFaceButton: {fileID: 1313090541}
+  tabNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  tabSelectedColor: {r: 1, g: 0.6, b: 0.1, a: 1}
   equipmentPanel: {fileID: 1884818370}
   facePanel: {fileID: 1209365296}
   popup: {fileID: 7406666182115108691}
@@ -23714,6 +23958,19 @@ MonoBehaviour:
   - {fileID: 806158733}
   - {fileID: 769139183}
   - {fileID: 2106796581}
+--- !u!114 &1662634736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266431461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccaa2ef9a56b3f447a38023b6ca84c9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpenPanel
+  Panel: {fileID: 266431461}
 --- !u!1 &1664740960
 GameObject:
   m_ObjectHideFlags: 0
@@ -25526,6 +25783,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 62d6a2abb7658404380756d20bc11e18,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1858745993}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -25666,6 +25934,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &1858745993 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1858745989}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1861473938
 GameObject:
   m_ObjectHideFlags: 0
@@ -25891,6 +26171,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: c5d617251c09642769c7ea529c3cbfca,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 1874253835}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -26019,6 +26310,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &1874253835 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1874253832}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &1882932545
 GameObject:
   m_ObjectHideFlags: 0
@@ -30176,6 +30479,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 43121c32de4a14154a17eb818d1f3d11,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 2106796582}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -30328,6 +30642,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &2106796582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 2106796577}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &2111755179
 GameObject:
   m_ObjectHideFlags: 0
@@ -31838,19 +32164,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e40c99f9e01129b40bbe8f25d3b375be, type: 3}
---- !u!114 &1103598135588772134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2754915874650352726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f36517d186ffe92469371862583393c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  imageType: 9
 --- !u!224 &1128000214354359602
 RectTransform:
   m_ObjectHideFlags: 0
@@ -33314,7 +33627,7 @@ PrefabInstance:
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
@@ -33324,17 +33637,17 @@ PrefabInstance:
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
@@ -33374,12 +33687,12 @@ PrefabInstance:
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 190
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -120
       objectReference: {fileID: 0}
     - target: {fileID: 3985385595525526393, guid: 8f280365bb33a2e4992852c6e5c24a5e,
         type: 3}
@@ -34268,7 +34581,6 @@ GameObject:
   - component: {fileID: 3911460288144563297}
   - component: {fileID: 5134534272994654484}
   - component: {fileID: 7583741189932259261}
-  - component: {fileID: 1103598135588772134}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -39266,6 +39578,7 @@ MonoBehaviour:
   description: {fileID: 0}
   rarityBgImage: {fileID: 1151902925733537155}
   rarityText: {fileID: 1151902927191765082}
+  itemRarityBgImage: {fileID: 1624093020}
   commonBg: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
   commonText: {r: 0.8627451, g: 0.8627451, b: 0.8627451, a: 1}
   uncommonBg: {r: 0.11764706, g: 0.43137255, b: 0.23529412, a: 1}
@@ -40408,6 +40721,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 0f0c6e818d77a48fd8d20068b8275b69,
         type: 3}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: backgroundImage
+      value: 
+      objectReference: {fileID: 8576755779911252813}
+    - target: {fileID: 1547693748108466105, guid: fce8dfa6ec270084c87e2d2426549a9e,
+        type: 3}
+      propertyPath: defaultBackgroundImage
+      value: 
+      objectReference: {fileID: 21300000, guid: dd77367546bf4433dbbb2317a935df54,
+        type: 3}
     - target: {fileID: 5878996485238281030, guid: fce8dfa6ec270084c87e2d2426549a9e,
         type: 3}
       propertyPath: m_Name
@@ -40530,6 +40854,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087ad015f4ebd6d498cead021aecb252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlotView
+--- !u!114 &8576755779911252813 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4275309527266667832, guid: fce8dfa6ec270084c87e2d2426549a9e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8576755779911252811}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!222 &8818448755443540532
 CanvasRenderer:
   m_ObjectHideFlags: 0

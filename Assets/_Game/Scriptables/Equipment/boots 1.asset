@@ -18,7 +18,8 @@ MonoBehaviour:
   partId: boots/boots_c_2
   icon: {fileID: 21300000, guid: 64df34a0d39464707b84b77ac7460e88, type: 3}
   description: 
-  rarity: 0
+  rarity: 2
+  rarityBG: {fileID: 21300000, guid: 35d7e6588f1f34db1b9a5e62f4efdf77, type: 3}
   statType: 2
   statBySlotLevel:
     serializedVersion: 2

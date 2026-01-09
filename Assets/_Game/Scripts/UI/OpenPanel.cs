@@ -8,4 +8,9 @@ public class OpenPanel : MonoBehaviour
     {
         Panel.gameObject.SetActive(true);
     }
+
+    public void DeActivateGameObject()
+    {
+        Panel.gameObject.SetActive(false);
+    }
 }
