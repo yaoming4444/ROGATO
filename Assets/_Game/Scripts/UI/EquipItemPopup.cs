@@ -13,15 +13,47 @@ public class EquipItemPopup : MonoBehaviour
     [SerializeField] private TMP_Text title;
     [SerializeField] private TMP_Text description;
 
+    [Header("Rarity UI")]
+    [SerializeField] private Image rarityBgImage;
+    [SerializeField] private TMP_Text rarityText;
+
+    [Header("Rarity Colors (BG / Text)")]
+    [SerializeField] private Color commonBg = new Color32(70, 70, 70, 255);
+    [SerializeField] private Color commonText = new Color32(220, 220, 220, 255);
+
+    [SerializeField] private Color uncommonBg = new Color32(30, 110, 60, 255);
+    [SerializeField] private Color uncommonText = new Color32(190, 255, 210, 255);
+
+    [SerializeField] private Color rareBg = new Color32(35, 75, 150, 255);
+    [SerializeField] private Color rareText = new Color32(200, 220, 255, 255);
+
+    [SerializeField] private Color epicBg = new Color32(110, 50, 150, 255);
+    [SerializeField] private Color epicText = new Color32(240, 210, 255, 255);
+
+    [SerializeField] private Color legendaryBg = new Color32(170, 120, 25, 255);
+    [SerializeField] private Color legendaryText = new Color32(255, 240, 190, 255);
+
+    [Header("Stats UI")]
+    [SerializeField] private GameObject statsGroup;        // <-- NEW: весь блок статов (иконка+цифра)
+    [SerializeField] private TMP_Text statsValueText;      // <-- цифра (например: 15)
+    [SerializeField] private Image statTypeImage;          // <-- иконка ATK/DEF/HP
+    [SerializeField] private Sprite atkSprite;
+    [SerializeField] private Sprite defSprite;
+    [SerializeField] private Sprite hpSprite;
+
+    [Header("Extra UI (NEW)")]
+    [SerializeField] private TMP_Text slotLevelText;       // <-- "LVL X/120"
+    [SerializeField] private TMP_Text itemTypeText;        // <-- "Item Type" / slot type
+
     [Header("Buttons")]
     [SerializeField] private Button closeButton;
     [SerializeField] private Button confirmButton;
     [SerializeField] private TMP_Text confirmButtonLabel;
 
     [Header("Color (optional)")]
-    [SerializeField] private Button colorButton;                 // кнопка "Color"
-    [SerializeField] private EquipmentColorPicker colorPicker;   // ссылка на ColorPicker
-    [SerializeField] private Sprite skinPreviewSprite;           // <-- заготовленный спрайт дл€ кожи (head/skin preview)
+    [SerializeField] private Button colorButton;
+    [SerializeField] private EquipmentColorPicker colorPicker;
+    [SerializeField] private Sprite skinPreviewSprite;
 
     private Action _onConfirm;
     private EquipItemDef _currentItem;
@@ -75,17 +107,106 @@ public class EquipItemPopup : MonoBehaviour
         if (icon) icon.sprite = item ? item.icon : null;
         if (title) title.text = item ? item.displayName : "Item";
         if (description) description.text = item ? item.description : "";
+
+        RefreshRarityUI(item);
+        RefreshExtraUI(item);
+        RefreshStatsUI(item);
+    }
+
+    private void RefreshExtraUI(EquipItemDef item)
+    {
+        if (item == null)
+        {
+            if (slotLevelText) slotLevelText.text = "";
+            if (itemTypeText) itemTypeText.text = "";
+            return;
+        }
+
+        var st = GameCore.GameInstance.I?.State;
+        int slotLevel = st != null ? st.GetVisualSlotLevel(item.slotType) : 1;
+
+        if (slotLevelText)
+            slotLevelText.text = $"LVL {slotLevel}/120";
+
+        if (itemTypeText)
+            itemTypeText.text = item.slotType.ToString(); // хочешь красивее Ч сделаем маппинг
+    }
+
+    private void RefreshRarityUI(EquipItemDef item)
+    {
+        if (!rarityBgImage && !rarityText) return;
+
+        if (item == null)
+        {
+            if (rarityText) rarityText.text = "";
+            if (rarityBgImage) rarityBgImage.color = Color.clear;
+            return;
+        }
+
+        if (rarityText)
+            rarityText.text = item.rarity.ToString().ToUpperInvariant();
+
+        var (bg, txt) = GetRarityColors(item.rarity);
+
+        if (rarityBgImage) rarityBgImage.color = bg;
+        if (rarityText) rarityText.color = txt;
+    }
+
+    private (Color bg, Color text) GetRarityColors(EquipRarity r)
+    {
+        switch (r)
+        {
+            case EquipRarity.Common: return (commonBg, commonText);
+            case EquipRarity.Uncommon: return (uncommonBg, uncommonText);
+            case EquipRarity.Rare: return (rareBg, rareText);
+            case EquipRarity.Epic: return (epicBg, epicText);
+            case EquipRarity.Legendary: return (legendaryBg, legendaryText);
+            default: return (commonBg, commonText);
+        }
+    }
+
+    private void RefreshStatsUI(EquipItemDef item)
+    {
+        // если стата нет Ч скрываем весь блок статов
+        bool hasStat = (item != null && item.statType != EquipStatType.None);
+
+        if (statsGroup)
+            statsGroup.SetActive(hasStat);
+
+        if (!hasStat)
+            return;
+
+        var st = GameCore.GameInstance.I?.State;
+        int slotLevel = st != null ? st.GetVisualSlotLevel(item.slotType) : 1;
+        int value = item.GetStatValueForSlotLevel(slotLevel);
+
+        // только цифра, без текста и без "+"
+        if (statsValueText)
+            statsValueText.text = value.ToString();
+
+        if (statTypeImage)
+        {
+            statTypeImage.enabled = true;
+            statTypeImage.sprite = GetStatSprite(item.statType);
+        }
+    }
+
+    private Sprite GetStatSprite(EquipStatType t)
+    {
+        switch (t)
+        {
+            case EquipStatType.ATK: return atkSprite;
+            case EquipStatType.DEF: return defSprite;
+            case EquipStatType.HP: return hpSprite;
+            default: return null;
+        }
     }
 
     private void RefreshColorButton(EquipItemDef item)
     {
-        if (!colorButton)
-            return;
+        if (!colorButton) return;
 
         var t = GetColorTargetForItem(item);
-
-        // показываем кнопку только если:
-        // - предмет краситс€ (Hair/Beard/Brow) »Ћ» это отдельна€ кнопка дл€ кожи (если ты еЄ тоже используешь через этот попап)
         bool canShow = (t != EquipmentColorPicker.Target.None) && colorPicker != null;
 
         colorButton.gameObject.SetActive(canShow);
@@ -101,20 +222,13 @@ public class EquipItemPopup : MonoBehaviour
         if (target == EquipmentColorPicker.Target.None)
             return;
 
-        var gi = GameCore.GameInstance.I;
-        var st = gi?.State;
+        var st = GameCore.GameInstance.I?.State;
         if (st == null)
             return;
 
-        // 1) берем текущий сохраненный цвет из PlayerState
         var initial = GetStateColor(st, target);
-
-        // 2) превью-спрайт дл€ outputPreviewImage:
-        //    - дл€ Skin: заготовленный спрайт skinPreviewSprite
-        //    - дл€ Hair/Beard/Brow: иконка текущего предмета (или можешь заменить на отдельные спрайты)
         Sprite preview = GetPreviewSpriteForTarget(target, _currentItem);
 
-        // 3) открываем пикер (и ¬ј∆Ќќ: auto-apply теперь выключен Ч примен€ем через Apply кнопкой на пикере)
         colorPicker.Open(
             target: target,
             previewSprite: preview,
@@ -125,12 +239,8 @@ public class EquipItemPopup : MonoBehaviour
     private Sprite GetPreviewSpriteForTarget(EquipmentColorPicker.Target t, EquipItemDef item)
     {
         if (t == EquipmentColorPicker.Target.Skin)
-        {
-            // твой "заготовленный спрайт" дл€ кожи
             return skinPreviewSprite != null ? skinPreviewSprite : (item ? item.icon : null);
-        }
 
-        // Hair/Beard/Brow
         return item ? item.icon : null;
     }
 
@@ -138,7 +248,6 @@ public class EquipItemPopup : MonoBehaviour
     {
         if (item == null) return EquipmentColorPicker.Target.None;
 
-        // под твои face слоты:
         switch (item.slotType)
         {
             case EquipmentType.Hair_Short:
@@ -151,10 +260,6 @@ public class EquipItemPopup : MonoBehaviour
             case EquipmentType.Brow:
                 return EquipmentColorPicker.Target.Brow;
 
-            // если захочешь вызывать skin picker через попап Ч раскомментируй:
-            // case EquipmentType.Skin:
-            //     return EquipmentColorPicker.Target.Skin;
-
             default:
                 return EquipmentColorPicker.Target.None;
         }
@@ -162,8 +267,6 @@ public class EquipItemPopup : MonoBehaviour
 
     private Color32 GetStateColor(GameCore.PlayerState st, EquipmentColorPicker.Target t)
     {
-        // Ёти методы должны быть в PlayerState:
-        // GetHairColor32 / GetBeardColor32 / GetBrowColor32 (как GetSkinColor32)
         switch (t)
         {
             case EquipmentColorPicker.Target.Skin: return st.GetSkinColor32();
@@ -197,6 +300,9 @@ public class EquipItemPopup : MonoBehaviour
         else gameObject.SetActive(false);
     }
 }
+
+
+
 
 
 

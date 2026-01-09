@@ -1,5 +1,22 @@
 using UnityEngine;
 
+public enum EquipStatType
+{
+    None = 0,
+    ATK = 1,
+    DEF = 2,
+    HP = 3
+}
+
+public enum EquipRarity
+{
+    Common = 0,
+    Uncommon = 1,
+    Rare = 2,
+    Epic = 3,
+    Legendary = 4
+}
+
 [CreateAssetMenu(menuName = "Game/Equipment/Equip Item", fileName = "EquipItem_")]
 public class EquipItemDef : ScriptableObject
 {
@@ -8,12 +25,36 @@ public class EquipItemDef : ScriptableObject
     public string displayName;
 
     [Header("Equip rules")]
-    public EquipmentType slotType;        // куда надевается
+    public EquipmentType slotType;   // куда надевается
     public string partId;            // ключ для PartsManager (что именно ставить в визуал)
 
     [Header("UI")]
     public Sprite icon;
 
     [TextArea] public string description;
+
+    [Header("Rarity (NEW)")]
+    public EquipRarity rarity = EquipRarity.Common;
+
+    [Header("Stats (Visual Equipment)")]
+    public EquipStatType statType = EquipStatType.None;
+
+    [Tooltip("X = уровень слота (1..120), Y = значение стата. Например: (1,2) (120,250)")]
+    public AnimationCurve statBySlotLevel = AnimationCurve.Linear(1, 1, 120, 120);
+
+    [Tooltip("Округление значения стата (обычно true).")]
+    public bool roundToInt = true;
+
+    public int GetStatValueForSlotLevel(int slotLevel)
+    {
+        if (statType == EquipStatType.None) return 0;
+
+        slotLevel = Mathf.Clamp(slotLevel, 1, 120);
+        float val = statBySlotLevel != null ? statBySlotLevel.Evaluate(slotLevel) : 0f;
+
+        return roundToInt ? Mathf.RoundToInt(val) : Mathf.FloorToInt(val);
+    }
 }
+
+
 

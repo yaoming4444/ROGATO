@@ -9,7 +9,7 @@ public class EquipmentWindowController : MonoBehaviour
 
     [Header("Services")]
     [SerializeField] private MonoBehaviour inventoryServiceBehaviour; // DevInventoryService_AllItems
-    [SerializeField] private VisualEquipmentService equipment;
+    [SerializeField] private VisualEquipmentService equipment;        // СЮДА ДАЙ ПРЕФАБНЫЙ (always on) сервис
     [SerializeField] private EquipDatabase equipDatabase;
 
     [Header("Tabs")]
@@ -17,25 +17,28 @@ public class EquipmentWindowController : MonoBehaviour
     [SerializeField] private Button tabEquipmentButton;
     [SerializeField] private Button tabFaceButton;
 
+    [Header("Tab Colors")]
+    [SerializeField] private Color tabNormalColor = Color.white;
+    [SerializeField] private Color tabSelectedColor = new Color(1f, 0.6f, 0.1f, 1f); // оранж
+
     [Header("Panels")]
     [SerializeField] private GameObject equipmentPanel;
     [SerializeField] private GameObject facePanel;
 
     [Header("Popup (optional)")]
-    [SerializeField] private EquipItemPopup popup; // <-- ВАЖНО: конкретный тип, НЕ MonoBehaviour/dynamic
+    [SerializeField] private EquipItemPopup popup;
 
     [Header("UI - Inventory")]
     [SerializeField] private Transform inventoryGridRoot;
     [SerializeField] private InventoryItemView inventoryItemPrefab;
 
     [Header("UI - Slots (Top)")]
-    [SerializeField] private List<EquipmentSlotView> equipmentSlots = new(); // 8 слотов экипы
-    [SerializeField] private List<EquipmentSlotView> faceSlots = new();      // 6 face: hair_short, eyes, beard, brow, mouth, gear_left
+    [SerializeField] private List<EquipmentSlotView> equipmentSlots = new();
+    [SerializeField] private List<EquipmentSlotView> faceSlots = new();
 
     private IInventoryService _inventory;
     private Tab _activeTab;
 
-    // ====== НАБОРЫ СЛОТОВ ДЛЯ ФИЛЬТРА ИНВЕНТАРЯ ======
     private static readonly HashSet<EquipmentType> EquipmentSlotSet = new()
     {
         EquipmentType.Helmet,
@@ -46,6 +49,7 @@ public class EquipmentWindowController : MonoBehaviour
         EquipmentType.Back,
         EquipmentType.Gear_Left,
         EquipmentType.Gear_Right,
+        EquipmentType.Eyewear,   // если у тебя eyewear в equipment вкладке
     };
 
     private static readonly HashSet<EquipmentType> FaceSlotSet = new()
@@ -61,8 +65,10 @@ public class EquipmentWindowController : MonoBehaviour
     private void Awake()
     {
         _inventory = inventoryServiceBehaviour as IInventoryService;
-        if (_inventory == null)
-            Debug.LogWarning("[EquipmentWindowController] inventoryServiceBehaviour does not implement IInventoryService");
+
+        // ВАЖНО: всегда берём singleton
+        if (equipment == null)
+            equipment = VisualEquipmentService.I;
 
         if (tabEquipmentButton) tabEquipmentButton.onClick.AddListener(() => SwitchTab(Tab.Equipment));
         if (tabFaceButton) tabFaceButton.onClick.AddListener(() => SwitchTab(Tab.Face));
@@ -70,13 +76,15 @@ public class EquipmentWindowController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (equipment == null)
+            equipment = VisualEquipmentService.I;
+
         if (equipment != null)
             equipment.OnChanged += OnEquipmentChanged;
 
-        // Восстановление экипы для UI из PlayerState (чтобы после запуска было видно)
-        var gi = GameCore.GameInstance.I;
-        if (equipment != null && equipDatabase != null && gi != null && gi.State != null)
-            equipment.LoadFromState(gi.State, equipDatabase);
+        // НЕ вызывай больше LoadFromState из окна.
+        // Сервис сам синкнется на StateChanged и OnEnable.
+        equipment?.SyncFromState();
 
         SwitchTab(startTab, rebuildInventory: true, refreshSlots: true);
     }
@@ -87,9 +95,9 @@ public class EquipmentWindowController : MonoBehaviour
             equipment.OnChanged -= OnEquipmentChanged;
     }
 
+
     private void OnEquipmentChanged()
     {
-        // лучше обновлять оба набора, чтобы при переключении вкладок всё уже было актуально
         RefreshSlots(equipmentSlots);
         RefreshSlots(faceSlots);
     }
@@ -101,13 +109,7 @@ public class EquipmentWindowController : MonoBehaviour
         if (equipmentPanel) equipmentPanel.SetActive(tab == Tab.Equipment);
         if (facePanel) facePanel.SetActive(tab == Tab.Face);
 
-        // оставь интерактивными обе, либо делай выбранную неинтерактивной — на вкус
-        if (tabEquipmentButton) tabEquipmentButton.interactable = true;
-        if (tabFaceButton) tabFaceButton.interactable = true;
-
-        // выделяем выбранную (включит Selected Color)
-        if (tab == Tab.Equipment) SetTabSelected(tabEquipmentButton, true);
-        else SetTabSelected(tabFaceButton, true);
+        ApplyTabColors(tab);
 
         if (rebuildInventory) BuildInventory();
 
@@ -118,15 +120,19 @@ public class EquipmentWindowController : MonoBehaviour
         }
     }
 
+    private void ApplyTabColors(Tab active)
+    {
+        SetButtonColor(tabEquipmentButton, active == Tab.Equipment ? tabSelectedColor : tabNormalColor);
+        SetButtonColor(tabFaceButton,      active == Tab.Face      ? tabSelectedColor : tabNormalColor);
+    }
 
-    private void SetTabSelected(Button btn, bool selected)
+    private void SetButtonColor(Button btn, Color c)
     {
         if (!btn) return;
 
-        // Важно: чтобы работало Selected, кнопка должна быть "Selectable"
-        // (Button = Selectable)
-        if (selected)
-            btn.Select(); // даст Selected state
+        // красим TargetGraphic (обычно Image)
+        if (btn.targetGraphic != null)
+            btn.targetGraphic.color = c;
     }
 
     private void BuildInventory()
@@ -157,17 +163,12 @@ public class EquipmentWindowController : MonoBehaviour
     {
         if (equipment == null || item == null) return;
 
-        // Попап: надеваем только после кнопки Equip
         if (popup != null)
         {
-            popup.ShowForInventoryItem(
-                item,
-                onConfirm: () => equipment.Equip(item)
-            );
+            popup.ShowForInventoryItem(item, onConfirm: () => equipment.Equip(item));
             return;
         }
 
-        // fallback без попапа
         equipment.Equip(item);
     }
 
@@ -180,8 +181,6 @@ public class EquipmentWindowController : MonoBehaviour
             if (slotView == null) continue;
 
             var equippedItem = equipment.GetEquipped(slotView.slot);
-
-            // SlotView сам решит: показывать дефолтную иконку / делать кнопку интерактивной
             slotView.Bind(equippedItem, OnSlotClickedUnequip);
         }
     }
@@ -191,21 +190,18 @@ public class EquipmentWindowController : MonoBehaviour
         if (equipment == null) return;
 
         var equippedItem = equipment.GetEquipped(slot);
-        if (equippedItem == null)
-            return; // если пусто — ничего не делаем (и кнопка у тебя должна быть неинтерактивной)
+        if (equippedItem == null) return;
 
         if (popup != null)
         {
-            popup.ShowForEquippedItem(
-                equippedItem,
-                onConfirm: () => equipment.Unequip(slot)
-            );
+            popup.ShowForEquippedItem(equippedItem, onConfirm: () => equipment.Unequip(slot));
             return;
         }
 
         equipment.Unequip(slot);
     }
 }
+
 
 
 

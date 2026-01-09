@@ -41,8 +41,16 @@ namespace GameCore
         // Это ДОЛЖНЫ БЫТЬ реальные имена скинов из Spine, например:
         // "top/top_c_10", "boots/boots_c_3", "skin/skin_c_1", etc.
         //
-        // Если хочешь “префиксы” — тоже можно, но тогда биндер должен
-        // искать StartsWith(). Я советую хранить полное имя.
+
+        // Visual equipment slot levels (1..120)
+        public int lvl_helmet = 1;
+        public int lvl_top = 1;
+        public int lvl_bottom = 1;
+        public int lvl_boots = 1;
+        public int lvl_gloves = 1;
+        public int lvl_gearRight = 1;
+        public int lvl_back = 1;
+        public int lvl_eyewear = 1;
 
         public string visual_back = "";
         public string visual_beard = "";
@@ -134,6 +142,15 @@ namespace GameCore
                 AutoSellEnabled = false,
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
+                lvl_helmet = 1,
+                lvl_top = 1,
+                lvl_bottom = 1,
+                lvl_boots = 1,
+                lvl_gloves = 1,
+                lvl_gearRight = 1,
+                lvl_back = 1,
+                lvl_eyewear = 1,
+
                 // ====== DEFAULT VISUALS ======
                 // Поставь тут свои реальные дефолтные скины.
                 // Если ты хочешь "все части индекс 1" — чаще всего это *_c_1 (но проверь имена в Spine).
@@ -219,6 +236,50 @@ namespace GameCore
         {
             EnsureValid();
             Equipped[(int)slot] = itemId ?? "";
+        }
+
+        public int GetVisualSlotLevel(EquipmentType slot)
+        {
+            switch (slot)
+            {
+                case EquipmentType.Helmet: return lvl_helmet;
+                case EquipmentType.Top: return lvl_top;
+                case EquipmentType.Bottom: return lvl_bottom;
+                case EquipmentType.Boots: return lvl_boots;
+                case EquipmentType.Gloves: return lvl_gloves;
+                case EquipmentType.Gear_Right: return lvl_gearRight;
+                case EquipmentType.Back: return lvl_back;
+                case EquipmentType.Eyewear: return lvl_eyewear;
+                default: return 1; // все остальные слоты не прокачиваются
+            }
+        }
+
+        public void SetVisualSlotLevel(EquipmentType slot, int level)
+        {
+            level = Mathf.Clamp(level, 1, 120);
+
+            switch (slot)
+            {
+                case EquipmentType.Helmet: lvl_helmet = level; break;
+                case EquipmentType.Top: lvl_top = level; break;
+                case EquipmentType.Bottom: lvl_bottom = level; break;
+                case EquipmentType.Boots: lvl_boots = level; break;
+                case EquipmentType.Gloves: lvl_gloves = level; break;
+                case EquipmentType.Gear_Right: lvl_gearRight = level; break;
+                case EquipmentType.Back: lvl_back = level; break;
+                case EquipmentType.Eyewear: lvl_eyewear = level; break;
+                default: return;
+            }
+        }
+
+        public bool UpgradeVisualSlotLevel(EquipmentType slot, int delta = 1)
+        {
+            int cur = GetVisualSlotLevel(slot);
+            int next = Mathf.Clamp(cur + delta, 1, 120);
+            if (next == cur) return false;
+
+            SetVisualSlotLevel(slot, next);
+            return true;
         }
     }
 }

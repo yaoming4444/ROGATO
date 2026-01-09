@@ -509,6 +509,30 @@ namespace GameCore
             RaiseStateChanged();
         }
 
+        // VISUAL EQUIPMENT SLOT LEVEL //
+
+        public bool UpgradeVisualSlot(EquipmentType slot, int delta = 1, bool saveLocal = true)
+        {
+            var st = State;
+            if (st == null) return false;
+
+            bool changed = st.UpgradeVisualSlotLevel(slot, delta);
+            if (!changed) return false;
+
+            RaiseStateChanged();
+
+            if (saveLocal)
+                SaveLocalNow(); // или SaveAllNow(), как ты используешь
+
+            return true;
+        }
+
+        public int GetVisualSlotLevel(EquipmentType slot)
+        {
+            var st = State;
+            return st != null ? st.GetVisualSlotLevel(slot) : 1;
+        }
+
         public void DevResetProgress(bool enableServerAutosave = true)
         {
             var fresh = PlayerState.CreateDefault();
