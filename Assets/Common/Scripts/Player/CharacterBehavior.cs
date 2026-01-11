@@ -1,65 +1,239 @@
 using OctoberStudio.Easing;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace OctoberStudio
 {
+    /// <summary>
+    /// ICharacterBehavior implementation for Spine персонажа (SkeletonAnimation).
+    /// ”правл€ет анимаци€ми по именам (Idle/Run/Die/Hit).
+    /// </summary>
     public class CharacterBehavior : MonoBehaviour, ICharacterBehavior
     {
-        protected static readonly int DEFEAT_TRIGGER = Animator.StringToHash("Defeat");
-        protected static readonly int REVIVE_TRIGGER = Animator.StringToHash("Revive");
-        protected static readonly int SPEED_FLOAT = Animator.StringToHash("Speed");
+        [Header("Spine")]
+        [SerializeField] private SkeletonAnimation skeletonAnimation; // основной компонент (внутри есть и SkeletonRenderer)
 
-        protected static readonly int _Overlay = Shader.PropertyToID("_Overlay");
+        [Header("Animation Names")]
+        [SerializeField] private string idleAnim = "Idle";
+        [SerializeField] private string runAnim = "Run";
+        [SerializeField] private string walkAnim = "";     // опционально
+        [SerializeField] private string defeatAnim = "Die";
+        [SerializeField] private string reviveAnim = "";   // если нет Ч оставь пустым
+        [SerializeField] private string hitAnim = "Hit";   // если нет Ч оставь пустым
 
-        [SerializeField] protected SpriteRenderer playerSpriteRenderer;
-        [SerializeField] protected Animator animator;
-        [SerializeField] protected Color hitColor;
-        [SerializeField] protected Transform centerTransform;
-        public Transform CenterTransform => centerTransform;
+        [Header("Movement")]
+        [SerializeField, Range(0.01f, 0.5f)] private float moveThreshold = 0.05f;
+
+        [Header("Hit Flash")]
+        [SerializeField] private Color hitColor = new Color(1f, 0.3f, 0.3f, 1f);
+        [SerializeField] private float hitFlashDuration = 0.10f;
+
+        [Header("Center")]
+        [SerializeField] private Transform centerTransform;
+        public Transform CenterTransform => centerTransform != null ? centerTransform : transform;
 
         public Transform Transform => transform;
 
-        protected IEasingCoroutine damageCoroutine;
+        private IEasingCoroutine _hitCoroutine;
+        private bool _isDead;
+        private bool _isMoving;
+
+        private Spine.AnimationState _state; // Spine.AnimationState
+
+        [Header("Flip/Scale")]
+        [SerializeField] private Transform visualRoot; // сюда: объект где SkeletonAnimation (обычно child)
+        [SerializeField] private bool invertFlip = false; // если вправо смотрит влево Ч включи
+
+        private Vector3 _baseVisualScale;
+        private int _facingSign = 1;
+
+
+        private void Awake()
+        {
+            if (!skeletonAnimation)
+                skeletonAnimation = GetComponentInChildren<SkeletonAnimation>(true);
+
+            if (!visualRoot)
+                visualRoot = skeletonAnimation != null ? skeletonAnimation.transform : transform;
+
+            _baseVisualScale = visualRoot.localScale; // тут твои 0.3,0.3,0.3
+
+
+            EnsureReady();
+        }
+
+        private void Start()
+        {
+            EnsureReady();
+            PlayBase(idleAnim, loop: true);
+        }
+
+        private bool EnsureReady()
+        {
+            if (skeletonAnimation == null) return false;
+
+            // ¬ твоей версии нет IsValid Ч есть skeletonAnimation.valid (унаследовано от SkeletonRenderer).
+            // Initialize(false) безопасно: если уже valid, оно просто вернетс€.
+            skeletonAnimation.Initialize(false);
+
+            if (!skeletonAnimation.valid) return false;
+
+            // AnimationState property сам вызывает Initialize(false) и возвращает state
+            _state ??= skeletonAnimation.AnimationState;
+            return _state != null;
+        }
 
         public virtual void SetSpeed(float speed)
         {
-            animator.SetFloat(SPEED_FLOAT, speed);
-        }
+            if (_isDead) return;
+            if (!EnsureReady()) return;
 
-        public virtual void SetLocalScale(Vector3 scale)
-        {
-            transform.localScale = scale;
-        }
+            bool movingNow = speed > moveThreshold;
+            if (movingNow == _isMoving) return;
+            _isMoving = movingNow;
 
-        public virtual void PlayReviveAnimation()
-        {
-            animator.SetTrigger(REVIVE_TRIGGER);
-        }
-
-        public virtual void PlayDefeatAnimation()
-        {
-            animator.SetTrigger(DEFEAT_TRIGGER);
-        }
-
-        public virtual void SetSortingOrder(int order) 
-        {
-            playerSpriteRenderer.sortingOrder = order;
-        }
-
-        public virtual void FlashHit(UnityAction onFinish = null)
-        {
-            if (damageCoroutine.ExistsAndActive()) return;
-
-            var transparentColor = hitColor;
-            transparentColor.a = 0;
-
-            playerSpriteRenderer.material.SetColor(_Overlay, transparentColor);
-
-            damageCoroutine = playerSpriteRenderer.material.DoColor(_Overlay, hitColor, 0.05f).SetOnFinish(() =>
+            if (_isMoving)
             {
-                damageCoroutine = playerSpriteRenderer.material.DoColor(_Overlay, transparentColor, 0.05f).SetOnFinish(onFinish);
+                var anim = !string.IsNullOrWhiteSpace(runAnim) ? runAnim : walkAnim;
+                PlayBase(anim, loop: true);
+            }
+            else
+            {
+                PlayBase(idleAnim, loop: true);
+            }
+        }
+
+        public void SetLocalScale(Vector3 scale)
+        {
+            if (visualRoot == null) return;
+
+            int sign = scale.x >= 0 ? 1 : -1;
+            if (invertFlip) sign = -sign;
+
+            if (_facingSign == sign) return;
+            _facingSign = sign;
+
+            var s = _baseVisualScale;
+            s.x = Mathf.Abs(_baseVisualScale.x) * _facingSign; // сохран€ем 0.3 и мен€ем только знак
+            visualRoot.localScale = s;
+        }
+
+
+        public void PlayReviveAnimation()
+        {
+            _isDead = false;
+            if (!EnsureReady()) return;
+
+            if (!string.IsNullOrWhiteSpace(reviveAnim) && HasAnimation(reviveAnim))
+            {
+                _state.SetAnimation(0, reviveAnim, false);
+
+                if (!string.IsNullOrWhiteSpace(idleAnim) && HasAnimation(idleAnim))
+                    _state.AddAnimation(0, idleAnim, true, 0f);
+            }
+            else
+            {
+                PlayBase(idleAnim, loop: true);
+            }
+        }
+
+        public void PlayDefeatAnimation()
+        {
+            _isDead = true;
+            if (!EnsureReady()) return;
+
+            if (!string.IsNullOrWhiteSpace(defeatAnim) && HasAnimation(defeatAnim))
+                _state.SetAnimation(0, defeatAnim, false);
+            else
+                PlayBase(idleAnim, loop: true);
+        }
+
+        public void SetSortingOrder(int order)
+        {
+            // SkeletonRenderer Ќ≈ имеет sortingOrder Ч он на MeshRenderer.
+            MeshRenderer mr = null;
+
+            if (skeletonAnimation != null)
+                mr = skeletonAnimation.GetComponent<MeshRenderer>();
+
+            if (!mr)
+                mr = GetComponentInChildren<MeshRenderer>(true);
+
+            if (mr)
+                mr.sortingOrder = order;
+        }
+
+        public void FlashHit(UnityAction onFinish = null)
+        {
+            if (!EnsureReady())
+            {
+                onFinish?.Invoke();
+                return;
+            }
+
+            if (_hitCoroutine.ExistsAndActive())
+                return;
+
+            // 1) Hit анимаци€ на overlay track (1)
+            if (!string.IsNullOrWhiteSpace(hitAnim) && HasAnimation(hitAnim))
+            {
+                _state.SetAnimation(1, hitAnim, false);
+                _state.AddEmptyAnimation(1, 0.05f, hitFlashDuration);
+            }
+
+            // 2) флешим tint скелета
+            var skel = skeletonAnimation.Skeleton;
+            var old = new Color(skel.R, skel.G, skel.B, skel.A);
+
+            SetSkeletonColor(hitColor);
+
+            _hitCoroutine = EasingManager.DoAfter(hitFlashDuration, () =>
+            {
+                SetSkeletonColor(old);
+                onFinish?.Invoke();
             });
+        }
+
+        // ===== helpers =====
+
+        private void PlayBase(string animName, bool loop)
+        {
+            if (!EnsureReady()) return;
+            if (string.IsNullOrWhiteSpace(animName) || !HasAnimation(animName))
+                return;
+
+            TrackEntry cur = _state.GetCurrent(0);
+            if (cur != null && cur.Animation != null && cur.Animation.Name == animName && cur.Loop == loop)
+                return;
+
+            _state.SetAnimation(0, animName, loop);
+        }
+
+        private bool HasAnimation(string animName)
+        {
+            if (!EnsureReady()) return false;
+
+            var asset = skeletonAnimation.SkeletonDataAsset;
+            if (asset == null) return false;
+
+            var data = asset.GetSkeletonData(false);
+            if (data == null) return false;
+
+            return data.FindAnimation(animName) != null;
+        }
+
+        private void SetSkeletonColor(Color c)
+        {
+            if (!EnsureReady()) return;
+
+            var skel = skeletonAnimation.Skeleton;
+            skel.R = c.r;
+            skel.G = c.g;
+            skel.B = c.b;
+            skel.A = c.a;
         }
     }
 }
+

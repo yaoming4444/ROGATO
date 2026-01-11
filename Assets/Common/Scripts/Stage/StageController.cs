@@ -64,7 +64,7 @@ namespace OctoberStudio
             experienceManager.Init(testingPreset);
             dropManager.Init();
             fieldManager.Init(Stage, director);
-            abilityManager.Init(testingPreset, PlayerBehavior.Player.Data);
+            //abilityManager.Init(testingPreset, PlayerBehavior.Player.Data);
             cameraManager.Init(Stage);
 
             PlayerBehavior.Player.onPlayerDied += OnGameFailed;
