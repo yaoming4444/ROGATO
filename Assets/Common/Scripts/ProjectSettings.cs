@@ -7,13 +7,6 @@ namespace OctoberStudio
     [CreateAssetMenu(fileName = "ProjectSettings", menuName = "October/Project Settings", order = 1)]
     public class ProjectSettings : ScriptableObject
     {
-        [SerializeField] protected string loginSceneName = "LoginNew";
-        public string LoginSceneName => loginSceneName;
-
-        [SerializeField] protected string lobbySceneName = "LoginNew";
-        public string LobbySceneName => lobbySceneName;
-
-
         [SerializeField] protected string mainMenuSceneName = "Main Menu";
         public string MainMenuSceneName => mainMenuSceneName;
 

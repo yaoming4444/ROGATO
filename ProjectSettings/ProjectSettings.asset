@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: 7befda73599a79847a622e54ce070c88
+  productGUID: 00000000000000000000000000000000
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -47,7 +47,7 @@ PlayerSettings:
   defaultScreenWidthWeb: 800
   defaultScreenHeightWeb: 800
   m_StereoRenderingPath: 0
-  m_ActiveColorSpace: 0
+  m_ActiveColorSpace: 1
   unsupportedMSAAFallback: 0
   m_SpriteBatchMaxVertexCount: 65535
   m_SpriteBatchVertexThreshold: 300
@@ -567,9 +567,6 @@ PlayerSettings:
   - serializedVersion: 3
     m_BuildTarget: Android
     m_Formats: 03000000
-  - serializedVersion: 3
-    m_BuildTarget: WebGL
-    m_Formats: 05000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -835,13 +832,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols:
-    Android: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
-    PS4: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
-    Standalone: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
-    WebGL: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
-    XboxOne: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
-    iPhone: IDOSGAMES_NOTIFICATIONS_ANDROID;IDOSGAMES_NOTIFICATIONS_IOS;IDOSGAMES_MARKETPLACE;IDOSGAMES_CRYPTO_WALLET
+  scriptingDefineSymbols: {}
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -958,7 +949,7 @@ PlayerSettings:
   cloudProjectId: 69b46570-aad4-4e46-94e8-7118275a8a89
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: ROGATO
+  projectName: 
   organizationId: gordon0027
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

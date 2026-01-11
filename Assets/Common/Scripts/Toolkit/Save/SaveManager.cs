@@ -105,7 +105,7 @@ namespace OctoberStudio.Save
 
         private void Load()
         {
-            /*if (IsSaveLoaded)
+            if (IsSaveLoaded)
                 return;
 
             if(saveType == SaveType.SaveFile)
@@ -129,7 +129,7 @@ namespace OctoberStudio.Save
 
             IsSaveLoaded = true;
 
-            OnSaveLoaded?.Invoke();*/
+            OnSaveLoaded?.Invoke();
         }
 
         private SaveDatabase LoadSave()

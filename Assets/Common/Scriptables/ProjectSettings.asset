@@ -12,8 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba65de5fd9069241aafb2d7d75b5f44, type: 3}
   m_Name: ProjectSettings
   m_EditorClassIdentifier: 
-  loginSceneName: LoginNew
-  lobbySceneName: LoginNew
-  mainMenuSceneName: LoginNew
-  gameSceneName: LoginNew
-  loadingSceneName: LoginNew
+  mainMenuSceneName: Main Menu
+  gameSceneName: Game
+  loadingSceneName: Loading Screen
