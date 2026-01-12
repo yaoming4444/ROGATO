@@ -132,7 +132,7 @@ namespace OctoberStudio.UI
             save.XP = 0f;
             save.XPLEVEL = 0;
 
-            GameController.AudioManager.PlaySound(AudioManager.BUTTON_CLICK_HASH);
+            /*GameController.AudioManager.PlaySound(AudioManager.BUTTON_CLICK_HASH);*/
             GameController.LoadStage();
         }
 

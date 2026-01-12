@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba65de5fd9069241aafb2d7d75b5f44, type: 3}
   m_Name: ProjectSettings
   m_EditorClassIdentifier: 
-  mainMenuSceneName: LoginNew
+  mainMenuSceneName: MainNew
   gameSceneName: Game
   loadingSceneName: Loading Screen
+  useDefaultSceneLoader: 0
