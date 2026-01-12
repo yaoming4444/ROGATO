@@ -16,6 +16,21 @@ namespace OctoberStudio
             RewriteStartScene();
         }
 
+        private static bool IsEnabled()
+        {
+            // ищем ProjectSettings и читаем bool useDefaultSceneLoader
+            var guids = AssetDatabase.FindAssets($"t:{typeof(ProjectSettings).Name}");
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<ProjectSettings>(path);
+                if (asset != null)
+                    return asset.UseDefaultSceneLoader; // добавишь bool в ProjectSettings
+            }
+            return false; // по умолчанию выключено
+        }
+
+
         public static void OnProjectSettingsChanged()
         {
             ActivateGameScene();
@@ -28,6 +43,12 @@ namespace OctoberStudio
 
         private static void ActivateGameScene()
         {
+            if (!IsEnabled())
+            {
+                EditorSceneManager.playModeStartScene = null;
+                return;
+            }
+
             var mainMenuSceneName = GetMainMenuSceneName();
 
             if(mainMenuSceneName != null)

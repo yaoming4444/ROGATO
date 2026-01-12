@@ -15,9 +15,6 @@ EditorBuildSettings:
     path: Assets/IDosGamesSDK/Scenes/MainNew.unity
     guid: 8fc17ef6be4e74c44bd978b0aef1dc5f
   - enabled: 1
-    path: Assets/Common/Scenes/Main Menu.unity
-    guid: 9a2530fc90b664144a144b64f3c8d472
-  - enabled: 1
     path: Assets/Common/Scenes/Loading Screen.unity
     guid: 95a86f634c4229442892ca7b7c2d7635
   - enabled: 1

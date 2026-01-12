@@ -16,6 +16,9 @@ namespace OctoberStudio
         [SerializeField] protected string loadingSceneName = "Loading Screen";
         public string LoadingSceneName => loadingSceneName;
 
+        [SerializeField] private bool useDefaultSceneLoader = false;
+        public bool UseDefaultSceneLoader => useDefaultSceneLoader;
+
         protected void OnValidate()
         {
 #if UNITY_EDITOR
