@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Simple.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/IDosGamesSDK/Scenes/LoginNew.unity
+    guid: 1b1a66290d21f014791a960e297998b3
+  - enabled: 1
+    path: Assets/IDosGamesSDK/Scenes/MainNew.unity
+    guid: 8fc17ef6be4e74c44bd978b0aef1dc5f
+  - enabled: 1
     path: Assets/Common/Scenes/Main Menu.unity
     guid: 9a2530fc90b664144a144b64f3c8d472
   - enabled: 1
