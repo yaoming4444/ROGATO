@@ -697,6 +697,12 @@ MonoBehaviour:
   moveThreshold: 0.05
   hitColor: {r: 1, g: 0.3882353, b: 0.3882353, a: 0.6666667}
   hitFlashDuration: 0.1
-  centerTransform: {fileID: 1084302725158477326}
+  centerTransform: {fileID: 0}
   visualRoot: {fileID: 1084302725158477326}
   invertFlip: 1
+  autoFindCenterInParents: 1
+  centerNames:
+  - Center
+  - center
+  - CenterPoint
+  - Center Point

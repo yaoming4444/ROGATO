@@ -20,6 +20,9 @@ namespace OctoberStudio
         [Header("Character (Single Prefab)")]
         [SerializeField] private GameObject characterPrefab; // <-- ТВОЙ Spine prefab (единственный)
         [SerializeField] private bool applyVisualsFromPlayerState = true;
+        [SerializeField] protected CharactersDatabase charactersDatabase; // TO EDIT
+        protected CharactersSave charactersSave;
+        public CharacterData Data { get; set; }
 
         [Header("Base Stats (no database)")]
         [SerializeField] private float baseHP = 100f;
@@ -102,6 +105,11 @@ namespace OctoberStudio
         protected virtual void Awake()
         {
             instance = this;
+
+            // TO EDIT
+            charactersSave = GameController.SaveManager.GetSave<CharactersSave>("Characters");
+            Data = charactersDatabase.GetCharacterData(charactersSave.SelectedCharacterId);
+            //
 
             // 1) Spawn single character prefab
             if (characterPrefab == null)

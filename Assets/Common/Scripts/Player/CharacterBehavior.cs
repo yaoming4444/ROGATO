@@ -46,6 +46,10 @@ namespace OctoberStudio
         [SerializeField] private Transform visualRoot; // сюда: объект где SkeletonAnimation (обычно child)
         [SerializeField] private bool invertFlip = false; // если вправо смотрит влево Ч включи
 
+        [Header("Center Auto-find")]
+        [SerializeField] private bool autoFindCenterInParents = true;
+        [SerializeField] private string[] centerNames = { "Center", "center", "CenterPoint", "Center Point" };
+
         private Vector3 _baseVisualScale;
         private int _facingSign = 1;
 
@@ -58,6 +62,11 @@ namespace OctoberStudio
             if (!visualRoot)
                 visualRoot = skeletonAnimation != null ? skeletonAnimation.transform : transform;
 
+            if (centerTransform == null && autoFindCenterInParents)
+            {
+                centerTransform = FindCenterInParents();
+            }
+
             _baseVisualScale = visualRoot.localScale; // тут твои 0.3,0.3,0.3
 
 
@@ -68,6 +77,35 @@ namespace OctoberStudio
         {
             EnsureReady();
             PlayBase(idleAnim, loop: true);
+        }
+
+        private Transform FindCenterInParents()
+        {
+            // 1) »щем у родител€ (Player) по стандартным именам
+            var p = transform.parent;
+            if (p != null)
+            {
+                foreach (var n in centerNames)
+                {
+                    var t = p.Find(n);
+                    if (t != null) return t;
+                }
+            }
+
+            // 2) ≈сли вдруг Center лежит глубже/выше Ч пробегаем вверх по цепочке
+            var cur = transform.parent;
+            while (cur != null)
+            {
+                foreach (var n in centerNames)
+                {
+                    var t = cur.Find(n);
+                    if (t != null) return t;
+                }
+                cur = cur.parent;
+            }
+
+            // 3) ‘олбэк: если вообще не нашли Ч используем свой transform
+            return transform;
         }
 
         private bool EnsureReady()
