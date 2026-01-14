@@ -22,10 +22,10 @@ namespace OctoberStudio.UI
 
         private void Start()
         {
-            lobbyWindow.Init(ShowUpgrades, ShowSettings, ShowCharacters);
+            /*lobbyWindow.Init(ShowUpgrades, ShowSettings, ShowCharacters);
             upgradesWindow.Init(HideUpgrades);
             settingsWindow.Init(HideSettings);
-            charactersWindow.Init(HideCharacters);
+            charactersWindow.Init(HideCharacters);*/
         }
 
         private void ShowUpgrades()

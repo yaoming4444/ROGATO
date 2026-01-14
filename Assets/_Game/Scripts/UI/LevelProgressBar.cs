@@ -54,7 +54,7 @@ namespace GameCore.UI
             int lvl = Mathf.Max(_prog.StartLevel, s.Level);
             int totalExp = Mathf.Max(0, s.Exp);
 
-            if (levelText) levelText.text = $"LVL {lvl}";
+            if (levelText) levelText.text = $"{lvl}";
 
             if (_prog.IsMaxLevel(lvl))
             {

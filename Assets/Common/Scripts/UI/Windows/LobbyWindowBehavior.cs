@@ -23,9 +23,9 @@ namespace OctoberStudio.UI
 
         [Space]
         [SerializeField] Button playButton;
-        [SerializeField] Button upgradesButton;
+        /*[SerializeField] Button upgradesButton;
         [SerializeField] Button settingsButton;
-        [SerializeField] Button charactersButton;
+        [SerializeField] Button charactersButton;*/
         [SerializeField] Button leftButton;
         [SerializeField] Button rightButton;
 
@@ -76,12 +76,12 @@ namespace OctoberStudio.UI
             GameController.InputManager.InputAsset.UI.Settings.performed += OnSettingsInputClicked;
         }
 
-        public void Init(UnityAction onUpgradesButtonClicked, UnityAction onSettingsButtonClicked, UnityAction onCharactersButtonClicked)
+       /* public void Init(UnityAction onUpgradesButtonClicked, UnityAction onSettingsButtonClicked, UnityAction onCharactersButtonClicked)
         {
             upgradesButton.onClick.AddListener(onUpgradesButtonClicked);
             settingsButton.onClick.AddListener(onSettingsButtonClicked);
             charactersButton.onClick.AddListener(onCharactersButtonClicked);
-        }
+        }*/
 
         public void InitStage(int stageId)
         {
@@ -179,7 +179,7 @@ namespace OctoberStudio.UI
 
         private void OnSettingsInputClicked(InputAction.CallbackContext context)
         {
-            settingsButton.onClick?.Invoke();
+            /*settingsButton.onClick?.Invoke();*/
         }
 
         private void ConfirmButtonClicked()

@@ -47,7 +47,11 @@ namespace LayerLab.ArtMaker
                         DemoControl.Instance.OnClick_Home();
                         break;
                     case ButtonType.SavePrefab:
+#if UNITY_EDITOR
                         CharacterPrefabUtility.Instance.CreateCharacterPrefab();
+#else
+    Debug.LogWarning("SavePrefab is Editor-only and is not available in builds.");
+#endif
                         break;
                     case ButtonType.LinkAssetStore:
                         AudioManager.Instance.PlaySound(SoundList.ButtonDefault);
