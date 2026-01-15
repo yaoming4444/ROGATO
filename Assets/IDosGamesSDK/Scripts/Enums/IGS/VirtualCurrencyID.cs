@@ -5,6 +5,7 @@ namespace IDosGames
 		IG,
 		CO,
 		WK,
-		SS
+		SS,
+		TC
 	}
 }
