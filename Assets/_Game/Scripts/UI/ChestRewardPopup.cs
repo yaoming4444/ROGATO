@@ -13,14 +13,20 @@ namespace GameCore.UI
         [SerializeField] private Image newRarity;
         [SerializeField] private TMP_Text newName;
         [SerializeField] private TMP_Text newPowerText; // ONE power text here
-        [SerializeField] private TMP_Text newStats;
+
+        [Header("NEW stats (numbers only)")]
+        [SerializeField] private TMP_Text newHpText;   // digits only
+        [SerializeField] private TMP_Text newAtkText;  // digits only
 
         [Header("CURRENT item block (only if comparison)")]
         [SerializeField] private GameObject currentBlock;
         [SerializeField] private Image curIcon;
         [SerializeField] private Image curRarity;
         [SerializeField] private TMP_Text curName;
-        [SerializeField] private TMP_Text curStats;
+
+        [Header("CURRENT stats (numbers only)")]
+        [SerializeField] private TMP_Text curHpText;   // digits only
+        [SerializeField] private TMP_Text curAtkText;  // digits only
 
         [Header("QoL")]
         [SerializeField] private Toggle autoSellToggle;
@@ -61,10 +67,12 @@ namespace GameCore.UI
 
             if (newName) newName.text = "";
             if (newPowerText) newPowerText.text = "";
-            if (newStats) newStats.text = "";
+            if (newHpText) newHpText.text = "";
+            if (newAtkText) newAtkText.text = "";
 
             if (curName) curName.text = "";
-            if (curStats) curStats.text = "";
+            if (curHpText) curHpText.text = "";
+            if (curAtkText) curAtkText.text = "";
         }
 
         public void Show(ItemDef newItem)
@@ -101,6 +109,8 @@ namespace GameCore.UI
             if (newName)
                 newName.text = $"{_newItem.DisplayName} ({_newItem.Rarity})";
 
+            ApplyHpAtkOnly(_newItem, newHpText, newAtkText);
+
             // ===================== CURRENT =====================
             var cur = (gi != null) ? gi.GetEquippedDef(_newItem.Slot) : null;
             bool hasCurrent = (cur != null);
@@ -126,8 +136,7 @@ namespace GameCore.UI
                 if (curName)
                     curName.text = $"{cur.DisplayName} ({cur.Rarity})";
 
-                if (curStats)
-                    curStats.text = FormatStats(cur);
+                ApplyHpAtkOnly(cur, curHpText, curAtkText);
             }
 
             // ===================== POWER TEXT (ONLY NEW BLOCK) =====================
@@ -148,7 +157,7 @@ namespace GameCore.UI
                     }
                     else if (delta < 0)
                     {
-                        newPowerText.text = $"{delta} PWR"; // already has "-"
+                        newPowerText.text = $"{delta} PWR";
                         newPowerText.color = powerMinusColor;
                     }
                     else
@@ -158,9 +167,6 @@ namespace GameCore.UI
                     }
                 }
             }
-
-            if (newStats)
-                newStats.text = FormatStats(_newItem);
 
             // ===================== BUTTONS =====================
             if (equipButton)
@@ -173,11 +179,11 @@ namespace GameCore.UI
             if (sellButton)
             {
                 sellButton.gameObject.SetActive(hasCurrent);
-                if (hasCurrent)
+                /*if (hasCurrent)
                 {
                     var t = sellButton.GetComponentInChildren<TMP_Text>(true);
                     if (t) t.text = $"SELL (+{_newItem.SellGems} gems)";
-                }
+                }*/
             }
         }
 
@@ -235,9 +241,7 @@ namespace GameCore.UI
                 return;
             }
 
-            // AutoSell OFF: SWAP and re-open popup as duel:
-            // Current = (now equipped) yesterday new
-            // New = old item that got unequipped
+            // AutoSell OFF: SWAP and re-open popup
             gi.EquipItem(_newItem.Slot, _newItem.Id, immediateSave: false);
             gi.SaveAllNow();
 
@@ -257,13 +261,16 @@ namespace GameCore.UI
             CloseAndNotify();
         }
 
-        private string FormatStats(ItemDef it)
+        private static void ApplyHpAtkOnly(ItemDef it, TMP_Text hpText, TMP_Text atkText)
         {
+            if (it == null) return;
             var s = it.Stats;
-            return $"ATK: {s.Atk}\nDEF: {s.Def}\nHP: {s.Hp}";
+            if (hpText) hpText.text = s.Hp.ToString();
+            if (atkText) atkText.text = s.Atk.ToString();
         }
     }
 }
+
 
 
 
