@@ -271,7 +271,7 @@ namespace OctoberStudio.UI
             // Сигнал: InventoryUpdated (обычно обновляется в рамках RequestUserAllData)
             UserInventory.InventoryUpdated += OnAllDataRefreshed;
 
-            UserDataService.RequestUserAllData();
+            UserDataService.RequestUserInventory();
 
             _allDataTimeoutCoroutine = StartCoroutine(AllDataRefreshTimeoutCoroutine());
         }

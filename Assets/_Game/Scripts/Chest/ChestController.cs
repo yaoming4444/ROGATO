@@ -82,7 +82,7 @@ namespace GameCore.UI
             // 5) запускаем анимацию сундука; попап покажем ТОЛЬКО ПОСЛЕ окончания
             if (chestAnim != null)
             {
-                chestAnim.PlayOpen(item.Icon, onOpened: () =>
+                chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
                 {
                     // защита: вдруг уже сбросили/сменили
                     if (_pendingItem == null) { _busy = false; return; }

@@ -25,3 +25,5 @@ MonoBehaviour:
   sellGems: 1
   icon: {fileID: 21300000, guid: 34a06a67eeedb4a7daa8b642a9184ba5, type: 3}
   iconRarity: {fileID: 21300000, guid: f9e9b26d4c59dec4eaea839b3dd97e24, type: 3}
+  rarityVFX: {fileID: 4541188829483667197, guid: 2d4afb3207af64972a49cdf7ef16823a,
+    type: 3}

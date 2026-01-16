@@ -30,6 +30,7 @@ namespace GameCore.Items
         [Header("UI")]
         [SerializeField] private Sprite icon;
         [SerializeField] private Sprite iconRarity;
+        [SerializeField] private GameObject rarityVFX;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -43,6 +44,7 @@ namespace GameCore.Items
 
         public Sprite Icon => icon;
         public Sprite IconRarity => iconRarity;
+        public GameObject RarityVFX => rarityVFX;
 
         public ExtraStat[] ExtraStats => extraStats;
 
