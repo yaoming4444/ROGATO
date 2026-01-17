@@ -20605,7 +20605,7 @@ PrefabInstance:
     - target: {fileID: 3380765460122810646, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 5.5043335
+      value: 5.5043945
       objectReference: {fileID: 0}
     - target: {fileID: 3380765460122810646, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
@@ -20845,7 +20845,7 @@ PrefabInstance:
     - target: {fileID: 5876033352820631180, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -15.999878
+      value: -16
       objectReference: {fileID: 0}
     - target: {fileID: 5876033352820631180, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
@@ -33430,6 +33430,41 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1861473940}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: HideRewardPopup
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameCore.UI.ChestController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930894003890601881, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3221657895199894044, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
         type: 3}

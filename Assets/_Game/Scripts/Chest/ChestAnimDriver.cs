@@ -49,6 +49,33 @@ public class ChestAnimDriver : MonoBehaviour
         _c = StartCoroutine(CoOpen(droppedSprite, rarityVFXPrefab, onOpened));
     }
 
+    /// <summary>
+    /// Instantly forces the chest into the OPEN state (last frame) and shows icon/VFX.
+    /// Use this when you restore a pending chest reward after restart.
+    /// </summary>
+    public void SetOpenedStatic(Sprite droppedSprite, GameObject rarityVFXPrefab)
+    {
+        if (_c != null)
+        {
+            StopCoroutine(_c);
+            _c = null;
+        }
+
+        IsPlayingOpen = false;
+
+        if (!anim) return;
+
+        // Go to open state and clamp to the last frame
+        anim.Rebind();
+        anim.Update(0f);
+        anim.Play(openState, 0, 1f);
+        anim.Update(0f);
+
+        // Show visuals like after open
+        if (showIconAfterOpen)
+            ShowDropIcon(droppedSprite, rarityVFXPrefab);
+    }
+
     private IEnumerator CoOpen(Sprite droppedSprite, GameObject rarityVFXPrefab, Action onOpened)
     {
         IsPlayingOpen = true;

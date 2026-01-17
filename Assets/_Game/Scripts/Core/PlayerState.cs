@@ -26,6 +26,12 @@ namespace GameCore
         public int ChestLevel = 1;
         public bool AutoSellEnabled = false;
 
+        /// <summary>
+        /// If not empty, the player has a chest drop that still requires a decision (Equip/Sell).
+        /// Must survive app restarts.
+        /// </summary>
+        public string pendingChestItemId = "";
+
         // Stores itemId for each slot. Empty string means slot is empty.
         public string[] Equipped;
 
@@ -36,12 +42,8 @@ namespace GameCore
         public static int SlotCount => Enum.GetValues(typeof(EquipSlot)).Length;
 
         // ============================================================
-        // VISUAL (Spine skin names) Ч храним строки (полные имена скинов)
+        // VISUAL (Spine skin names) - store full skin names as strings
         // ============================================================
-        // IMPORTANT:
-        // Ёто ƒќЋ∆Ќџ Ѕџ“№ реальные имена скинов из Spine, например:
-        // "top/top_c_10", "boots/boots_c_3", "skin/skin_c_1", etc.
-        //
 
         // Visual equipment slot levels (1..120)
         public int lvl_helmet = 1;
@@ -75,7 +77,7 @@ namespace GameCore
         public string visual_skin = "";
 
         // ============================================================
-        // COLOR (skin color) Ч Color32 (RGBA) чтобы нормально сериализовалось
+        // COLOR (skin/hair/beard/brow) - store as Color32 components for JSON safety
         // ============================================================
         public byte skinColorR = 255;
         public byte skinColorG = 255;
@@ -126,7 +128,6 @@ namespace GameCore
 
         /// <summary>
         /// Creates a fresh default state for first launch / dev reset.
-        /// ¬ј∆Ќќ: тут задаЄм дефолтные скины сразу на все части.
         /// </summary>
         public static PlayerState CreateDefault()
         {
@@ -141,6 +142,7 @@ namespace GameCore
                 SelectedSkinId = "default",
                 ChestLevel = 1,
                 AutoSellEnabled = false,
+                pendingChestItemId = "",
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                 lvl_helmet = 1,
@@ -153,8 +155,6 @@ namespace GameCore
                 lvl_eyewear = 1,
 
                 // ====== DEFAULT VISUALS ======
-                // ѕоставь тут свои реальные дефолтные скины.
-                // ≈сли ты хочешь "все части индекс 1" Ч чаще всего это *_c_1 (но проверь имена в Spine).
                 visual_beard = "",
                 visual_eyewear = "",
                 visual_gear_left = "",
@@ -174,8 +174,7 @@ namespace GameCore
                 visual_skin = DEFAULT_SKIN,
             };
 
-            // ====== DEFAULT SKIN COLOR ======
-            // пример УтЄплый светлыйФ Ч можешь помен€ть на любой
+            // Example default skin color
             s.SetSkinColor32(new Color32(255, 220, 200, 255));
 
             s.EnsureValid();
@@ -187,8 +186,7 @@ namespace GameCore
         /// Fixes:
         /// - null Equipped
         /// - incorrect array length (when enum changed)
-        /// - null strings inside array
-        /// - null visual strings
+        /// - null strings
         /// </summary>
         public void EnsureValid()
         {
@@ -198,7 +196,9 @@ namespace GameCore
             for (int i = 0; i < Equipped.Length; i++)
                 Equipped[i] ??= "";
 
-            // на вс€кий: чтобы после загрузки не было nullТов
+            pendingChestItemId ??= "";
+
+            // Visual strings must never be null
             visual_back ??= "";
             visual_beard ??= "";
             visual_boots ??= "";
@@ -220,7 +220,7 @@ namespace GameCore
             visual_top ??= "";
             visual_skin ??= "";
 
-            // если вдруг кто-то сохранил A=0
+            // If someone saved A=0
             if (skinColorA == 0) skinColorA = 255;
         }
 
@@ -248,7 +248,7 @@ namespace GameCore
                 case EquipmentType.Gear_Right: return lvl_gearRight;
                 case EquipmentType.Back: return lvl_back;
                 case EquipmentType.Eyewear: return lvl_eyewear;
-                default: return 1; // все остальные слоты не прокачиваютс€
+                default: return 1;
             }
         }
 
@@ -281,7 +281,6 @@ namespace GameCore
         }
 
         // ===== DEFAULT VISUAL PRESETS (source of truth) =====
-        // ƒќЋ∆Ќџ совпадать с тем, что ты хочешь видеть когда слот "пустой"
         public const string DEFAULT_BACK = "back/back_c_1";
         public const string DEFAULT_BOOTS = "boots/boots_c_1";
         public const string DEFAULT_BOTTOM = "bottom/bottom_c_1";
@@ -294,7 +293,7 @@ namespace GameCore
         public const string DEFAULT_TOP = "top/top_c_1";
         public const string DEFAULT_SKIN = "skin/skin_c_1";
 
-        // какие PartsType считаем "об€зательными", чтобы при "" показывать дефолт
+        // Which PartsType are considered mandatory (when empty -> show default)
         public bool IsMandatoryVisual(PartsType type)
         {
             switch (type)
@@ -313,7 +312,7 @@ namespace GameCore
                     return true;
 
                 default:
-                    return false; // Helmet/Eyewear/Beard/Gear_* и т.д. пусть снимаютс€ в -1
+                    return false;
             }
         }
 
@@ -336,14 +335,13 @@ namespace GameCore
                 case PartsType.Skin: return DEFAULT_SKIN;
 
                 default:
-                    return ""; // у необ€зательных дефолта нет
+                    return "";
             }
         }
 
         /// <summary>
-        /// ¬ј∆Ќќ: это только дл€ –≈Ќƒ≈–ј.
-        /// ≈сли в State пусто, но слот mandatory Ч вернем дефолт.
-        /// ƒл€ non-mandatory вернем "" (и биндер поставит -1).
+        /// For render only: if rawValue is empty and slot is mandatory -> return default.
+        /// For non-mandatory -> return empty (binder should equip -1).
         /// </summary>
         public string GetVisualForRender(PartsType type, string rawValue)
         {
@@ -356,11 +354,4 @@ namespace GameCore
             return "";
         }
     }
-
 }
-
-
-
-
-
-

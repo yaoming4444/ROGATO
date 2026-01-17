@@ -53,6 +53,10 @@ namespace GameCore
         // Chest
         public bool AutoSellEnabled => State != null && State.AutoSellEnabled;
 
+        // Pending chest reward (player can postpone Equip/Sell decision and return later)
+        public bool HasPendingChestReward => State != null && !string.IsNullOrWhiteSpace(State.pendingChestItemId);
+        public string PendingChestItemId => State != null ? (State.pendingChestItemId ?? "") : "";
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
         {
@@ -205,6 +209,38 @@ namespace GameCore
             if (State == null) return;
             MarkDirty();
             StateChanged?.Invoke(State);
+        }
+
+        // ===================== CHEST (PENDING REWARD) =====================
+
+        /// <summary>
+        /// Store pending chest reward so player can decide later (survives restart).
+        /// </summary>
+        public void SetPendingChestReward(string itemId, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.pendingChestItemId = itemId ?? "";
+            MarkDirty();
+            StateChanged?.Invoke(State);
+
+            if (immediateSave)
+                SaveAllNow();
+        }
+
+        /// <summary>
+        /// Clears pending chest reward (called after Equip/Sell).
+        /// </summary>
+        public void ClearPendingChestReward(bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.pendingChestItemId = "";
+            MarkDirty();
+            StateChanged?.Invoke(State);
+
+            if (immediateSave)
+                SaveAllNow();
         }
 
         // ===================== VISUAL MUTATIONS (¬¿∆ÕŒ ƒÀﬂ 2 — ≈À≈“ŒÕŒ¬) =====================
