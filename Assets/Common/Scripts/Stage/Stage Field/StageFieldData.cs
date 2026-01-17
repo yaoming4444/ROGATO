@@ -43,6 +43,13 @@ namespace OctoberStudio
         public GameObject BottomRightPrefab => bottomRightPrefab;
         public GameObject BottomLeftPrefab => bottomLeftPrefab;
 
+        [Header("Rect Field (only for StageType.Rect)")]
+        [SerializeField, Min(1)] int rectColumns = 1;
+        [SerializeField, Min(1)] int rectRows = 1;
+
+        public int RectColumns => rectColumns;
+        public int RectRows => rectRows;
+
         [Header("Prop")]
         [SerializeField] List<StagePropData> propChances;
         public List<StagePropData> PropChances => propChances;

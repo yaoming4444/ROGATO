@@ -6,256 +6,261 @@ namespace OctoberStudio
 {
     public class RectFieldBehavior : AbstractFieldBehavior
     {
-        StageChunkBehavior chunk;
+        readonly List<StageChunkBehavior> chunks = new List<StageChunkBehavior>();
+        readonly List<Transform> borders = new List<Transform>();
 
-        List<Transform> borders = new List<Transform>();
+        // cached bounds
+        float leftBound, rightBound, topBound, bottomBound;
+        Vector2 chunkSize;
 
         public override void Init(StageFieldData stageFieldData, bool spawnProp)
         {
             base.Init(stageFieldData, spawnProp);
 
-            chunk = Object.Instantiate(stageFieldData.GetBackgroundPrefabs().Random()).GetComponent<StageChunkBehavior>();
+            int cols = Mathf.Max(1, stageFieldData.RectColumns);
+            int rows = Mathf.Max(1, stageFieldData.RectRows);
 
-            chunk.transform.position = Vector3.zero;
-            chunk.transform.rotation = Quaternion.identity;
-            chunk.transform.localScale = Vector3.one;
+            // Spawn first chunk to get size
+            var first = Object.Instantiate(stageFieldData.GetBackgroundPrefabs().Random())
+                .GetComponent<StageChunkBehavior>();
 
-            if (stageFieldData.TopPrefab != null)
+            first.transform.position = Vector3.zero;
+            first.transform.rotation = Quaternion.identity;
+            first.transform.localScale = Vector3.one;
+
+            chunkSize = first.Size;
+            chunks.Add(first);
+
+            // Spawn remaining chunks in a centered grid
+            for (int y = 0; y < rows; y++)
             {
-                var topBorder = Object.Instantiate(stageFieldData.TopPrefab).GetComponent<Transform>();
-                topBorder.transform.position = Vector3.up * chunk.Size.y;
-                borders.Add(topBorder);
+                for (int x = 0; x < cols; x++)
+                {
+                    if (x == 0 && y == 0) continue;
+
+                    var chunk = Object.Instantiate(stageFieldData.GetBackgroundPrefabs().Random())
+                        .GetComponent<StageChunkBehavior>();
+
+                    chunk.transform.rotation = Quaternion.identity;
+                    chunk.transform.localScale = Vector3.one;
+
+                    chunks.Add(chunk);
+                }
             }
 
-            if (stageFieldData.BottomPrefab != null)
+            // Position all chunks (centered around 0,0)
+            int index = 0;
+            float xCenter = (cols - 1) / 2f;
+            float yCenter = (rows - 1) / 2f;
+
+            for (int y = 0; y < rows; y++)
             {
-                var bottomBorder = Object.Instantiate(stageFieldData.BottomPrefab).GetComponent<Transform>();
-                bottomBorder.transform.position = Vector3.down * chunk.Size.y;
-                borders.Add(bottomBorder);
+                for (int x = 0; x < cols; x++)
+                {
+                    var chunk = chunks[index++];
+
+                    float px = (x - xCenter) * chunkSize.x;
+                    float py = (y - yCenter) * chunkSize.y;
+
+                    chunk.transform.position = new Vector3(px, py, 0);
+
+                    SpawnProp(chunk);
+                }
             }
 
-            if (stageFieldData.LeftPrefab != null)
+            // Calculate total field bounds
+            float halfW = cols * chunkSize.x / 2f;
+            float halfH = rows * chunkSize.y / 2f;
+
+            leftBound = -halfW;
+            rightBound = halfW;
+            bottomBound = -halfH;
+            topBound = halfH;
+
+            // Borders are placed outside by half chunk (same logic as old single-chunk: border at +/- chunk.Size)
+            float borderX = halfW + chunkSize.x / 2f;
+            float borderY = halfH + chunkSize.y / 2f;
+
+            // --- NEW: tile borders along the whole perimeter (no gaps) ---
+            // Top/Bottom: one segment per column
+            for (int x = 0; x < cols; x++)
             {
-                var leftBorder = Object.Instantiate(stageFieldData.LeftPrefab).GetComponent<Transform>();
-                leftBorder.transform.position = Vector3.left * chunk.Size.x;
-                borders.Add(leftBorder);
+                float px = (x - xCenter) * chunkSize.x;
+
+                if (stageFieldData.TopPrefab != null)
+                {
+                    var t = Object.Instantiate(stageFieldData.TopPrefab).transform;
+                    t.position = new Vector3(px, borderY, 0);
+                    borders.Add(t);
+                }
+
+                if (stageFieldData.BottomPrefab != null)
+                {
+                    var b = Object.Instantiate(stageFieldData.BottomPrefab).transform;
+                    b.position = new Vector3(px, -borderY, 0);
+                    borders.Add(b);
+                }
             }
 
-            if (stageFieldData.RightPrefab != null)
+            // Left/Right: one segment per row
+            for (int y = 0; y < rows; y++)
             {
-                var rightBorder = Object.Instantiate(stageFieldData.RightPrefab).GetComponent<Transform>();
-                rightBorder.transform.position = Vector3.right * chunk.Size.x;
-                borders.Add(rightBorder);
+                float py = (y - yCenter) * chunkSize.y;
+
+                if (stageFieldData.LeftPrefab != null)
+                {
+                    var l = Object.Instantiate(stageFieldData.LeftPrefab).transform;
+                    l.position = new Vector3(-borderX, py, 0);
+                    borders.Add(l);
+                }
+
+                if (stageFieldData.RightPrefab != null)
+                {
+                    var r = Object.Instantiate(stageFieldData.RightPrefab).transform;
+                    r.position = new Vector3(borderX, py, 0);
+                    borders.Add(r);
+                }
             }
 
+            // Corners (4 pieces)
             if (stageFieldData.TopLeftPrefab != null)
             {
-                var topLeftCorner = Object.Instantiate(stageFieldData.TopLeftPrefab).GetComponent<Transform>();
-                topLeftCorner.transform.position = new Vector2(-chunk.Size.x, chunk.Size.y);
-                borders.Add(topLeftCorner);
+                var c = Object.Instantiate(stageFieldData.TopLeftPrefab).transform;
+                c.position = new Vector3(-borderX, borderY, 0);
+                borders.Add(c);
             }
 
             if (stageFieldData.TopRightPrefab != null)
             {
-                var topRightCorner = Object.Instantiate(stageFieldData.TopRightPrefab).GetComponent<Transform>();
-                topRightCorner.transform.position = new Vector2(chunk.Size.x, chunk.Size.y);
-                borders.Add(topRightCorner);
+                var c = Object.Instantiate(stageFieldData.TopRightPrefab).transform;
+                c.position = new Vector3(borderX, borderY, 0);
+                borders.Add(c);
             }
 
             if (stageFieldData.BottomLeftPrefab != null)
             {
-                var bottomLeftCorner = Object.Instantiate(stageFieldData.BottomLeftPrefab).GetComponent<Transform>();
-                bottomLeftCorner.transform.position = new Vector2(-chunk.Size.x, -chunk.Size.y);
-                borders.Add(bottomLeftCorner);
+                var c = Object.Instantiate(stageFieldData.BottomLeftPrefab).transform;
+                c.position = new Vector3(-borderX, -borderY, 0);
+                borders.Add(c);
             }
 
             if (stageFieldData.BottomRightPrefab != null)
             {
-                var bottomRightCorner = Object.Instantiate(stageFieldData.BottomRightPrefab).GetComponent<Transform>();
-                bottomRightCorner.transform.position = new Vector2(chunk.Size.x, -chunk.Size.y);
-                borders.Add(bottomRightCorner);
+                var c = Object.Instantiate(stageFieldData.BottomRightPrefab).transform;
+                c.position = new Vector3(borderX, -borderY, 0);
+                borders.Add(c);
             }
-
-            SpawnProp(chunk);
         }
 
         public override void Update()
         {
-
+            // Rect field is static
         }
 
         public override bool ValidatePosition(Vector2 position)
         {
-            if (position.x > chunk.transform.position.x + chunk.Size.x / 2) return false;
-            if (position.x < chunk.transform.position.x - chunk.Size.x / 2) return false;
-
-            if (position.y > chunk.transform.position.y + chunk.Size.y / 2) return false;
-            if (position.y < chunk.transform.position.y - chunk.Size.y / 2) return false;
-
+            if (position.x > rightBound) return false;
+            if (position.x < leftBound) return false;
+            if (position.y > topBound) return false;
+            if (position.y < bottomBound) return false;
             return true;
         }
 
         public override Vector2 GetRandomPositionOnBorder()
         {
-            Vector2 randomPoint = Random.insideUnitCircle.normalized * Mathf.Max(chunk.Size.x, chunk.Size.y);
-
-            if (randomPoint.x > chunk.Size.x / 2) randomPoint.x = chunk.Size.x / 2;
-            if (randomPoint.x < -chunk.Size.x / 2) randomPoint.x = -chunk.Size.x / 2;
-
-            if (randomPoint.y > chunk.Size.y / 2) randomPoint.y = chunk.Size.y / 2;
-            if (randomPoint.y < -chunk.Size.y / 2) randomPoint.y = -chunk.Size.y / 2;
-
-            return randomPoint + chunk.transform.position.XY();
+            // Pick random side and point on that edge
+            int side = Random.Range(0, 4); // 0=top 1=bottom 2=left 3=right
+            switch (side)
+            {
+                case 0: return new Vector2(Random.Range(leftBound, rightBound), topBound);
+                case 1: return new Vector2(Random.Range(leftBound, rightBound), bottomBound);
+                case 2: return new Vector2(leftBound, Random.Range(bottomBound, topBound));
+                default: return new Vector2(rightBound, Random.Range(bottomBound, topBound));
+            }
         }
 
         public override Vector2 GetBossSpawnPosition(BossFenceBehavior fence, Vector2 offset)
         {
             var playerPosition = PlayerBehavior.Player.transform.position.XY();
-            var desiredPosition = playerPosition + offset;
+            var desired = playerPosition + offset;
 
-            if (fence is CircleFenceBehavior circleFence)
+            // clamp into field (with fence size)
+            if (fence is CircleFenceBehavior c)
             {
-                bool tooCloseToLeftBorder = desiredPosition.x - circleFence.Radius < -chunk.Size.x / 2;
-                bool tooCloseToRightBorder = desiredPosition.x + circleFence.Radius > chunk.Size.x / 2;
-
-                if (tooCloseToLeftBorder && tooCloseToRightBorder) 
-                {
-                    desiredPosition.x = 0;
-                } else if (tooCloseToLeftBorder)
-                {
-                    desiredPosition.x = -chunk.Size.x / 2 + circleFence.Radius;
-                } else if (tooCloseToRightBorder)
-                {
-                    desiredPosition.x = chunk.Size.x / 2 - circleFence.Radius;
-                }
-
-                bool tooCloseToTopBorder = desiredPosition.y + circleFence.Radius > chunk.Size.y / 2;
-                bool tooCloseToBottomBorder = desiredPosition.y - circleFence.Radius < -chunk.Size.y / 2;
-
-                if (tooCloseToTopBorder && tooCloseToBottomBorder)
-                {
-                    desiredPosition.y = 0;
-                }
-                else if (tooCloseToTopBorder)
-                {
-                    desiredPosition.y = chunk.Size.y / 2 - circleFence.Radius;
-                }
-                else if (tooCloseToBottomBorder)
-                {
-                    desiredPosition.y = -chunk.Size.y / 2 + circleFence.Radius;
-                }
+                desired.x = Mathf.Clamp(desired.x, leftBound + c.Radius, rightBound - c.Radius);
+                desired.y = Mathf.Clamp(desired.y, bottomBound + c.Radius, topBound - c.Radius);
             }
-            else if (fence is RectFenceBehavior rectFence)
+            else if (fence is RectFenceBehavior r)
             {
-                bool tooCloseToLeftBorder = desiredPosition.x - rectFence.Width / 2 < -chunk.Size.x / 2;
-                bool tooCloseToRightBorder = desiredPosition.x + rectFence.Width / 2 > chunk.Size.x / 2;
-
-                if (tooCloseToLeftBorder && tooCloseToRightBorder)
-                {
-                    desiredPosition.x = 0;
-                }
-                else if (tooCloseToLeftBorder)
-                {
-                    desiredPosition.x = -chunk.Size.x / 2 + rectFence.Width / 2;
-                }
-                else if (tooCloseToRightBorder)
-                {
-                    desiredPosition.x = chunk.Size.x / 2 - rectFence.Width / 2;
-                }
-
-                bool tooCloseToTopBorder = desiredPosition.y + rectFence.Height / 2 > chunk.Size.y / 2;
-                bool tooCloseToBottomBorder = desiredPosition.y - rectFence.Height / 2 < -chunk.Size.y / 2;
-
-                if (tooCloseToTopBorder && tooCloseToBottomBorder)
-                {
-                    desiredPosition.y = 0;
-                }
-                else if (tooCloseToTopBorder)
-                {
-                    desiredPosition.y = chunk.Size.y / 2 - rectFence.Height / 2;
-                }
-                else if (tooCloseToBottomBorder)
-                {
-                    desiredPosition.y = -chunk.Size.y / 2 + rectFence.Height / 2;
-                }
+                desired.x = Mathf.Clamp(desired.x, leftBound + r.Width / 2f, rightBound - r.Width / 2f);
+                desired.y = Mathf.Clamp(desired.y, bottomBound + r.Height / 2f, topBound - r.Height / 2f);
             }
 
-            return desiredPosition;
+            return desired;
         }
 
         public override bool IsPointOutsideRight(Vector2 point, out float distance)
         {
-            bool result = point.x > chunk.RightBound;
-            distance = result ? point.x - chunk.RightBound : 0;
+            bool result = point.x > rightBound;
+            distance = result ? point.x - rightBound : 0;
             return result;
         }
 
         public override bool IsPointOutsideLeft(Vector2 point, out float distance)
         {
-            bool result = point.x < chunk.LeftBound;
-            distance = result ? chunk.LeftBound - point.x : 0;
+            bool result = point.x < leftBound;
+            distance = result ? leftBound - point.x : 0;
             return result;
         }
 
         public override bool IsPointOutsideTop(Vector2 point, out float distance)
         {
-            bool result = point.y > chunk.TopBound;
-            distance = result ? point.y - chunk.TopBound : 0;
+            bool result = point.y > topBound;
+            distance = result ? point.y - topBound : 0;
             return result;
         }
 
         public override bool IsPointOutsideBottom(Vector2 point, out float distance)
         {
-            bool result = point.y < chunk.BottomBound;
-            distance = result ? chunk.BottomBound - point.y : 0;
+            bool result = point.y < bottomBound;
+            distance = result ? bottomBound - point.y : 0;
             return result;
         }
 
         public override Vector2 GetIntersectionPoint(Vector2 start, Vector2 end, float offset)
         {
             var path = end - start;
-            var distance = path.magnitude;
+            if (path.sqrMagnitude < Mathf.Epsilon) return start;
 
-            // start == end
-            if (distance < Mathf.Epsilon) return start;
-
-            var direction = path.normalized;
+            var rect = new Rect(
+                leftBound + offset,
+                bottomBound + offset,
+                (rightBound - leftBound) - offset * 2f,
+                (topBound - bottomBound) - offset * 2f
+            );
 
             float tx1, tx2, ty1, ty2;
 
-            // Create rectangle with offset
-            var rect = new Rect(chunk.LeftBound + offset, chunk.BottomBound + offset, (chunk.Size.x - offset) * 2, (chunk.Size.y - offset) * 2);
-
-            // X axis
             if (Mathf.Abs(path.x) > Mathf.Epsilon)
             {
-                // Calculate intersection points
                 tx1 = (rect.xMin - start.x) / path.x;
                 tx2 = (rect.xMax - start.x) / path.x;
-
-                // Swapping if needed
                 if (tx1 > tx2) (tx1, tx2) = (tx2, tx1);
             }
             else
             {
-                // No intersection
                 tx1 = float.NegativeInfinity;
                 tx2 = float.PositiveInfinity;
             }
 
-            // Y axis
             if (Mathf.Abs(path.y) > Mathf.Epsilon)
             {
-                // Calculate intersection points
                 ty1 = (rect.yMin - start.y) / path.y;
                 ty2 = (rect.yMax - start.y) / path.y;
-
-                // Swapping if needed
                 if (ty1 > ty2) (ty1, ty2) = (ty2, ty1);
             }
             else
             {
-                // No intersection
                 ty1 = float.NegativeInfinity;
                 ty2 = float.PositiveInfinity;
             }
@@ -263,7 +268,6 @@ namespace OctoberStudio
             var tEnter = Mathf.Max(tx1, ty1);
             var tExit = Mathf.Min(tx2, ty2);
 
-            // No intersection
             if (tExit < 0f || tEnter > tExit) return start;
 
             return start + path * tExit;
@@ -271,18 +275,18 @@ namespace OctoberStudio
 
         public override void RemovePropFromBossFence(BossFenceBehavior fence)
         {
-            chunk.RemovePropFromBossFence(fence);
+            for (int i = 0; i < chunks.Count; i++)
+                chunks[i].RemovePropFromBossFence(fence);
         }
 
         public override void Clear()
         {
-            Object.Destroy(chunk.gameObject);
+            for (int i = 0; i < chunks.Count; i++)
+                Object.Destroy(chunks[i].gameObject);
+            chunks.Clear();
 
-            for(int i = 0; i < borders.Count; i++)
-            {
+            for (int i = 0; i < borders.Count; i++)
                 Object.Destroy(borders[i].gameObject);
-            }
-
             borders.Clear();
         }
     }
