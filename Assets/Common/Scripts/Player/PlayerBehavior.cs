@@ -1,6 +1,5 @@
 using OctoberStudio.Easing;
 using OctoberStudio.Extensions;
-using OctoberStudio.Upgrades;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -32,7 +31,7 @@ namespace OctoberStudio
         [SerializeField, Min(0.01f)] protected float speed = 2;
         [SerializeField, Min(0.1f)] protected float defaultMagnetRadius = 0.75f;
         [SerializeField, Min(1f)] protected float xpMultiplier = 1;
-        [SerializeField, Range(0.1f, 1f)] protected float cooldownMultiplier = 1; 
+        [SerializeField, Range(0.1f, 1f)] protected float cooldownMultiplier = 1;
         [SerializeField, Range(0, 100)] protected int initialDamageReductionPercent = 0;
         [SerializeField, Min(1f)] protected float initialProjectileSpeedMultiplier = 1;
         [SerializeField, Min(1f)] protected float initialSizeMultiplier = 1f;
@@ -102,6 +101,18 @@ namespace OctoberStudio
         protected ICharacterBehavior _character;
         private GameCore.Visual.PartsManagerStateBinder _binder;
 
+        // ===== Equipment Bonus (from GameCore) =====
+        [Header("Equipment Bonus (from GameCore)")]
+        [SerializeField] private bool useEquipmentBonuses = true;
+
+        private float equipDamageBonus; // +к урону (Atk)
+        private float equipHpBonus;     // +к hp (Hp)
+
+        private float BaseDamageWithEquip => baseDamage + equipDamageBonus;
+        private float BaseHpWithEquip => baseHP + equipHpBonus;
+
+        private bool _equipSubscribed;
+
         protected virtual void Awake()
         {
             instance = this;
@@ -127,7 +138,6 @@ namespace OctoberStudio
             go.transform.ResetLocal();
             go.transform.localScale = prefabScale;
 
-
             _character = go.GetComponent<ICharacterBehavior>();
             if (_character == null)
                 Debug.LogError("[PlayerBehavior] characterPrefab must have a component implementing ICharacterBehavior.");
@@ -135,12 +145,15 @@ namespace OctoberStudio
             // 2) Find binder on spawned prefab (optional)
             _binder = go.GetComponentInChildren<GameCore.Visual.PartsManagerStateBinder>(true);
 
-            // 3) Init HP UI
+            // 3) Init HP UI (первична€ инициализаци€)
             healthbar.Init(baseHP);
             healthbar.SetAutoHideWhenMax(true);
             healthbar.SetAutoShowOnChanged(true);
 
-            // 4) Recalculate all gameplay stats
+            // 4) ѕервый пулл бонусов (если сервис уже есть)
+            PullEquipmentBonusesOnly();
+
+            // 5) Recalculate all gameplay stats
             RecalculateMagnetRadius(1);
             RecalculateMoveSpeed(1);
             RecalculateDamage(1);
@@ -156,7 +169,7 @@ namespace OctoberStudio
             LookDirection = Vector2.right;
             IsMovingAlowed = true;
 
-            // 5) Apply visuals from PlayerState
+            // 6) Apply visuals from PlayerState
             if (applyVisualsFromPlayerState)
             {
                 TryApplyVisualsOnce();
@@ -165,6 +178,18 @@ namespace OctoberStudio
                 if (gi != null)
                     gi.StateChanged += OnStateChanged;
             }
+
+            Debug.Log($"[Player] UI atk={GameCore.PlayerEquipmentStatsService.I?.BonusAtk} baseDamage={baseDamage} Damage={Damage}");
+        }
+
+        private void OnEnable()
+        {
+            SubscribeToEquipmentServiceIfReady();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeFromEquipmentService();
         }
 
         protected virtual void OnDestroy()
@@ -172,23 +197,87 @@ namespace OctoberStudio
             var gi = GameCore.GameInstance.I;
             if (gi != null)
                 gi.StateChanged -= OnStateChanged;
+
+            UnsubscribeFromEquipmentService();
+        }
+
+        private void SubscribeToEquipmentServiceIfReady()
+        {
+            if (!useEquipmentBonuses) return;
+            if (_equipSubscribed) return;
+
+            var svc = GameCore.PlayerEquipmentStatsService.I;
+            if (svc == null) return;
+
+            svc.Changed += OnEquipmentStatsChanged;
+            _equipSubscribed = true;
+
+            PullEquipmentBonusesAndRecalc();
+        }
+
+        private void UnsubscribeFromEquipmentService()
+        {
+            if (!_equipSubscribed) return;
+
+            var svc = GameCore.PlayerEquipmentStatsService.I;
+            if (svc != null)
+                svc.Changed -= OnEquipmentStatsChanged;
+
+            _equipSubscribed = false;
+        }
+
+        private void OnEquipmentStatsChanged()
+        {
+            PullEquipmentBonusesAndRecalc();
+        }
+
+        private void PullEquipmentBonusesOnly()
+        {
+            if (!useEquipmentBonuses) return;
+
+            var svc = GameCore.PlayerEquipmentStatsService.I;
+            if (svc == null) return;
+
+            equipDamageBonus = svc.BonusAtk;
+            equipHpBonus = svc.BonusHp;
+        }
+
+        private void PullEquipmentBonusesAndRecalc()
+        {
+            if (!useEquipmentBonuses) return;
+
+            var svc = GameCore.PlayerEquipmentStatsService.I;
+            if (svc == null)
+            {
+                SubscribeToEquipmentServiceIfReady();
+                return;
+            }
+
+            equipDamageBonus = svc.BonusAtk;
+            equipHpBonus = svc.BonusHp;
+
+            RecalculateDamage(1);
+            RecalculateMaxHP(1);
         }
 
         private void OnStateChanged(GameCore.PlayerState _)
         {
-            // When equip/unequip happens -> refresh parts
+            // refresh visuals
             TryApplyVisualsOnce();
+
+            // если сервис по€вилс€ позже Ч подпишемс€
+            SubscribeToEquipmentServiceIfReady();
         }
 
         private void TryApplyVisualsOnce()
         {
             if (_binder == null) return;
-
-            // если GameInstance/State ещЄ не готов (ранний Awake) Ч просто пропустим
             if (GameCore.GameInstance.I == null || GameCore.GameInstance.I.State == null) return;
 
             _binder.ApplyFromState();
         }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
         protected virtual void Update()
         {
@@ -246,16 +335,12 @@ namespace OctoberStudio
 
         public virtual void RecalculateDamage(float damageMultiplier)
         {
-            Damage = baseDamage * damageMultiplier;
-
-            if (GameController.UpgradesManager.IsUpgradeAquired(UpgradeType.Damage))
-                Damage *= GameController.UpgradesManager.GetUpgadeValue(UpgradeType.Damage);
+            Damage = BaseDamageWithEquip * damageMultiplier;
         }
 
         public virtual void RecalculateMaxHP(float maxHPMultiplier)
         {
-            var upgradeValue = GameController.UpgradesManager.GetUpgadeValue(UpgradeType.Health);
-            healthbar.ChangeMaxHP((baseHP + upgradeValue) * maxHPMultiplier);
+            healthbar.ChangeMaxHP(BaseHpWithEquip * maxHPMultiplier);
         }
 
         public virtual void RecalculateXPMuliplier(float xpMultiplier)
@@ -271,9 +356,6 @@ namespace OctoberStudio
         public virtual void RecalculateDamageReduction(float damageReductionPercent)
         {
             DamageReductionMultiplier = (100f - initialDamageReductionPercent - damageReductionPercent) / 100f;
-
-            if (GameController.UpgradesManager.IsUpgradeAquired(UpgradeType.Armor))
-                DamageReductionMultiplier *= GameController.UpgradesManager.GetUpgadeValue(UpgradeType.Armor);
         }
 
         public virtual void RecalculateProjectileSpeedMultiplier(float projectileSpeedMultiplier)
@@ -303,7 +385,7 @@ namespace OctoberStudio
 
         public virtual void Heal(float hp)
         {
-            healthbar.AddHP(hp + GameController.UpgradesManager.GetUpgadeValue(UpgradeType.Healing));
+            healthbar.AddHP(hp);
         }
 
         public virtual void Revive()
@@ -420,3 +502,4 @@ namespace OctoberStudio
         }
     }
 }
+

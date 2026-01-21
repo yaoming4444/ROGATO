@@ -19,6 +19,7 @@ MonoBehaviour:
   prefab: {fileID: 2508247732540034436, guid: 96b489f6283cc1f4a8f703293f1c971b, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
@@ -28,7 +29,7 @@ MonoBehaviour:
     abilityCooldown: 5
     throwingForce: 8
     spread: 20
-    damage: 15
+    damage: 1.5
     projectileSize: 1
   - projectileCount: 2
     projectileLifetime: 4
@@ -36,7 +37,7 @@ MonoBehaviour:
     abilityCooldown: 5
     throwingForce: 8
     spread: 20
-    damage: 15
+    damage: 1.5
     projectileSize: 1
   - projectileCount: 2
     projectileLifetime: 4
@@ -44,7 +45,7 @@ MonoBehaviour:
     abilityCooldown: 5
     throwingForce: 8
     spread: 20
-    damage: 20
+    damage: 1.5
     projectileSize: 1.2
   - projectileCount: 3
     projectileLifetime: 4
@@ -52,7 +53,7 @@ MonoBehaviour:
     abilityCooldown: 5
     throwingForce: 8
     spread: 20
-    damage: 20
+    damage: 1.5
     projectileSize: 1.2
   - projectileCount: 3
     projectileLifetime: 4
@@ -60,5 +61,5 @@ MonoBehaviour:
     abilityCooldown: 5
     throwingForce: 8
     spread: 20
-    damage: 25
+    damage: 2.5
     projectileSize: 1.4

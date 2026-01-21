@@ -19,31 +19,32 @@ MonoBehaviour:
   prefab: {fileID: 8295970409944387311, guid: fef53c88fbaf9b74d8f8b7ace6957279, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 1
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - abilityCooldown: 1
     projectileSpeed: 5
-    damage: 10
+    damage: 1
     projectileSize: 1
     projectileLifetime: 5
   - abilityCooldown: 0.5
     projectileSpeed: 6
-    damage: 10
+    damage: 1
     projectileSize: 1
     projectileLifetime: 5
   - abilityCooldown: 0.4
     projectileSpeed: 7
-    damage: 15
+    damage: 1.5
     projectileSize: 1
     projectileLifetime: 5
   - abilityCooldown: 0.35
     projectileSpeed: 8
-    damage: 20
+    damage: 2
     projectileSize: 1
     projectileLifetime: 5
   - abilityCooldown: 0.25
     projectileSpeed: 8
-    damage: 20
+    damage: 2
     projectileSize: 1
     projectileLifetime: 5

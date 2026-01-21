@@ -19,21 +19,22 @@ MonoBehaviour:
   prefab: {fileID: 6046089768498997805, guid: 7788118687ac2254e9574b5bcaf6d2ff, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - fieldRadius: 0.8
-    damage: 5
+    damage: 0.5
     damageCooldown: 1
   - fieldRadius: 1
-    damage: 10
+    damage: 1
     damageCooldown: 1
   - fieldRadius: 1.2
-    damage: 15
+    damage: 1.5
     damageCooldown: 1
   - fieldRadius: 1.4
-    damage: 15
+    damage: 1.5
     damageCooldown: 1
   - fieldRadius: 1.6
-    damage: 20
+    damage: 2
     damageCooldown: 1

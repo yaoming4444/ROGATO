@@ -19,6 +19,7 @@ MonoBehaviour:
   prefab: {fileID: 8666185439850298685, guid: 9baadb2220f82de488e6d4d5eb4ba662, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
@@ -27,7 +28,7 @@ MonoBehaviour:
     abilityCooldown: 5
     fireballLifetime: 5
     speed: 3
-    damage: 15
+    damage: 1.5
     projectileSize: 1
     explosionRadius: 1
   - projectilesCount: 2
@@ -35,7 +36,7 @@ MonoBehaviour:
     abilityCooldown: 5
     fireballLifetime: 5
     speed: 3
-    damage: 15
+    damage: 1.5
     projectileSize: 1
     explosionRadius: 1
   - projectilesCount: 2
@@ -43,7 +44,7 @@ MonoBehaviour:
     abilityCooldown: 5
     fireballLifetime: 5
     speed: 4
-    damage: 15
+    damage: 1.5
     projectileSize: 1
     explosionRadius: 1.5
   - projectilesCount: 3
@@ -51,7 +52,7 @@ MonoBehaviour:
     abilityCooldown: 5
     fireballLifetime: 5
     speed: 4
-    damage: 20
+    damage: 2
     projectileSize: 1
     explosionRadius: 1.5
   - projectilesCount: 3
@@ -59,6 +60,6 @@ MonoBehaviour:
     abilityCooldown: 5
     fireballLifetime: 5
     speed: 5
-    damage: 20
+    damage: 2
     projectileSize: 1.25
     explosionRadius: 1.75

@@ -19,26 +19,27 @@ MonoBehaviour:
   prefab: {fileID: 3128169338053202466, guid: 565cc53bad5258c4984210d9f55ab7b2, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - speed: 1
     angularSpeed: 180
-    damage: 20
+    damage: 2
     size: 0.5
   - speed: 1
     angularSpeed: 180
-    damage: 20
+    damage: 2
     size: 0.5
   - speed: 1
     angularSpeed: 180
-    damage: 25
+    damage: 2.5
     size: 0.75
   - speed: 1
     angularSpeed: 180
-    damage: 30
+    damage: 3
     size: 0.75
   - speed: 1
     angularSpeed: 180
-    damage: 35
+    damage: 3.5
     size: 1

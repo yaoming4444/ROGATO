@@ -19,31 +19,32 @@ MonoBehaviour:
   prefab: {fileID: 5349004258488764192, guid: 1fb009b476592b649aae6523123f1897, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 1
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - abilityCooldown: 2
     slashesCount: 1
-    damage: 10
+    damage: 1
     slashSize: 1
     timeBetweenSlashes: 0.2
   - abilityCooldown: 2
     slashesCount: 2
-    damage: 10
+    damage: 1
     slashSize: 1
     timeBetweenSlashes: 0.2
   - abilityCooldown: 2
     slashesCount: 3
-    damage: 15
+    damage: 1.5
     slashSize: 1.2
     timeBetweenSlashes: 0.2
   - abilityCooldown: 2
     slashesCount: 4
-    damage: 15
+    damage: 1.5
     slashSize: 1.2
     timeBetweenSlashes: 0.2
   - abilityCooldown: 2
     slashesCount: 5
-    damage: 15
+    damage: 1.5
     slashSize: 1.4
     timeBetweenSlashes: 0.2

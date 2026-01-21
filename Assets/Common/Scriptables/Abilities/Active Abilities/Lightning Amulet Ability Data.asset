@@ -19,34 +19,35 @@ MonoBehaviour:
   prefab: {fileID: 4750932732856416329, guid: c37d6662bf5c9b14cbd31a3cf83221c5, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
-  - damage: 20
+  - damage: 2
     additionalDamage: 5
     additionalDamageRadius: 0.5
     lightningsCount: 1
     abilityCooldown: 5
     durationBetweenHits: 0.2
-  - damage: 20
+  - damage: 2
     additionalDamage: 5
     additionalDamageRadius: 0.5
     lightningsCount: 2
     abilityCooldown: 5
     durationBetweenHits: 0.2
-  - damage: 20
+  - damage: 2
     additionalDamage: 5
     additionalDamageRadius: 0.5
     lightningsCount: 3
     abilityCooldown: 5
     durationBetweenHits: 0.2
-  - damage: 25
+  - damage: 2.5
     additionalDamage: 7
     additionalDamageRadius: 0.5
     lightningsCount: 4
     abilityCooldown: 5
     durationBetweenHits: 0.2
-  - damage: 30
+  - damage: 3
     additionalDamage: 10
     additionalDamageRadius: 0.5
     lightningsCount: 5

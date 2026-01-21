@@ -19,6 +19,7 @@ MonoBehaviour:
   prefab: {fileID: 6119386174245202466, guid: 460c16e3997ff1d43b013c9b00f6ec69, type: 3}
   isActiveAbility: 1
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
@@ -26,7 +27,7 @@ MonoBehaviour:
     abilityCooldown: 5
     mineSpawnRadius: 2
     mineLifetime: 5
-    damage: 20
+    damage: 2
     mineSize: 1
     mineTriggerRadius: 0.3
     mineDamageRadius: 1
@@ -34,7 +35,7 @@ MonoBehaviour:
     abilityCooldown: 5
     mineSpawnRadius: 2
     mineLifetime: 6
-    damage: 20
+    damage: 2
     mineSize: 1.2
     mineTriggerRadius: 0.35
     mineDamageRadius: 1.2
@@ -42,7 +43,7 @@ MonoBehaviour:
     abilityCooldown: 5
     mineSpawnRadius: 2.5
     mineLifetime: 7
-    damage: 25
+    damage: 2.5
     mineSize: 1.4
     mineTriggerRadius: 0.4
     mineDamageRadius: 1.4
@@ -50,7 +51,7 @@ MonoBehaviour:
     abilityCooldown: 5
     mineSpawnRadius: 2.5
     mineLifetime: 8
-    damage: 25
+    damage: 2.5
     mineSize: 1.6
     mineTriggerRadius: 0.45
     mineDamageRadius: 1.6
@@ -58,7 +59,7 @@ MonoBehaviour:
     abilityCooldown: 5
     mineSpawnRadius: 2.5
     mineLifetime: 9
-    damage: 30
+    damage: 3
     mineSize: 1.8
     mineTriggerRadius: 0.5
     mineDamageRadius: 1.8
