@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using GameCore.Items;
 
@@ -14,14 +15,14 @@ namespace GameCore.UI
         private bool _busy;           // protects from spam clicks while opening / popup open
         private ItemDef _pendingItem; // item awaiting decision
 
+        public bool IsBusy => _busy;
+        public ItemDef PendingItem => _pendingItem;
+
         private void Awake()
         {
-            // Popup лучше держать выключенным по умолчанию в сцене,
-            // но на всякий случай выключим здесь.
             if (popup != null && popup.gameObject.activeSelf)
                 popup.gameObject.SetActive(false);
 
-            // Чтобы после Equip/Sell возвращать сундук в Idle
             if (popup != null)
             {
                 popup.OnDecisionMade -= OnPopupDecision;
@@ -55,7 +56,7 @@ namespace GameCore.UI
 
         private void OnPopupDecision()
         {
-            // Игрок принял решение => очищаем pending, возвращаем сундук в idle
+            // Игрок принял решение => очищаем pending, возвращаем сундук в idle :contentReference[oaicite:1]{index=1}
             var gi = GameCore.GameInstance.I;
             if (gi != null)
                 gi.ClearPendingChestReward(immediateSave: false);
@@ -82,7 +83,6 @@ namespace GameCore.UI
             var item = ResolveItem(gi.PendingChestItemId);
             if (item == null)
             {
-                // Если предмета больше нет в базе - не даём игроку застрять.
                 gi.ClearPendingChestReward(immediateSave: true);
                 if (chestAnim != null) chestAnim.ResetToIdle();
                 return;
@@ -91,11 +91,9 @@ namespace GameCore.UI
             _pendingItem = item;
             _busy = false;
 
-            // Попап по умолчанию скрываем. Игрок сам решит, когда вернуться.
             if (popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // Восстанавливаем визуал сундука (открыт + иконка/VFX)
             if (chestAnim != null)
                 chestAnim.SetOpenedStatic(item.Icon, item.RarityVFX);
         }
@@ -112,14 +110,150 @@ namespace GameCore.UI
             return db.GetById(itemId);
         }
 
+        /// <summary>
+        /// Показать попап по текущему pending.
+        /// </summary>
+        public void ShowPendingPopup()
+        {
+            var gi = GameCore.GameInstance.I;
+            if (gi == null || popup == null) return;
+            if (!gi.HasPendingChestReward) return;
+
+            if (_pendingItem == null || _pendingItem.Id != gi.PendingChestItemId)
+                _pendingItem = ResolveItem(gi.PendingChestItemId);
+
+            if (_pendingItem == null)
+            {
+                gi.ClearPendingChestReward(immediateSave: true);
+                if (chestAnim != null) chestAnim.ResetToIdle();
+                _busy = false;
+                return;
+            }
+
+            if (!popup.gameObject.activeSelf)
+            {
+                popup.Show(_pendingItem);
+                _busy = true;
+            }
+        }
+
+        /// <summary>
+        /// Закрыть pending без попапа (для авто-продажи/авто-экипа).
+        /// </summary>
+        public void FinalizePending()
+        {
+            var gi = GameCore.GameInstance.I;
+            if (gi != null)
+                gi.ClearPendingChestReward(immediateSave: false);
+
+            if (chestAnim != null)
+                chestAnim.ResetToIdle();
+
+            _pendingItem = null;
+            _busy = false;
+
+            if (gi != null)
+                gi.SaveAllNow();
+        }
+
+        public void FinalizePendingKeepVisual()
+        {
+            var gi = GameCore.GameInstance.I;
+            if (gi != null)
+                gi.ClearPendingChestReward(immediateSave: false);
+
+            _pendingItem = null;
+            _busy = false;
+
+            if (gi != null)
+                gi.SaveAllNow();
+        }
+
+        /// <summary>
+        /// Авто-режим: открывает сундук и вызывает onOpened ПОСЛЕ окончания анимации.
+        /// Попап НЕ показываем автоматически.
+        /// </summary>
+        public bool TryOpenChestAuto(Action<ItemDef> onOpened)
+        {
+            var gi = GameCore.GameInstance.I;
+            if (gi == null || dropTable == null || popup == null)
+                return false;
+
+            // Есть pending — не тратим сундук, просто отдаём предмет
+            if (gi.HasPendingChestReward)
+            {
+                if (_pendingItem == null || _pendingItem.Id != gi.PendingChestItemId)
+                    _pendingItem = ResolveItem(gi.PendingChestItemId);
+
+                if (_pendingItem == null)
+                {
+                    gi.ClearPendingChestReward(immediateSave: true);
+                    if (chestAnim != null) chestAnim.ResetToIdle();
+                    _busy = false;
+                    return false;
+                }
+
+                onOpened?.Invoke(_pendingItem);
+                return true;
+            }
+
+            if (_busy) return false;
+
+            // 1) тратим сундук :contentReference[oaicite:2]{index=2}
+            if (!gi.SpendChest(1, immediateSave: false))
+                return false;
+
+            _busy = true;
+
+            // 2) опыт
+            gi.AddExp(10, immediateSave: false);
+
+            // 3) ролл предмета :contentReference[oaicite:3]{index=3}
+            var rolled = ChestService.Roll(dropTable);
+            var item = rolled.Item;
+            if (item == null)
+            {
+                Debug.LogWarning("[Chest] Rolled null item (db pool empty?)");
+                gi.SaveAllNow();
+                _busy = false;
+                return false;
+            }
+
+            _pendingItem = item;
+
+            // 4) pending сохраняем сразу (чтобы пережило выход во время анимации) :contentReference[oaicite:4]{index=4}
+            gi.SetPendingChestReward(item.Id, immediateSave: false);
+
+            // 5) спрячем попап
+            if (popup.gameObject.activeSelf)
+                popup.Hide();
+
+            // 6) запускаем анимацию; callback придёт ПОСЛЕ анимации (см. ChestAnimDriver)
+            if (chestAnim != null)
+            {
+                chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
+                {
+                    if (_pendingItem == null) { _busy = false; return; }
+                    onOpened?.Invoke(_pendingItem);
+                });
+            }
+            else
+            {
+                // если анимации нет — считаем что "всё сразу"
+                onOpened?.Invoke(item);
+            }
+
+            gi.SaveAllNow();
+            return true;
+        }
+
+        // Ручной режим (как у тебя сейчас) :contentReference[oaicite:5]{index=5}
         public void OpenChest()
         {
             var gi = GameCore.GameInstance.I;
             if (gi == null || dropTable == null || popup == null)
                 return;
 
-            // Если уже есть pending reward - не тратим сундук повторно.
-            // Просто возвращаем попап, чтобы игрок принял решение.
             if (gi.HasPendingChestReward)
             {
                 if (_pendingItem == null || _pendingItem.Id != gi.PendingChestItemId)
@@ -144,16 +278,13 @@ namespace GameCore.UI
 
             if (_busy) return;
 
-            // 1) сначала тратим сундук
             if (!gi.SpendChest(1, immediateSave: false))
                 return;
 
             _busy = true;
 
-            // 2) даём опыт
             gi.AddExp(10, immediateSave: false);
 
-            // 3) роллим предмет
             var rolled = ChestService.Roll(dropTable);
             var item = rolled.Item;
             if (item == null)
@@ -165,32 +296,24 @@ namespace GameCore.UI
             }
 
             _pendingItem = item;
-
-            // 4) сохраняем pending в State сразу (чтобы пережило выход из игры даже во время анимации)
             gi.SetPendingChestReward(item.Id, immediateSave: false);
 
-            // 5) на всякий случай спрячем попап (если вдруг был открыт)
             if (popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // 6) запускаем анимацию сундука; попап покажем ТОЛЬКО ПОСЛЕ окончания
             if (chestAnim != null)
             {
                 chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
                 {
                     if (_pendingItem == null) { _busy = false; return; }
-
                     popup.Show(_pendingItem);
-                    // busy снимем только когда игрок нажмёт Equip/Sell (OnDecisionMade)
                 });
             }
             else
             {
-                // если анимации нет — показываем сразу
                 popup.Show(item);
             }
 
-            // 7) сохраняем
             gi.SaveAllNow();
         }
     }

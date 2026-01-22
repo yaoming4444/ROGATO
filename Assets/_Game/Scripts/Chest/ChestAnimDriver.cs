@@ -9,7 +9,24 @@ public class ChestAnimDriver : MonoBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private string idleState = "ChestIdle";
     [SerializeField] private string openState = "ChestOpen";
+
+    [Tooltip("Fallback duration if clip length can't be read. Also used when WaitMode = FixedDuration.")]
     [SerializeField] private float openDuration = 0.6f;
+
+    public enum WaitMode
+    {
+        FixedDuration,      // wait openDuration
+        AnimatorStateLength // wait actual animator state length (more reliable)
+    }
+
+    [Header("Timing")]
+    [SerializeField] private WaitMode waitMode = WaitMode.AnimatorStateLength;
+
+    [Tooltip("If true uses realtime/unscaled time (ignores Time.timeScale).")]
+    [SerializeField] private bool useUnscaledTime = true;
+
+    [Tooltip("Extra padding added to the wait time (helps if transitions cut early).")]
+    [SerializeField] private float extraWait = 0.05f;
 
     [Header("Drop Icon (overlay)")]
     [SerializeField] private Image dropIcon;                 // UI Image поверх сундука
@@ -22,6 +39,12 @@ public class ChestAnimDriver : MonoBehaviour
     private Coroutine _c;
     private GameObject _spawnedVFX;
 
+    // Cached data for AnimEvent_ShowDrop
+    private Sprite _pendingSprite;
+    private GameObject _pendingVfxPrefab;
+
+    private bool _dropShownThisOpen;
+
     public bool IsPlayingOpen { get; private set; }
 
     private void Awake()
@@ -32,21 +55,36 @@ public class ChestAnimDriver : MonoBehaviour
 
     /// <summary>
     /// Запускаем анимацию открытия.
-    /// После openDuration:
-    /// - показываем иконку (если включено)
-    /// - спавним VFX префаб (если включено)
-    /// - вызываем onOpened()
+    /// - Визуал (иконка/VFX) показывается по Animation Event: AnimEvent_ShowDrop()
+    /// - onOpened() вызывается после ПОЛНОГО окончания открытия (по duration/length)
     /// В idle НЕ возвращаемся — остаёмся на последнем кадре Open.
     /// </summary>
-    /// <param name="droppedSprite">Спрайт дропа для иконки.</param>
-    /// <param name="rarityVFXPrefab">Префаб VFX (UI), который будет заинстансен в itemVFXRoot. Может быть null.</param>
-    /// <param name="onOpened">Коллбек после завершения открытия.</param>
     public void PlayOpen(Sprite droppedSprite, GameObject rarityVFXPrefab, Action onOpened = null)
     {
         if (!anim) return;
 
+        // запоминаем, что показать когда придёт event
+        _pendingSprite = droppedSprite;
+        _pendingVfxPrefab = rarityVFXPrefab;
+
+        _dropShownThisOpen = false;
+
         if (_c != null) StopCoroutine(_c);
-        _c = StartCoroutine(CoOpen(droppedSprite, rarityVFXPrefab, onOpened));
+        _c = StartCoroutine(CoOpen(onOpened));
+    }
+
+    /// <summary>
+    /// Animation Event (добавь в клип ChestOpen).
+    /// Поставь его в последний/предпоследний кадр, где сундук уже открыт.
+    /// </summary>
+    public void AnimEvent_ShowDrop()
+    {
+        if (_dropShownThisOpen) return; // защита если event случайно стоит 2 раза
+        _dropShownThisOpen = true;
+
+        if (!showIconAfterOpen) return;
+
+        ShowDropIcon(_pendingSprite, _pendingVfxPrefab);
     }
 
     /// <summary>
@@ -65,41 +103,87 @@ public class ChestAnimDriver : MonoBehaviour
 
         if (!anim) return;
 
+        // remember to show
+        _pendingSprite = droppedSprite;
+        _pendingVfxPrefab = rarityVFXPrefab;
+
         // Go to open state and clamp to the last frame
         anim.Rebind();
         anim.Update(0f);
         anim.Play(openState, 0, 1f);
         anim.Update(0f);
 
-        // Show visuals like after open
+        _dropShownThisOpen = true; // уже показали
         if (showIconAfterOpen)
             ShowDropIcon(droppedSprite, rarityVFXPrefab);
     }
 
-    private IEnumerator CoOpen(Sprite droppedSprite, GameObject rarityVFXPrefab, Action onOpened)
+    private IEnumerator CoOpen(Action onOpened)
     {
         IsPlayingOpen = true;
-
         HideDropIcon();
 
         // Жёсткий reset, чтобы open стартовал с нуля
         anim.Rebind();
         anim.Update(0f);
 
+        // Стартуем open
         anim.Play(openState, 0, 0f);
+        anim.Update(0f);
 
-        // ждём конец открытия
-        yield return new WaitForSecondsRealtime(openDuration);
+        // Даем Animator 1 кадр, чтобы state info обновился корректно
+        yield return null;
 
-        // останемся на последнем кадре ChestOpen
-        if (showIconAfterOpen)
-            ShowDropIcon(droppedSprite, rarityVFXPrefab);
+        float wait = GetOpenWaitSeconds() + Mathf.Max(0f, extraWait);
+
+        // ? ЖДЁМ ПОЛНОСТЬЮ ОТКРЫТИЕ (иконка появится по Animation Event)
+        if (useUnscaledTime)
+            yield return new WaitForSecondsRealtime(wait);
+        else
+            yield return new WaitForSeconds(wait);
+
+        // На случай если ты забыл поставить Animation Event:
+        // покажем дроп в конце, чтобы не было "пусто"
+        if (!_dropShownThisOpen && showIconAfterOpen)
+        {
+            ShowDropIcon(_pendingSprite, _pendingVfxPrefab);
+            _dropShownThisOpen = true;
+        }
+
+        // Останемся на последнем кадре ChestOpen (на всякий случай)
+        anim.Play(openState, 0, 1f);
+        anim.Update(0f);
 
         IsPlayingOpen = false;
         _c = null;
 
-        // сигнал наружу: "анимация закончилась, можно показывать попап"
         onOpened?.Invoke();
+    }
+
+    /// <summary>
+    /// Returns seconds to wait for open animation.
+    /// </summary>
+    private float GetOpenWaitSeconds()
+    {
+        if (!anim) return Mathf.Max(0.01f, openDuration);
+
+        if (waitMode == WaitMode.FixedDuration)
+            return Mathf.Max(0.01f, openDuration);
+
+        try
+        {
+            var info = anim.GetCurrentAnimatorStateInfo(0);
+
+            // если реально на этом стейте — берём length
+            if (info.IsName(openState) && info.length > 0.01f)
+                return info.length;
+
+            // иногда IsName может не сработать из-за разных путей,
+            // поэтому аккуратно fallback
+        }
+        catch { }
+
+        return Mathf.Max(0.01f, openDuration);
     }
 
     public void ResetToIdle()
@@ -115,8 +199,8 @@ public class ChestAnimDriver : MonoBehaviour
 
         if (!anim) return;
 
-        // Сразу в Idle с 0 кадра
         anim.Play(idleState, 0, 0f);
+        anim.Update(0f);
     }
 
     private void ShowDropIcon(Sprite s, GameObject rarityVFXPrefab)
@@ -132,36 +216,27 @@ public class ChestAnimDriver : MonoBehaviour
         // VFX
         if (!showVFXAfterOpen) return;
 
-        // Удаляем прошлый VFX, если был
         if (_spawnedVFX)
         {
             Destroy(_spawnedVFX);
             _spawnedVFX = null;
         }
 
-        // Спавним новый
         if (rarityVFXPrefab != null && itemVFXRoot != null)
         {
             _spawnedVFX = Instantiate(rarityVFXPrefab, itemVFXRoot);
             _spawnedVFX.SetActive(true);
         }
-        else
-        {
-            // Если префаб/рут не задан — просто ничего не делаем (без ошибок).
-            // Можно добавить Debug.LogWarning если хочешь.
-        }
     }
 
     private void HideDropIcon()
     {
-        // Иконка
         if (dropIcon)
         {
             dropIcon.enabled = false;
             dropIcon.sprite = null;
         }
 
-        // VFX
         if (_spawnedVFX)
         {
             Destroy(_spawnedVFX);
@@ -171,7 +246,6 @@ public class ChestAnimDriver : MonoBehaviour
 
     private void OnDisable()
     {
-        // На всякий случай, чтобы не оставались VFX при выключении объекта/канваса
         if (_c != null)
         {
             StopCoroutine(_c);
@@ -187,7 +261,4 @@ public class ChestAnimDriver : MonoBehaviour
         }
     }
 }
-
-
-
 
