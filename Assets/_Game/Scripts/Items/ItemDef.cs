@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GameCore.Items
 {
@@ -17,6 +18,10 @@ namespace GameCore.Items
         [Min(0)]
         [SerializeField] private int power = 0;
 
+        [Header("Item Level")]
+        [Min(1)]
+        [SerializeField] private int level = 1;
+
         [Header("Base Stats")]
         [SerializeField] private ItemStats stats;
 
@@ -29,8 +34,17 @@ namespace GameCore.Items
 
         [Header("UI")]
         [SerializeField] private Sprite icon;
-        [SerializeField] private Sprite iconRarity;
+
+        // ? НОВОЕ: цвет редкости (вместо спрайта)
+        // Если alpha = 0 => бейдж можно скрывать
+        [SerializeField] private Color rarityColor = new Color(1f, 1f, 1f, 0f);
+
         [SerializeField] private GameObject rarityVFX;
+
+        // (опционально) чтобы Unity не ругался на старое поле при обновлении ассетов:
+        // оставляем "на память", но больше не используем
+        [FormerlySerializedAs("iconRarity")]
+        [SerializeField, HideInInspector] private Sprite iconRarity_Legacy;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -38,12 +52,14 @@ namespace GameCore.Items
         public Rarity Rarity => rarity;
 
         public int Power => power;
+        public int Level => level;
 
         public ItemStats Stats => stats;
         public int SellGems => sellGems;
 
         public Sprite Icon => icon;
-        public Sprite IconRarity => iconRarity;
+
+        public Color RarityColor => rarityColor;
         public GameObject RarityVFX => rarityVFX;
 
         public ExtraStat[] ExtraStats => extraStats;
@@ -56,11 +72,8 @@ namespace GameCore.Items
 
             if (power < 0) power = 0;
             if (sellGems < 0) sellGems = 0;
+            if (level < 1) level = 1;
         }
 #endif
     }
 }
-
-
-
-

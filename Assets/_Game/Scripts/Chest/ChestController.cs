@@ -12,6 +12,9 @@ namespace GameCore.UI
         [Header("Chest Button Animation")]
         [SerializeField] private ChestAnimDriver chestAnim;
 
+        [Header("Auto Open Runner (optional)")]
+        [SerializeField] private AutoChestRunner autoRunner; // ? добавили
+
         private bool _busy;           // protects from spam clicks while opening / popup open
         private ItemDef _pendingItem; // item awaiting decision
 
@@ -22,6 +25,9 @@ namespace GameCore.UI
         {
             if (popup != null && popup.gameObject.activeSelf)
                 popup.gameObject.SetActive(false);
+
+            if (autoRunner == null)
+                autoRunner = FindObjectOfType<AutoChestRunner>(true);
 
             if (popup != null)
             {
@@ -42,21 +48,27 @@ namespace GameCore.UI
         }
 
         /// <summary>
-        /// Кнопка "X / Close" на попапе должна вызывать этот метод.
-        /// Попап скрываем, но сундук (открытый + иконка/VFX) остаётся.
+        /// ? Кнопка "X / Close" на попапе должна вызывать этот метод.
+        /// - скрываем попап
+        /// - ВЫКЛЮЧАЕМ авто-луп (но pending оставляем!)
+        /// - сундук остаётся открытым и с иконкой предмета
         /// </summary>
         public void HideRewardPopup()
         {
+            // ? остановить авто-луп, но НЕ трогать pending
+            if (autoRunner != null && autoRunner.IsRunning)
+                autoRunner.DisableAutoKeepPending();
+
             if (popup != null && popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // Разрешаем снова кликнуть по сундуку, чтобы открыть попап обратно.
+            // теперь можно кликнуть по сундуку и открыть попап обратно
             _busy = false;
         }
 
         private void OnPopupDecision()
         {
-            // Игрок принял решение => очищаем pending, возвращаем сундук в idle :contentReference[oaicite:1]{index=1}
+            // Игрок принял решение => очищаем pending, возвращаем сундук в idle
             var gi = GameCore.GameInstance.I;
             if (gi != null)
                 gi.ClearPendingChestReward(immediateSave: false);
@@ -199,7 +211,7 @@ namespace GameCore.UI
 
             if (_busy) return false;
 
-            // 1) тратим сундук :contentReference[oaicite:2]{index=2}
+            // 1) тратим сундук
             if (!gi.SpendChest(1, immediateSave: false))
                 return false;
 
@@ -208,7 +220,7 @@ namespace GameCore.UI
             // 2) опыт
             gi.AddExp(10, immediateSave: false);
 
-            // 3) ролл предмета :contentReference[oaicite:3]{index=3}
+            // 3) ролл предмета
             var rolled = ChestService.Roll(dropTable);
             var item = rolled.Item;
             if (item == null)
@@ -221,14 +233,14 @@ namespace GameCore.UI
 
             _pendingItem = item;
 
-            // 4) pending сохраняем сразу (чтобы пережило выход во время анимации) :contentReference[oaicite:4]{index=4}
+            // 4) pending сохраняем сразу
             gi.SetPendingChestReward(item.Id, immediateSave: false);
 
             // 5) спрячем попап
             if (popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // 6) запускаем анимацию; callback придёт ПОСЛЕ анимации (см. ChestAnimDriver)
+            // 6) запускаем анимацию; callback придёт ПОСЛЕ анимации
             if (chestAnim != null)
             {
                 chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
@@ -239,7 +251,6 @@ namespace GameCore.UI
             }
             else
             {
-                // если анимации нет — считаем что "всё сразу"
                 onOpened?.Invoke(item);
             }
 
@@ -247,7 +258,7 @@ namespace GameCore.UI
             return true;
         }
 
-        // Ручной режим (как у тебя сейчас) :contentReference[oaicite:5]{index=5}
+        // Ручной режим
         public void OpenChest()
         {
             var gi = GameCore.GameInstance.I;

@@ -40,7 +40,7 @@ namespace GameCore
 
         // Tune these:
         private const float DefaultDebounceDelay = 1.0f; // wait after last change
-        private const float DefaultMinInterval = 3.0f;   // do not send more often than this
+        private const float DefaultMinInterval = 8f;   // do not send more often than this
 
         private static float _debounceDelay = DefaultDebounceDelay;
         private static float _minInterval = DefaultMinInterval;

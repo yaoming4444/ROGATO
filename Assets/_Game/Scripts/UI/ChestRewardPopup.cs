@@ -10,7 +10,7 @@ namespace GameCore.UI
     {
         [Header("NEW item block (always visible)")]
         [SerializeField] private Image newIcon;
-        [SerializeField] private Image newRarity;
+        [SerializeField] private Image newRarity;      // badge sprite set in prefab
         [SerializeField] private TMP_Text newName;
         [SerializeField] private TMP_Text newPowerText; // ONE power text here
 
@@ -21,7 +21,7 @@ namespace GameCore.UI
         [Header("CURRENT item block (only if comparison)")]
         [SerializeField] private GameObject currentBlock;
         [SerializeField] private Image curIcon;
-        [SerializeField] private Image curRarity;
+        [SerializeField] private Image curRarity;      // badge sprite set in prefab
         [SerializeField] private TMP_Text curName;
 
         [Header("CURRENT stats (numbers only)")]
@@ -73,6 +73,10 @@ namespace GameCore.UI
             if (curName) curName.text = "";
             if (curHpText) curHpText.text = "";
             if (curAtkText) curAtkText.text = "";
+
+            // Optional: hide rarity badges by default
+            if (newRarity) { newRarity.enabled = false; newRarity.color = Color.white; }
+            if (curRarity) { curRarity.enabled = false; curRarity.color = Color.white; }
         }
 
         public void Show(ItemDef newItem)
@@ -99,12 +103,8 @@ namespace GameCore.UI
                 newIcon.color = Color.white;
             }
 
-            if (newRarity)
-            {
-                newRarity.enabled = (_newItem.IconRarity != null);
-                newRarity.sprite = _newItem.IconRarity;
-                newRarity.color = Color.white;
-            }
+            // ? NEW RARITY: COLOR ONLY (sprite is set in prefab)
+            ApplyRarityColor(newRarity, _newItem);
 
             if (newName)
                 newName.text = $"{_newItem.DisplayName} ({_newItem.Rarity})";
@@ -126,12 +126,8 @@ namespace GameCore.UI
                     curIcon.color = Color.white;
                 }
 
-                if (curRarity)
-                {
-                    curRarity.enabled = (cur.IconRarity != null);
-                    curRarity.sprite = cur.IconRarity;
-                    curRarity.color = Color.white;
-                }
+                // ? CURRENT RARITY: COLOR ONLY
+                ApplyRarityColor(curRarity, cur);
 
                 if (curName)
                     curName.text = $"{cur.DisplayName} ({cur.Rarity})";
@@ -177,14 +173,7 @@ namespace GameCore.UI
 
             // IMPORTANT: если слот пуст Ч SELL Ќ≈Ћ№«я
             if (sellButton)
-            {
                 sellButton.gameObject.SetActive(hasCurrent);
-                /*if (hasCurrent)
-                {
-                    var t = sellButton.GetComponentInChildren<TMP_Text>(true);
-                    if (t) t.text = $"SELL (+{_newItem.SellGems} gems)";
-                }*/
-            }
         }
 
         public void Hide()
@@ -268,12 +257,21 @@ namespace GameCore.UI
             if (hpText) hpText.text = s.Hp.ToString();
             if (atkText) atkText.text = s.Atk.ToString();
         }
+
+        private static void ApplyRarityColor(Image rarityImg, ItemDef def)
+        {
+            if (!rarityImg || def == null) return;
+
+            // Sprite должен быть задан в префабе!
+            Color c = def.RarityColor;
+
+            bool show = c.a > 0.001f;
+            rarityImg.enabled = show;
+
+            if (show)
+                rarityImg.color = c;
+            else
+                rarityImg.color = Color.white; // safety reset
+        }
     }
 }
-
-
-
-
-
-
-

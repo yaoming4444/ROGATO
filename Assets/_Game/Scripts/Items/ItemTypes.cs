@@ -26,10 +26,10 @@ namespace GameCore.Items
         Gloves = 5,
         Belt = 6,
         Ring = 7,
-        Amulet = 8,
-        Artifact = 9,
-        Companion = 10,
-        Badge = 11
+        Eyewear = 8,
+        Shield = 9,
+        Backpack = 10,
+        Cloack = 11
     }
 
     /// <summary>
