@@ -31,13 +31,16 @@ public class AutoChestRunner : MonoBehaviour
     {
         _s = settings;
 
-        StopAuto(); // standard stop (also resets chest visuals)
+        // ? ВАЖНО: старт авто НЕ должен сбрасывать pending.
+        StopAuto(); // stop loop only (pending stays)
+
         _c = StartCoroutine(Loop());
         RunningChanged?.Invoke(true);
     }
 
     /// <summary>
-    /// Standard stop: stops loop AND resets pending+visuals (FinalizePending).
+    /// ? Stop ONLY the loop.
+    /// Keeps pending reward + chest visuals (opened chest + drop icon) intact.
     /// </summary>
     public void StopAuto()
     {
@@ -46,16 +49,17 @@ public class AutoChestRunner : MonoBehaviour
         if (_c != null) StopCoroutine(_c);
         _c = null;
 
-        // standard behavior: reset chest (clears pending)
-        if (chest != null)
-            chest.FinalizePending();
+        // ? НЕ делаем chest.FinalizePending() здесь!
 
         if (wasRunning)
             RunningChanged?.Invoke(false);
     }
 
     /// <summary>
-    /// FULL OFF (your current): stops loop + clears pause + resets chest visuals (FinalizePending).
+    /// ? FULL OFF:
+    /// - stop loop
+    /// - clear pause counter
+    /// - keep pending intact
     /// </summary>
     public void DisableAuto()
     {
@@ -64,21 +68,22 @@ public class AutoChestRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ? IMPORTANT: stops auto loop, but DOES NOT clear pending reward and DOES NOT reset chest visuals.
-    /// Use this when user closes comparison popup (X), so they can click chest later and decide.
+    /// ? For compatibility with your previous calls.
+    /// Stops loop and keeps pending.
     /// </summary>
     public void DisableAutoKeepPending()
     {
-        bool wasRunning = (_c != null);
+        DisableAuto();
+    }
 
-        if (_c != null) StopCoroutine(_c);
-        _c = null;
-
-        // keep pending as-is (NO chest.FinalizePending here)
-        ClearPause();
-
-        if (wasRunning)
-            RunningChanged?.Invoke(false);
+    /// <summary>
+    /// ? Use ONLY when you intentionally want to clear pending reward + reset chest to idle.
+    /// Example: user manually clicks "Cancel reward" (if you ever add), or emergency cleanup.
+    /// </summary>
+    public void ClearPendingNow()
+    {
+        if (chest != null)
+            chest.FinalizePending();
     }
 
     private IEnumerator Loop()
@@ -97,6 +102,7 @@ public class AutoChestRunner : MonoBehaviour
                 continue;
             }
 
+            // ждём, если занято (попап/анимация/ожидание решения)
             if (chest.IsBusy)
             {
                 yield return null;
@@ -108,10 +114,12 @@ public class AutoChestRunner : MonoBehaviour
             bool started = chest.TryOpenChestAuto(it => opened = it);
             if (!started)
             {
+                // сундуков нет/не удалось открыть — просто выключаем луп, pending не трогаем
                 DisableAuto();
                 yield break;
             }
 
+            // ждём пока анимация закончится (callback приходит после PlayOpen)
             while (opened == null)
             {
                 if (IsPaused) { yield return null; continue; }
@@ -125,6 +133,7 @@ public class AutoChestRunner : MonoBehaviour
                 yield break;
             }
 
+            // Текущая вещь в слоте
             var cur = gi.GetEquippedDef(opened.Slot);
 
             bool slotEmpty = (cur == null);
@@ -132,7 +141,9 @@ public class AutoChestRunner : MonoBehaviour
 
             int cls = GetRarityRank(opened);
 
-            // if slot empty OR improves power => show comparison popup
+            // =========================
+            // правило: если слот пуст ИЛИ повышает power — показываем сравнение
+            // =========================
             if (_s.IncreasePower && (slotEmpty || improvesPower))
             {
                 chest.ShowPendingPopup();
@@ -142,7 +153,10 @@ public class AutoChestRunner : MonoBehaviour
                 continue;
             }
 
-            // below MinClass => auto-sell
+            // =========================
+            // фильтр по классу: ниже MinClass => auto-sell
+            // (здесь мы ОСОЗНАННО закрываем pending, потому что решение принято автоматически)
+            // =========================
             if (cls < _s.MinClass)
             {
                 gi.SellItem(opened, immediateSave: false);
@@ -151,12 +165,14 @@ public class AutoChestRunner : MonoBehaviour
                 if (postAutoDecisionVisualHold > 0f)
                     yield return WaitWithPause(postAutoDecisionVisualHold);
 
-                chest.FinalizePending();
+                chest.FinalizePending(); // ? auto decision -> clear pending + reset chest
                 yield return WaitWithPause(_s.OpenInterval);
                 continue;
             }
 
-            // IncreasePower enabled and NOT better => auto-sell
+            // =========================
+            // IncreasePower включен и предмет НЕ лучше текущего => auto-sell
+            // =========================
             if (_s.IncreasePower && !slotEmpty)
             {
                 if (opened.Power <= cur.Power)
@@ -167,13 +183,15 @@ public class AutoChestRunner : MonoBehaviour
                     if (postAutoDecisionVisualHold > 0f)
                         yield return WaitWithPause(postAutoDecisionVisualHold);
 
-                    chest.FinalizePending();
+                    chest.FinalizePending(); // ? auto decision
                     yield return WaitWithPause(_s.OpenInterval);
                     continue;
                 }
             }
 
-            // otherwise show popup
+            // =========================
+            // иначе просто показываем попап
+            // =========================
             chest.ShowPendingPopup();
             while (chest.IsBusy || IsPaused) yield return null;
             yield return WaitWithPause(_s.OpenInterval);
