@@ -32789,6 +32789,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoChestRunner
   chest: {fileID: 1861473940}
+  postAutoDecisionVisualHold: 0.15
 --- !u!114 &1861473946
 MonoBehaviour:
   m_ObjectHideFlags: 0

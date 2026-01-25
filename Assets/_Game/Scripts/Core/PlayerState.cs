@@ -17,7 +17,7 @@ namespace GameCore
         // -------- Currencies --------
         public long Gold = 100;
         public int Gems = 0;
-        public int Chests = 200;
+        public int Chests = 1;
 
         // -------- Cosmetics --------
         public string SelectedSkinId = "default";

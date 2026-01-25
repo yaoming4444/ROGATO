@@ -34,6 +34,26 @@ namespace GameCore
 
         public static string LocalPath => Path.Combine(Application.persistentDataPath, LocalFileName);
 
+        // =========================
+        // SERVER SAVE THROTTLING
+        // =========================
+
+        // Tune these:
+        private const float DefaultDebounceDelay = 1.0f; // wait after last change
+        private const float DefaultMinInterval = 3.0f;   // do not send more often than this
+
+        private static float _debounceDelay = DefaultDebounceDelay;
+        private static float _minInterval = DefaultMinInterval;
+
+        private static bool _pendingServerSave;
+        private static string _pendingServerJson;
+        private static float _pendingDueRealtime;
+
+        private static float _lastServerSendRealtime = -999f;
+        private static string _lastSentJson; // prevent duplicate sends
+
+        private static SaveSystemRuntime _runtime;
+
         // -------- JSON --------
 
         public static string ToJson(PlayerState state, bool pretty = false)
@@ -149,11 +169,58 @@ namespace GameCore
 
         // -------- SERVER SAVE (iDos) --------
 
+        /// <summary>
+        /// NEW DEFAULT: debounced/throttled server save.
+        /// This prevents spamming UpdateCustomUserData when many small actions happen (auto-open etc).
+        /// </summary>
         public static void SaveServer(PlayerState state)
+        {
+            SaveServerDebounced(state, DefaultDebounceDelay, DefaultMinInterval);
+        }
+
+        /// <summary>
+        /// Debounced server save:
+        /// - waits debounceDelay after the last call
+        /// - sends at most once per minInterval
+        /// - always sends the latest state (coalesced)
+        /// </summary>
+        public static void SaveServerDebounced(PlayerState state, float debounceDelay, float minInterval)
         {
             if (state == null)
             {
-                Debug.LogError("[SaveSystem] SaveServer: state is null");
+                Debug.LogError("[SaveSystem] SaveServerDebounced: state is null");
+                return;
+            }
+
+            EnsureRuntime();
+
+            _debounceDelay = Mathf.Max(0.05f, debounceDelay);
+            _minInterval = Mathf.Max(0.2f, minInterval);
+
+            // Update timestamp before writing
+            state.LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            var json = ToJson(state, pretty: false);
+
+            // if identical to last sent and nothing pending -> no need
+            if (!_pendingServerSave && _lastSentJson == json)
+                return;
+
+            _pendingServerSave = true;
+            _pendingServerJson = json;
+
+            // push due time forward (classic debounce)
+            _pendingDueRealtime = Time.realtimeSinceStartup + _debounceDelay;
+        }
+
+        /// <summary>
+        /// Immediate server save (use ONLY when you really need it right now).
+        /// </summary>
+        public static void SaveServerImmediate(PlayerState state)
+        {
+            if (state == null)
+            {
+                Debug.LogError("[SaveSystem] SaveServerImmediate: state is null");
                 return;
             }
 
@@ -161,19 +228,106 @@ namespace GameCore
             state.LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             var json = ToJson(state, pretty: false);
-            var bytes = Encoding.UTF8.GetByteCount(json);
+            DoSendServer(json);
+        }
 
+        /// <summary>
+        /// Forces sending pending save right now (if any).
+        /// Call this on app pause/quit.
+        /// </summary>
+        public static void FlushServerNow()
+        {
+            if (!_pendingServerSave) return;
+            EnsureRuntime();
+            TrySendIfDue(force: true);
+        }
+
+        private static void EnsureRuntime()
+        {
+            if (_runtime != null) return;
+
+            var go = new GameObject("[SaveSystemRuntime]");
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            _runtime = go.AddComponent<SaveSystemRuntime>();
+        }
+
+        private static void Tick()
+        {
+            if (!_pendingServerSave) return;
+            TrySendIfDue(force: false);
+        }
+
+        private static void TrySendIfDue(bool force)
+        {
+            if (!_pendingServerSave) return;
+
+            float now = Time.realtimeSinceStartup;
+
+            // throttle: don't send more often than minInterval unless forced
+            if (!force && (now - _lastServerSendRealtime) < _minInterval)
+                return;
+
+            // debounce due time
+            if (!force && now < _pendingDueRealtime)
+                return;
+
+            var json = _pendingServerJson;
+
+            // clear pending first to avoid loops if send triggers more saves
+            _pendingServerSave = false;
+            _pendingServerJson = null;
+
+            // skip duplicates
+            if (_lastSentJson == json)
+                return;
+
+            DoSendServer(json);
+        }
+
+        private static void DoSendServer(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return;
+
+            var bytes = Encoding.UTF8.GetByteCount(json);
             Debug.Log($"[SaveSystem] Saving server key={ServerKey}, bytes={bytes}");
 
             try
             {
-                // iDosGames SDK call
+                // iDosGames SDK call (was called every time before) :contentReference[oaicite:1]{index=1}
                 UserDataService.UpdateCustomUserData(ServerKey, json);
-                Debug.Log("[SaveSystem] UpdateCustomUserData called");
+                Debug.Log("[SaveSystem] UpdateCustomUserData called (throttled)");
+
+                _lastServerSendRealtime = Time.realtimeSinceStartup;
+                _lastSentJson = json;
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSystem] SaveServer exception: {e}");
+                Debug.LogError($"[SaveSystem] DoSendServer exception: {e}");
+
+                // if failed -> restore pending so we can retry later
+                _pendingServerSave = true;
+                _pendingServerJson = json;
+                _pendingDueRealtime = Time.realtimeSinceStartup + Mathf.Max(1f, _debounceDelay);
+            }
+        }
+
+        private class SaveSystemRuntime : MonoBehaviour
+        {
+            private void Update()
+            {
+                SaveSystem.Tick();
+            }
+
+            private void OnApplicationPause(bool pause)
+            {
+                if (pause)
+                    SaveSystem.FlushServerNow();
+            }
+
+            private void OnApplicationQuit()
+            {
+                SaveSystem.FlushServerNow();
             }
         }
 
@@ -186,11 +340,6 @@ namespace GameCore
 
             try
             {
-                // IMPORTANT:
-                // Make sure the key used here matches SaveServer() key.
-                // If SDK supports string overload, prefer: GetCachedCustomUserData(ServerKey)
-                //
-                // Currently uses enum key:
                 var json = UserDataService.GetCachedCustomUserData(CustomUserDataKey.player_state_v1);
 
                 if (string.IsNullOrWhiteSpace(json))
@@ -215,8 +364,3 @@ namespace GameCore
         }
     }
 }
-
-
-
-
-
