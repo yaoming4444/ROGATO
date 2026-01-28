@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using GameCore.Items;
-using Unity.VisualScripting;
 
 namespace GameCore.UI
 {
@@ -20,6 +19,27 @@ namespace GameCore.UI
         [Header("Empty visuals")]
         [SerializeField] private Sprite emptyIcon; // optional: plus icon
 
+        [Header("Click -> Popup")]
+        [Tooltip("Button on this slot (you can put it on the root object). If empty, will try GetComponent<Button>().")]
+        [SerializeField] private Button clickButton;
+
+        [Tooltip("Popup that shows item details (name/atk/hp).")]
+        [SerializeField] private ItemInfoPopup infoPopup;
+
+        private ItemDef _cachedDef;
+
+        private void Awake()
+        {
+            if (clickButton == null)
+                clickButton = GetComponent<Button>();
+
+            if (clickButton != null)
+            {
+                clickButton.onClick.RemoveListener(OnClick);
+                clickButton.onClick.AddListener(OnClick);
+            }
+        }
+
         private void OnEnable()
         {
             if (GameCore.GameInstance.I != null)
@@ -34,15 +54,35 @@ namespace GameCore.UI
                 GameCore.GameInstance.I.StateChanged -= OnStateChanged;
         }
 
+        private void OnClick()
+        {
+            // Если попап не назначен — просто ничего
+            if (infoPopup == null) return;
+
+            // Показываем только если предмет реально есть
+            if (_cachedDef == null) return;
+
+            infoPopup.Show(_cachedDef);
+        }
+
         private void OnStateChanged(GameCore.PlayerState s)
         {
+            _cachedDef = null;
+
             if (s == null)
             {
                 SetEmpty();
                 return;
             }
 
-            var id = GameCore.GameInstance.I.GetEquippedId(slot);
+            var gi = GameCore.GameInstance.I;
+            if (gi == null)
+            {
+                SetEmpty();
+                return;
+            }
+
+            var id = gi.GetEquippedId(slot);
 
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -57,6 +97,8 @@ namespace GameCore.UI
                 return;
             }
 
+            _cachedDef = def;
+
             // Filled
             if (icon)
             {
@@ -67,10 +109,8 @@ namespace GameCore.UI
 
             if (rarity)
             {
-                // ? НЕ меняем rarity.sprite (он должен быть задан в префабе)
+                // НЕ меняем rarity.sprite (он задан в префабе)
                 var c = def.RarityColor;
-
-                // если хочешь скрывать бейдж для "Common" — ставь alpha=0 в дефолте
                 rarity.enabled = (c.a > 0.001f);
                 if (rarity.enabled)
                     rarity.color = c;
@@ -85,8 +125,10 @@ namespace GameCore.UI
 
         private void SetEmpty()
         {
-            // Работаем только с child icon и бейджем, фон/рамку не трогаем.
+            // слот пустой => попап по клику не показываем
+            _cachedDef = null;
 
+            // Работаем только с child icon и бейджем, фон/рамку не трогаем.
             if (icon)
             {
                 if (emptyIcon != null)
