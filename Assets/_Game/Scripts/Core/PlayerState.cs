@@ -32,8 +32,20 @@ namespace GameCore
         /// </summary>
         public string pendingChestItemId = "";
 
+        /// <summary>
+        /// Level of the pending chest item (core gear).
+        /// Stored so it survives app restarts.
+        /// </summary>
+        public int pendingChestItemLevel = 1;
+
         // Stores itemId for each slot. Empty string means slot is empty.
         public string[] Equipped;
+
+        /// <summary>
+        /// Level for each equipped core item (parallel to Equipped[]).
+        /// If slot is empty, level can stay 1 (doesn't matter).
+        /// </summary>
+        public int[] EquippedLevels;
 
         // Unix timestamp of last save; used for "newer save wins" logic.
         public long LastSavedUnix = 0;
@@ -143,6 +155,7 @@ namespace GameCore
                 ChestLevel = 1,
                 AutoSellEnabled = false,
                 pendingChestItemId = "",
+                pendingChestItemLevel = 1,
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                 lvl_helmet = 1,
@@ -196,7 +209,18 @@ namespace GameCore
             for (int i = 0; i < Equipped.Length; i++)
                 Equipped[i] ??= "";
 
+            // EquippedLevels must mirror Equipped
+            if (EquippedLevels == null || EquippedLevels.Length != SlotCount)
+                EquippedLevels = new int[SlotCount];
+
+            for (int i = 0; i < EquippedLevels.Length; i++)
+            {
+                if (EquippedLevels[i] <= 0)
+                    EquippedLevels[i] = 1;
+            }
+
             pendingChestItemId ??= "";
+            if (pendingChestItemLevel <= 0) pendingChestItemLevel = 1;
 
             // Visual strings must never be null
             visual_back ??= "";
@@ -234,6 +258,36 @@ namespace GameCore
         {
             EnsureValid();
             Equipped[(int)slot] = itemId ?? "";
+        }
+
+        public int GetEquippedLevel(EquipSlot slot)
+        {
+            EnsureValid();
+            int lvl = EquippedLevels[(int)slot];
+            return lvl <= 0 ? 1 : lvl;
+        }
+
+        public void SetEquippedLevel(EquipSlot slot, int level)
+        {
+            EnsureValid();
+            EquippedLevels[(int)slot] = Mathf.Max(1, level);
+        }
+
+        /// <summary>
+        /// Set both item id and its level in the slot.
+        /// If itemId is empty -> clears slot id and resets level to 1.
+        /// </summary>
+        public void SetEquipped(EquipSlot slot, string itemId, int itemLevel)
+        {
+            EnsureValid();
+
+            itemId ??= "";
+            Equipped[(int)slot] = itemId;
+
+            if (string.IsNullOrEmpty(itemId))
+                EquippedLevels[(int)slot] = 1;
+            else
+                EquippedLevels[(int)slot] = Mathf.Max(1, itemLevel);
         }
 
         public int GetVisualSlotLevel(EquipmentType slot)

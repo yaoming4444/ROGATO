@@ -10,8 +10,9 @@ namespace GameCore.UI
     {
         [Header("NEW item block (always visible)")]
         [SerializeField] private Image newIcon;
-        [SerializeField] private Image newRarity;      // badge sprite set in prefab
+        [SerializeField] private Image newRarity;      // badge sprite set in prefab (we only tint)
         [SerializeField] private TMP_Text newName;
+        [SerializeField] private TMP_Text newLevelText; // NEW: level separate
         [SerializeField] private TMP_Text newPowerText; // ONE power text here
 
         [Header("NEW stats (numbers only)")]
@@ -21,8 +22,9 @@ namespace GameCore.UI
         [Header("CURRENT item block (only if comparison)")]
         [SerializeField] private GameObject currentBlock;
         [SerializeField] private Image curIcon;
-        [SerializeField] private Image curRarity;      // badge sprite set in prefab
+        [SerializeField] private Image curRarity;      // badge sprite set in prefab (we only tint)
         [SerializeField] private TMP_Text curName;
+        [SerializeField] private TMP_Text curLevelText; // NEW: level separate
 
         [Header("CURRENT stats (numbers only)")]
         [SerializeField] private TMP_Text curHpText;   // digits only
@@ -41,6 +43,7 @@ namespace GameCore.UI
         [SerializeField] private Color powerNeutralColor = Color.white;
 
         private ItemDef _newItem;
+        private int _newItemLevel = 1;
 
         public Action OnDecisionMade;
 
@@ -66,11 +69,13 @@ namespace GameCore.UI
             if (currentBlock) currentBlock.SetActive(false);
 
             if (newName) newName.text = "";
-            if (newPowerText) newPowerText.text = "";
+            if (newLevelText) newLevelText.text = "";
+            if (newPowerText) { newPowerText.text = ""; newPowerText.color = powerNeutralColor; }
             if (newHpText) newHpText.text = "";
             if (newAtkText) newAtkText.text = "";
 
             if (curName) curName.text = "";
+            if (curLevelText) curLevelText.text = "";
             if (curHpText) curHpText.text = "";
             if (curAtkText) curAtkText.text = "";
 
@@ -79,9 +84,25 @@ namespace GameCore.UI
             if (curRarity) { curRarity.enabled = false; curRarity.color = Color.white; }
         }
 
+        /// <summary>
+        /// Backward compatible entry point:
+        /// берём level из GameInstance.PendingChestItemLevel, иначе 1.
+        /// </summary>
         public void Show(ItemDef newItem)
         {
+            var gi = GameCore.GameInstance.I;
+            int lvl = (gi != null) ? gi.PendingChestItemLevel : 1;
+            Show(newItem, lvl);
+        }
+
+        /// <summary>
+        /// Основной Show с явным itemLevel.
+        /// </summary>
+        public void Show(ItemDef newItem, int newItemLevel)
+        {
             _newItem = newItem;
+            _newItemLevel = Mathf.Max(1, newItemLevel);
+
             if (_newItem == null) return;
 
             if (!gameObject.activeSelf)
@@ -103,17 +124,21 @@ namespace GameCore.UI
                 newIcon.color = Color.white;
             }
 
-            // ? NEW RARITY: COLOR ONLY (sprite is set in prefab)
+            // NEW RARITY: COLOR ONLY (sprite set in prefab)
             ApplyRarityColor(newRarity, _newItem);
 
             if (newName)
                 newName.text = $"{_newItem.DisplayName} ({_newItem.Rarity})";
 
-            ApplyHpAtkOnly(_newItem, newHpText, newAtkText);
+            if (newLevelText)
+                newLevelText.text = $"LVL {_newItemLevel}";
+
+            ApplyHpAtkOnly(_newItem, _newItemLevel, newHpText, newAtkText);
 
             // ===================== CURRENT =====================
             var cur = (gi != null) ? gi.GetEquippedDef(_newItem.Slot) : null;
             bool hasCurrent = (cur != null);
+            int curLevel = hasCurrent && gi != null ? Mathf.Max(1, gi.GetEquippedLevel(_newItem.Slot)) : 1;
 
             if (currentBlock) currentBlock.SetActive(hasCurrent);
 
@@ -126,26 +151,33 @@ namespace GameCore.UI
                     curIcon.color = Color.white;
                 }
 
-                // ? CURRENT RARITY: COLOR ONLY
+                // CURRENT RARITY: COLOR ONLY
                 ApplyRarityColor(curRarity, cur);
 
                 if (curName)
                     curName.text = $"{cur.DisplayName} ({cur.Rarity})";
 
-                ApplyHpAtkOnly(cur, curHpText, curAtkText);
+                if (curLevelText)
+                    curLevelText.text = $"LVL {curLevel}";
+
+                ApplyHpAtkOnly(cur, curLevel, curHpText, curAtkText);
             }
 
             // ===================== POWER TEXT (ONLY NEW BLOCK) =====================
             if (newPowerText)
             {
+                int newPwr = _newItem.GetPower(_newItemLevel);
+
                 if (!hasCurrent)
                 {
-                    newPowerText.text = $"PWR: {_newItem.Power}";
+                    newPowerText.text = $"PWR: {newPwr}";
                     newPowerText.color = powerNeutralColor;
                 }
                 else
                 {
-                    int delta = _newItem.Power - cur.Power;
+                    int curPwr = cur.GetPower(curLevel);
+                    int delta = newPwr - curPwr;
+
                     if (delta > 0)
                     {
                         newPowerText.text = $"+{delta} PWR";
@@ -179,6 +211,7 @@ namespace GameCore.UI
         public void Hide()
         {
             _newItem = null;
+            _newItemLevel = 1;
             gameObject.SetActive(false);
         }
 
@@ -207,17 +240,22 @@ namespace GameCore.UI
             // slot empty -> just equip, close
             if (!hasCurrent)
             {
-                gi.EquipItem(_newItem.Slot, _newItem.Id, immediateSave: true);
+                gi.EquipItemWithLevel(_newItem.Slot, _newItem.Id, _newItemLevel, immediateSave: true);
                 CloseAndNotify();
                 return;
             }
 
+            int curLevelBeforeSwap = Mathf.Max(1, gi.GetEquippedLevel(_newItem.Slot));
+
             if (IsAutoSellEnabled())
             {
-                // keep stronger by Power, sell weaker, close
-                if (_newItem.Power >= cur.Power)
+                // keep stronger by computed PWR (variant A), sell weaker, close
+                int newPwr = _newItem.GetPower(_newItemLevel);
+                int curPwr = cur.GetPower(curLevelBeforeSwap);
+
+                if (newPwr >= curPwr)
                 {
-                    gi.EquipItem(_newItem.Slot, _newItem.Id, immediateSave: false);
+                    gi.EquipItemWithLevel(_newItem.Slot, _newItem.Id, _newItemLevel, immediateSave: false);
                     gi.SellItem(cur, immediateSave: false);
                 }
                 else
@@ -230,11 +268,11 @@ namespace GameCore.UI
                 return;
             }
 
-            // AutoSell OFF: SWAP and re-open popup
-            gi.EquipItem(_newItem.Slot, _newItem.Id, immediateSave: false);
+            // AutoSell OFF: SWAP and re-open popup (show previous item)
+            gi.EquipItemWithLevel(_newItem.Slot, _newItem.Id, _newItemLevel, immediateSave: false);
             gi.SaveAllNow();
 
-            Show(cur);
+            Show(cur, curLevelBeforeSwap);
         }
 
         private void OnSell()
@@ -242,7 +280,7 @@ namespace GameCore.UI
             var gi = GameCore.GameInstance.I;
             if (gi == null || _newItem == null) return;
 
-            // sellButton is hidden when slot empty, but still safety:
+            // sellButton hidden when slot empty, but safety:
             var cur = gi.GetEquippedDef(_newItem.Slot);
             if (cur == null) return;
 
@@ -250,13 +288,19 @@ namespace GameCore.UI
             CloseAndNotify();
         }
 
-        private static void ApplyHpAtkOnly(ItemDef it, TMP_Text hpText, TMP_Text atkText)
+        // ===================== Stats display =====================
+
+        private static void ApplyHpAtkOnly(ItemDef it, int itemLevel, TMP_Text hpText, TMP_Text atkText)
         {
             if (it == null) return;
-            var s = it.Stats;
+
+            ItemStats s = it.GetStats(itemLevel);
+
             if (hpText) hpText.text = s.Hp.ToString();
             if (atkText) atkText.text = s.Atk.ToString();
         }
+
+        // ===================== UI helpers =====================
 
         private static void ApplyRarityColor(Image rarityImg, ItemDef def)
         {
@@ -268,10 +312,7 @@ namespace GameCore.UI
             bool show = c.a > 0.001f;
             rarityImg.enabled = show;
 
-            if (show)
-                rarityImg.color = c;
-            else
-                rarityImg.color = Color.white; // safety reset
+            rarityImg.color = show ? c : Color.white;
         }
     }
 }

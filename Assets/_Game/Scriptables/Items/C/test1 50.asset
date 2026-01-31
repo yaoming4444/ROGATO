@@ -16,15 +16,23 @@ MonoBehaviour:
   displayName: Body
   slot: 2
   rarity: 4
-  power: 25
-  level: 5
+  power: 66
+  previewLevel: 5
   stats:
-    Atk: 10
+    Atk: 32
     Def: 20
-    Hp: 30
+    Hp: 22
   extraStats: []
   sellGems: 1
   icon: {fileID: 21300000, guid: defd5000544285c42b4e1ae97fedaa5d, type: 3}
   rarityColor: {r: 0.9215687, g: 0.86274517, b: 0.19215688, a: 1}
   rarityVFX: {fileID: 0}
   iconRarity_Legacy: {fileID: 21300000, guid: dcfccfc7b49536046935da8ac12257dc, type: 3}
+  statsScalePerLevel: 0.05
+  powerScalePerLevel: 0.02
+  atkPowerWeight: 1
+  hpPowerWeight: 0.8
+  rarityBaseline: 2
+  rarityStep: 0.02
+  rarityMinMultiplier: 0.85
+  rarityMaxMultiplier: 1.35

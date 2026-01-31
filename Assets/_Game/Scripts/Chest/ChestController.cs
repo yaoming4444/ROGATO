@@ -13,7 +13,7 @@ namespace GameCore.UI
         [SerializeField] private ChestAnimDriver chestAnim;
 
         [Header("Auto Open Runner (optional)")]
-        [SerializeField] private AutoChestRunner autoRunner; // ? добавили
+        [SerializeField] private AutoChestRunner autoRunner; // ? ????????
 
         private bool _busy;           // protects from spam clicks while opening / popup open
         private ItemDef _pendingItem; // item awaiting decision
@@ -48,27 +48,27 @@ namespace GameCore.UI
         }
 
         /// <summary>
-        /// ? Кнопка "X / Close" на попапе должна вызывать этот метод.
-        /// - скрываем попап
-        /// - ВЫКЛЮЧАЕМ авто-луп (но pending оставляем!)
-        /// - сундук остаётся открытым и с иконкой предмета
+        /// ? ?????? "X / Close" ?? ?????? ?????? ???????? ???? ?????.
+        /// - ???????? ?????
+        /// - ????????? ????-??? (?? pending ?????????!)
+        /// - ?????? ??????? ???????? ? ? ??????? ????????
         /// </summary>
         public void HideRewardPopup()
         {
-            // ? остановить авто-луп, но НЕ трогать pending
+            // ? ?????????? ????-???, ?? ?? ??????? pending
             if (autoRunner != null && autoRunner.IsRunning)
                 autoRunner.DisableAutoKeepPending();
 
             if (popup != null && popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // теперь можно кликнуть по сундуку и открыть попап обратно
+            // ?????? ????? ???????? ?? ??????? ? ??????? ????? ???????
             _busy = false;
         }
 
         private void OnPopupDecision()
         {
-            // Игрок принял решение => очищаем pending, возвращаем сундук в idle
+            // ????? ?????? ??????? => ??????? pending, ?????????? ?????? ? idle
             var gi = GameCore.GameInstance.I;
             if (gi != null)
                 gi.ClearPendingChestReward(immediateSave: false);
@@ -123,7 +123,7 @@ namespace GameCore.UI
         }
 
         /// <summary>
-        /// Показать попап по текущему pending.
+        /// ???????? ????? ?? ???????? pending.
         /// </summary>
         public void ShowPendingPopup()
         {
@@ -144,13 +144,14 @@ namespace GameCore.UI
 
             if (!popup.gameObject.activeSelf)
             {
-                popup.Show(_pendingItem);
+                int lvl = gi.PendingChestItemLevel;
+                popup.Show(_pendingItem, lvl);
                 _busy = true;
             }
         }
 
         /// <summary>
-        /// Закрыть pending без попапа (для авто-продажи/авто-экипа).
+        /// ??????? pending ??? ?????? (??? ????-???????/????-?????).
         /// </summary>
         public void FinalizePending()
         {
@@ -182,8 +183,8 @@ namespace GameCore.UI
         }
 
         /// <summary>
-        /// Авто-режим: открывает сундук и вызывает onOpened ПОСЛЕ окончания анимации.
-        /// Попап НЕ показываем автоматически.
+        /// ????-?????: ????????? ?????? ? ???????? onOpened ????? ????????? ????????.
+        /// ????? ?? ?????????? ?????????????.
         /// </summary>
         public bool TryOpenChestAuto(Action<ItemDef> onOpened)
         {
@@ -191,7 +192,7 @@ namespace GameCore.UI
             if (gi == null || dropTable == null || popup == null)
                 return false;
 
-            // Есть pending — не тратим сундук, просто отдаём предмет
+            // ???? pending ? ?? ?????? ??????, ?????? ????? ???????
             if (gi.HasPendingChestReward)
             {
                 if (_pendingItem == null || _pendingItem.Id != gi.PendingChestItemId)
@@ -211,16 +212,16 @@ namespace GameCore.UI
 
             if (_busy) return false;
 
-            // 1) тратим сундук
+            // 1) ?????? ??????
             if (!gi.SpendChest(1, immediateSave: false))
                 return false;
 
             _busy = true;
 
-            // 2) опыт
+            // 2) ????
             gi.AddExp(10, immediateSave: false);
 
-            // 3) ролл предмета
+            // 3) ???? ????????
             var rolled = ChestService.Roll(dropTable);
             var item = rolled.Item;
             if (item == null)
@@ -233,14 +234,19 @@ namespace GameCore.UI
 
             _pendingItem = item;
 
-            // 4) pending сохраняем сразу
-            gi.SetPendingChestReward(item.Id, immediateSave: false);
+            // itemLevel from player level (+ small chestLevel impact)
+            int playerLevel = (gi.State != null) ? Mathf.Max(1, gi.State.Level) : 1;
+            int chestLevel = (gi.State != null) ? Mathf.Max(1, gi.State.ChestLevel) : 1;
+            int itemLevel = CalcDropItemLevel(playerLevel, chestLevel);
 
-            // 5) спрячем попап
+            // 4) pending save (id + level)
+            gi.SetPendingChestReward(item.Id, itemLevel, immediateSave: false);
+
+            // 5) ??????? ?????
             if (popup.gameObject.activeSelf)
                 popup.Hide();
 
-            // 6) запускаем анимацию; callback придёт ПОСЛЕ анимации
+            // 6) ????????? ????????; callback ????? ????? ????????
             if (chestAnim != null)
             {
                 chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
@@ -258,7 +264,7 @@ namespace GameCore.UI
             return true;
         }
 
-        // Ручной режим
+        // ?????? ?????
         public void OpenChest()
         {
             var gi = GameCore.GameInstance.I;
@@ -280,7 +286,8 @@ namespace GameCore.UI
 
                 if (!popup.gameObject.activeSelf)
                 {
-                    popup.Show(_pendingItem);
+                    int lvl = gi.PendingChestItemLevel;
+                    popup.Show(_pendingItem, lvl);
                     _busy = true;
                 }
 
@@ -307,7 +314,13 @@ namespace GameCore.UI
             }
 
             _pendingItem = item;
-            gi.SetPendingChestReward(item.Id, immediateSave: false);
+
+            // itemLevel from player level (+ small chestLevel impact)
+            int playerLevel = (gi.State != null) ? Mathf.Max(1, gi.State.Level) : 1;
+            int chestLevel = (gi.State != null) ? Mathf.Max(1, gi.State.ChestLevel) : 1;
+            int itemLevel = CalcDropItemLevel(playerLevel, chestLevel);
+
+            gi.SetPendingChestReward(item.Id, itemLevel, immediateSave: false);
 
             if (popup.gameObject.activeSelf)
                 popup.Hide();
@@ -317,15 +330,35 @@ namespace GameCore.UI
                 chestAnim.PlayOpen(item.Icon, item.RarityVFX, onOpened: () =>
                 {
                     if (_pendingItem == null) { _busy = false; return; }
-                    popup.Show(_pendingItem);
+                    popup.Show(_pendingItem, itemLevel);
                 });
             }
             else
             {
-                popup.Show(item);
+                popup.Show(item, itemLevel);
             }
 
             gi.SaveAllNow();
+        }
+
+        // =========================
+        // Item level logic (simple)
+        // =========================
+        private static int CalcDropItemLevel(int playerLevel, int chestLevel)
+        {
+            int p = Mathf.Max(1, playerLevel);
+            int c = Mathf.Max(1, chestLevel);
+
+            int minOffset = -3;
+            if (c >= 5) minOffset = -2;
+            if (c >= 10) minOffset = -1;
+
+            // Range(min, max) for int: max not included, so (1) gives 0 as max
+            int offset = UnityEngine.Random.Range(minOffset, 1); // [minOffset..0]
+            int lvl = p + offset;
+
+            lvl = Mathf.Clamp(lvl, 1, p);
+            return lvl;
         }
     }
 }

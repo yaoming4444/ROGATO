@@ -16,12 +16,12 @@ MonoBehaviour:
   displayName: Companion
   slot: 10
   rarity: 1
-  power: 10
-  level: 2
+  power: 33
+  previewLevel: 2
   stats:
-    Atk: 10
-    Def: 20
-    Hp: 30
+    Atk: 22
+    Def: 0
+    Hp: 12
   extraStats: []
   sellGems: 1
   icon: {fileID: 21300000, guid: 0c964e5ab41c81b4cab78731d89649b6, type: 3}
@@ -29,3 +29,11 @@ MonoBehaviour:
   rarityVFX: {fileID: 4541188829483667197, guid: 2d4afb3207af64972a49cdf7ef16823a,
     type: 3}
   iconRarity_Legacy: {fileID: 21300000, guid: f9e9b26d4c59dec4eaea839b3dd97e24, type: 3}
+  statsScalePerLevel: 0.05
+  powerScalePerLevel: 0.02
+  atkPowerWeight: 1
+  hpPowerWeight: 0.8
+  rarityBaseline: 2
+  rarityStep: 0.02
+  rarityMinMultiplier: 0.85
+  rarityMaxMultiplier: 1.35

@@ -9,7 +9,7 @@ public class AutoChestRunner : MonoBehaviour
     [SerializeField] private ChestController chest;
 
     [Header("Visual")]
-    [SerializeField] private float postAutoDecisionVisualHold = 0.15f; // 0 = сразу сброс
+    [SerializeField] private float postAutoDecisionVisualHold = 0.15f; // 0 = no hold
 
     private Coroutine _c;
     private AutoOpenSettingsPopup.Settings _s;
@@ -31,15 +31,15 @@ public class AutoChestRunner : MonoBehaviour
     {
         _s = settings;
 
-        // ? ВАЖНО: старт авто НЕ должен сбрасывать pending.
-        StopAuto(); // stop loop only (pending stays)
+        // Stop only the loop (pending stays)
+        StopAuto();
 
         _c = StartCoroutine(Loop());
         RunningChanged?.Invoke(true);
     }
 
     /// <summary>
-    /// ? Stop ONLY the loop.
+    /// Stop ONLY the loop.
     /// Keeps pending reward + chest visuals (opened chest + drop icon) intact.
     /// </summary>
     public void StopAuto()
@@ -49,14 +49,14 @@ public class AutoChestRunner : MonoBehaviour
         if (_c != null) StopCoroutine(_c);
         _c = null;
 
-        // ? НЕ делаем chest.FinalizePending() здесь!
+        // Do NOT call chest.FinalizePending() here!
 
         if (wasRunning)
             RunningChanged?.Invoke(false);
     }
 
     /// <summary>
-    /// ? FULL OFF:
+    /// FULL OFF:
     /// - stop loop
     /// - clear pause counter
     /// - keep pending intact
@@ -68,7 +68,7 @@ public class AutoChestRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ? For compatibility with your previous calls.
+    /// For compatibility with previous calls.
     /// Stops loop and keeps pending.
     /// </summary>
     public void DisableAutoKeepPending()
@@ -77,8 +77,7 @@ public class AutoChestRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ? Use ONLY when you intentionally want to clear pending reward + reset chest to idle.
-    /// Example: user manually clicks "Cancel reward" (if you ever add), or emergency cleanup.
+    /// Use ONLY when you intentionally want to clear pending reward + reset chest to idle.
     /// </summary>
     public void ClearPendingNow()
     {
@@ -102,7 +101,7 @@ public class AutoChestRunner : MonoBehaviour
                 continue;
             }
 
-            // ждём, если занято (попап/анимация/ожидание решения)
+            // wait while other flow is busy (anim/popup)
             if (chest.IsBusy)
             {
                 yield return null;
@@ -114,12 +113,12 @@ public class AutoChestRunner : MonoBehaviour
             bool started = chest.TryOpenChestAuto(it => opened = it);
             if (!started)
             {
-                // сундуков нет/не удалось открыть — просто выключаем луп, pending не трогаем
+                // no chests / can't open. stop loop, keep pending untouched
                 DisableAuto();
                 yield break;
             }
 
-            // ждём пока анимация закончится (callback приходит после PlayOpen)
+            // wait for animation callback to set opened
             while (opened == null)
             {
                 if (IsPaused) { yield return null; continue; }
@@ -133,16 +132,26 @@ public class AutoChestRunner : MonoBehaviour
                 yield break;
             }
 
-            // Текущая вещь в слоте
+            // current equipped in that slot
             var cur = gi.GetEquippedDef(opened.Slot);
-
             bool slotEmpty = (cur == null);
-            bool improvesPower = (!slotEmpty && opened.Power > cur.Power);
+
+            // IMPORTANT (Variant A):
+            // compare computed Power using item.GetPower(level) so:
+            // - low level item can still win if its base stats are higher
+            // - rarity is a multiplier, not an absolute rule
+            int openedLevel = Mathf.Max(1, gi.PendingChestItemLevel);
+            int curLevel = slotEmpty ? 1 : Mathf.Max(1, gi.GetEquippedLevel(opened.Slot));
+
+            int openedPwr = opened.GetPower(openedLevel);
+            int curPwr = slotEmpty ? 0 : cur.GetPower(curLevel);
+
+            bool improvesPower = (!slotEmpty && openedPwr > curPwr);
 
             int cls = GetRarityRank(opened);
 
             // =========================
-            // правило: если слот пуст ИЛИ повышает power — показываем сравнение
+            // Rule: if IncreasePower is ON and item improves power OR slot empty => show popup (let player decide)
             // =========================
             if (_s.IncreasePower && (slotEmpty || improvesPower))
             {
@@ -154,8 +163,7 @@ public class AutoChestRunner : MonoBehaviour
             }
 
             // =========================
-            // фильтр по классу: ниже MinClass => auto-sell
-            // (здесь мы ОСОЗНАННО закрываем pending, потому что решение принято автоматически)
+            // Rule: if below MinClass => auto-sell
             // =========================
             if (cls < _s.MinClass)
             {
@@ -165,17 +173,17 @@ public class AutoChestRunner : MonoBehaviour
                 if (postAutoDecisionVisualHold > 0f)
                     yield return WaitWithPause(postAutoDecisionVisualHold);
 
-                chest.FinalizePending(); // ? auto decision -> clear pending + reset chest
+                chest.FinalizePending(); // auto decision -> clear pending + reset chest
                 yield return WaitWithPause(_s.OpenInterval);
                 continue;
             }
 
             // =========================
-            // IncreasePower включен и предмет НЕ лучше текущего => auto-sell
+            // Rule: IncreasePower hint AND slot has item AND new is NOT better => auto-sell
             // =========================
             if (_s.IncreasePower && !slotEmpty)
             {
-                if (opened.Power <= cur.Power)
+                if (openedPwr <= curPwr)
                 {
                     gi.SellItem(opened, immediateSave: false);
                     gi.SaveAllNow();
@@ -183,14 +191,14 @@ public class AutoChestRunner : MonoBehaviour
                     if (postAutoDecisionVisualHold > 0f)
                         yield return WaitWithPause(postAutoDecisionVisualHold);
 
-                    chest.FinalizePending(); // ? auto decision
+                    chest.FinalizePending(); // auto decision
                     yield return WaitWithPause(_s.OpenInterval);
                     continue;
                 }
             }
 
             // =========================
-            // иначе просто показываем попап
+            // Otherwise show popup
             // =========================
             chest.ShowPendingPopup();
             while (chest.IsBusy || IsPaused) yield return null;

@@ -56,6 +56,7 @@ namespace GameCore
         // Pending chest reward (player can postpone Equip/Sell decision and return later)
         public bool HasPendingChestReward => State != null && !string.IsNullOrWhiteSpace(State.pendingChestItemId);
         public string PendingChestItemId => State != null ? (State.pendingChestItemId ?? "") : "";
+        public int PendingChestItemLevel => State != null ? Mathf.Max(1, State.pendingChestItemLevel) : 1;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
@@ -218,9 +219,21 @@ namespace GameCore
         /// </summary>
         public void SetPendingChestReward(string itemId, bool immediateSave = false)
         {
+            // Legacy overload (kept for old call sites). Level defaults to 1.
+            SetPendingChestReward(itemId, 1, immediateSave);
+        }
+
+        /// <summary>
+        /// Store pending chest reward so player can decide later (survives restart).
+        /// Also stores itemLevel for core gear.
+        /// </summary>
+        public void SetPendingChestReward(string itemId, int itemLevel, bool immediateSave = false)
+        {
             if (State == null) return;
 
             State.pendingChestItemId = itemId ?? "";
+            State.pendingChestItemLevel = Mathf.Max(1, itemLevel);
+
             MarkDirty();
             StateChanged?.Invoke(State);
 
@@ -236,6 +249,8 @@ namespace GameCore
             if (State == null) return;
 
             State.pendingChestItemId = "";
+            State.pendingChestItemLevel = 1;
+
             MarkDirty();
             StateChanged?.Invoke(State);
 
@@ -243,17 +258,51 @@ namespace GameCore
                 SaveAllNow();
         }
 
-        // ===================== VISUAL MUTATIONS (ВАЖНО ДЛЯ 2 СКЕЛЕТОНОВ) =====================
-
         /// <summary>
-        /// Меняет конкретный визуальный слот в State (visual_*).
-        /// skinNameOrEmpty:
-        /// - "" (пусто) = по дефолту "снять" (в биндере ты сделаешь EquipParts(type, -1))
-        /// - "top/top_c_10" и т.п. = надеть
-        /// notify:
-        /// - true = сразу поднимет StateChanged (оба скелета обновятся)
-        /// - false = удобно для batch, потом вызови RaiseStateChanged()
+        /// Equip currently pending chest reward into its slot using stored pending level, then clears pending.
+        /// Returns false if there is no pending reward or item not found.
         /// </summary>
+        public bool EquipPendingChestReward(bool immediateSave = false)
+        {
+            if (State == null) return false;
+            if (!HasPendingChestReward) return false;
+
+            var db = ItemDatabase.I;
+            if (db == null)
+            {
+                Debug.LogWarning("[GameInstance] EquipPendingChestReward: ItemDatabase is null.");
+                return false;
+            }
+
+            string itemId = PendingChestItemId;
+            var def = db.GetById(itemId);
+            if (def == null)
+            {
+                Debug.LogWarning($"[GameInstance] EquipPendingChestReward: pending item not found: {itemId}");
+                ClearPendingChestReward(immediateSave: immediateSave);
+                return false;
+            }
+
+            int lvl = PendingChestItemLevel;
+
+            // core equip with level
+            EquipItemWithLevel(def.Slot, def.Id, lvl, immediateSave: false);
+
+            // clear pending after equip
+            State.pendingChestItemId = "";
+            State.pendingChestItemLevel = 1;
+
+            MarkDirty();
+            StateChanged?.Invoke(State);
+
+            if (immediateSave)
+                SaveAllNow();
+
+            return true;
+        }
+
+        // ===================== VISUAL MUTATIONS =====================
+
         public void SetVisual(PartsType type, string skinNameOrEmpty, bool notify = true)
         {
             if (State == null) return;
@@ -284,7 +333,6 @@ namespace GameCore
                 case PartsType.Skin: State.visual_skin = skinNameOrEmpty; break;
 
                 default:
-                    // None / unsupported
                     return;
             }
 
@@ -297,9 +345,6 @@ namespace GameCore
             SetVisual(type, "", notify);
         }
 
-        /// <summary>
-        /// Пример пачки: меняем несколько частей и 1 раз обновляем.
-        /// </summary>
         public void SetVisualBatch(string top = null, string boots = null, string helmet = null, bool notify = true)
         {
             if (State == null) return;
@@ -312,10 +357,6 @@ namespace GameCore
             if (notify) StateChanged?.Invoke(State);
         }
 
-        /// <summary>
-        /// Смена цвета кожи (ты уже хранишь RGBA в PlayerState).
-        /// Биндер потом должен вызвать partsManager.ChangeSkinColor(st.GetSkinColor32()).
-        /// </summary>
         public void SetSkinColor(Color32 c, bool notify = true)
         {
             if (State == null) return;
@@ -333,6 +374,18 @@ namespace GameCore
             State.Gold += amount;
             Touch();
             if (immediateSave) SaveAllNow();
+        }
+
+        public bool SpendGold(long amount, bool immediateSave = false)
+        {
+            if (State == null) return false;
+            if (amount <= 0) return true;
+            if (State.Gold < amount) return false;
+
+            State.Gold -= amount;
+            Touch();
+            if (immediateSave) SaveAllNow();
+            return true;
         }
 
         public void AddGems(int amount, bool immediateSave = false)
@@ -355,15 +408,20 @@ namespace GameCore
             return true;
         }
 
+        public void AddChest(int amount, bool immediateSave = false)
+        {
+            AddChests(amount, immediateSave);
+        }
+
         public void AddChests(int amount, bool immediateSave = false)
         {
             if (State == null) return;
-            State.Chests = Mathf.Max(0, State.Chests + amount);
+            State.Chests += amount;
             Touch();
             if (immediateSave) SaveAllNow();
         }
 
-        public bool SpendChest(int amount = 1, bool immediateSave = false)
+        public bool SpendChest(int amount, bool immediateSave = false)
         {
             if (State == null) return false;
             if (amount <= 0) return true;
@@ -430,13 +488,9 @@ namespace GameCore
             if (immediateSave) SaveAllNow();
         }
 
-        /// <summary>
-        /// Adds EXP to the player and auto-levels up using LevelProgression thresholds.
-        /// </summary>
         public void AddExp(int amount, bool immediateSave = false)
         {
             if (State == null) return;
-            if (amount <= 0) return;
 
             State.Exp += amount;
 
@@ -455,6 +509,9 @@ namespace GameCore
         public string GetEquippedId(EquipSlot slot)
             => State?.GetEquippedId(slot) ?? "";
 
+        public int GetEquippedLevel(EquipSlot slot)
+            => State?.GetEquippedLevel(slot) ?? 1;
+
         public ItemDef GetEquippedDef(EquipSlot slot)
         {
             var id = GetEquippedId(slot);
@@ -471,6 +528,12 @@ namespace GameCore
 
         public bool EquipItem(EquipSlot slot, string itemId, bool immediateSave = false)
         {
+            // Legacy overload (kept for old call sites). Level defaults to 1.
+            return EquipItemWithLevel(slot, itemId, 1, immediateSave);
+        }
+
+        public bool EquipItemWithLevel(EquipSlot slot, string itemId, int itemLevel, bool immediateSave = false)
+        {
             if (State == null) return false;
 
             var def = ItemDatabase.I ? ItemDatabase.I.GetById(itemId) : null;
@@ -486,7 +549,8 @@ namespace GameCore
                 return false;
             }
 
-            State.SetEquippedId(slot, itemId);
+            // store both id and level (core gear)
+            State.SetEquipped(slot, itemId, Mathf.Max(1, itemLevel));
 
             MarkDirty();
             EquipmentChanged?.Invoke();
@@ -499,7 +563,9 @@ namespace GameCore
         public void Unequip(EquipSlot slot, bool immediateSave = false)
         {
             if (State == null) return;
-            State.SetEquippedId(slot, "");
+
+            // clear both id and level
+            State.SetEquipped(slot, "", 1);
 
             MarkDirty();
             EquipmentChanged?.Invoke();
@@ -522,12 +588,18 @@ namespace GameCore
 
         public bool TryAutoEquipIfEmpty(ItemDef newItem, bool immediateSave = false)
         {
+            // Legacy overload: level defaults to 1.
+            return TryAutoEquipIfEmptyWithLevel(newItem, 1, immediateSave);
+        }
+
+        public bool TryAutoEquipIfEmptyWithLevel(ItemDef newItem, int itemLevel, bool immediateSave = false)
+        {
             if (State == null || newItem == null) return false;
 
             if (!IsSlotEmpty(newItem.Slot))
                 return false;
 
-            State.SetEquippedId(newItem.Slot, newItem.Id);
+            State.SetEquipped(newItem.Slot, newItem.Id, Mathf.Max(1, itemLevel));
 
             MarkDirty();
             EquipmentChanged?.Invoke();
@@ -538,7 +610,7 @@ namespace GameCore
         }
 
         /// <summary>
-        /// Старое имя оставил, чтобы твои старые вызовы не поломались.
+        /// ?????? ??? ???????, ????? ???? ?????? ?????? ?? ??????????.
         /// </summary>
         public void NotifyStateChangedExternal()
         {
@@ -558,7 +630,7 @@ namespace GameCore
             RaiseStateChanged();
 
             if (saveLocal)
-                SaveLocalNow(); // или SaveAllNow(), как ты используешь
+                SaveLocalNow(); // ??? SaveAllNow(), ??? ?? ???????????
 
             return true;
         }
@@ -583,13 +655,3 @@ namespace GameCore
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
