@@ -9,6 +9,24 @@ namespace OctoberStudio.Abilities.UI
 {
     public class AbilityCardBehavior : MonoBehaviour
     {
+        [Header("Type UI (Active/Passive)")]
+        [SerializeField] private Image backgroundImage;          // whole card bg
+        [SerializeField] private Sprite backgroundSpriteActive;
+        [SerializeField] private Sprite backgroundSpritePassive;
+
+        [Space]
+        [SerializeField] private Image titleImage;               // top ribbon/bg behind "ACTIVE/PASSIVE"
+        [SerializeField] private Sprite titleSpriteActive;
+        [SerializeField] private Sprite titleSpritePassive;
+
+        [Space]
+        [SerializeField] private Image abilityTypeImage;         // optional icon/badge near type text
+        [SerializeField] private Sprite abilityTypeSpriteActive;
+        [SerializeField] private Sprite abilityTypeSpritePassive;
+        [SerializeField] private TMP_Text abilityTypeText;       // "ACTIVE" / "PASSIVE"
+        [SerializeField] private Color textcolor_active = Color.white;
+        [SerializeField] private Color textcolor_passive = Color.white;
+
         [SerializeField] Image abilityIcon;
 
         [Space]
@@ -60,6 +78,8 @@ namespace OctoberStudio.Abilities.UI
         {
             Data = abilityData;
 
+            ApplyTypeStyle(abilityData != null && abilityData.IsActiveAbility);
+
             abilityIcon.sprite = abilityData.Icon;
 
             titleText.text = abilityData.Title;
@@ -70,7 +90,7 @@ namespace OctoberStudio.Abilities.UI
                 levelBackgroundImage.color = levelBackgroundEvoColor;
                 levelText.text = $"EVO";
             }
-            else if(level == -1 || abilityData.IsEndgameAbility)
+            else if (level == -1 || abilityData.IsEndgameAbility)
             {
                 levelBackgroundImage.color = levelBackgroundNewColor;
                 levelText.text = $"NEW!";
@@ -84,21 +104,54 @@ namespace OctoberStudio.Abilities.UI
             if (abilityData.IsEvolution)
             {
                 iconBackgroundImage.color = iconBackgroundEvoColor;
-            } else 
+            }
+            else
             {
                 iconBackgroundImage.color = iconBackgroundColor;
             }
 
-            if(StageController.AbilityManager.HasEvolution(Data.AbilityType, out var otherType))
+            if (StageController.AbilityManager.HasEvolution(Data.AbilityType, out var otherType))
             {
                 var otherData = StageController.AbilityManager.GetAbilityData(otherType);
                 var otherIcon = otherData.Icon;
 
                 evolutionBlock.SetActive(true);
                 evolutionIcon.sprite = otherIcon;
-            } else
+            }
+            else
             {
                 evolutionBlock.SetActive(false);
+            }
+        }
+
+        private void ApplyTypeStyle(bool isActive)
+        {
+            // Background
+            if (backgroundImage != null)
+            {
+                var sprite = isActive ? backgroundSpriteActive : backgroundSpritePassive;
+                if (sprite != null) backgroundImage.sprite = sprite;
+            }
+
+            // Title/Ribbon
+            if (titleImage != null)
+            {
+                var sprite = isActive ? titleSpriteActive : titleSpritePassive;
+                if (sprite != null) titleImage.sprite = sprite;
+            }
+
+            // Type badge/icon
+            if (abilityTypeImage != null)
+            {
+                var sprite = isActive ? abilityTypeSpriteActive : abilityTypeSpritePassive;
+                if (sprite != null) abilityTypeImage.sprite = sprite;
+            }
+
+            // Type label text
+            if (abilityTypeText != null)
+            {
+                abilityTypeText.text = isActive ? "ACTIVE" : "PASSIVE";
+                abilityTypeText.color = isActive ? textcolor_active : textcolor_passive;
             }
         }
 
