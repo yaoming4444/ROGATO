@@ -137,7 +137,8 @@ namespace OctoberStudio
             {
                 var abilityList = abilitiesLists[i];
 
-                abilityList.Hide();
+                //abilityList.Hide();
+                abilityList.Refresh();
             }
 
             blackgroundTint.Hide();
