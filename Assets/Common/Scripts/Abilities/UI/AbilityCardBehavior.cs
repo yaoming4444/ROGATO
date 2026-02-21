@@ -27,45 +27,47 @@ namespace OctoberStudio.Abilities.UI
         [SerializeField] private Color textcolor_active = Color.white;
         [SerializeField] private Color textcolor_passive = Color.white;
 
-        [SerializeField] Image abilityIcon;
+        [SerializeField] private Image abilityIcon;
 
         [Space]
-        [SerializeField] TMP_Text titleText;
-        [SerializeField] TMP_Text descriptionText;
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private TMP_Text descriptionText;
 
-        [Header("Level Text")]
-        [SerializeField] TMP_Text levelText;
-        [SerializeField] Image levelBackgroundImage;
-        [SerializeField] Color levelBackgroundColor;
-        [SerializeField] Color levelBackgroundNewColor;
-        [SerializeField] Color levelBackgroundEvoColor;
+        [Header("Level (Text / Background)")]
+        [SerializeField] private TMP_Text levelText;
+        [SerializeField] private Image levelBackgroundImage;
+        [SerializeField] private Color levelBackgroundColor;
+        [SerializeField] private Color levelBackgroundNewColor;
+        [SerializeField] private Color levelBackgroundEvoColor;
+
+        [Header("Level Stars (Active parts only)")]
+        [Tooltip("Assign 3 objects: Stars/Star(1)/Active, Stars/Star(2)/Active, Stars/Star(3)/Active")]
+        [SerializeField] private GameObject[] starActives = new GameObject[3];
 
         [Space]
-        [SerializeField] GameObject evolutionBlock;
-        [SerializeField] Image evolutionIcon;
+        [SerializeField] private GameObject evolutionBlock;
+        [SerializeField] private Image evolutionIcon;
 
         [Space]
-        [SerializeField] Button button;
+        [SerializeField] private Button button;
         public Selectable Selectable => button;
 
         [Space]
-        [SerializeField] RectTransform shineRect;
+        [SerializeField] private RectTransform shineRect;
 
         [Header("Icon Background")]
-        [SerializeField] Image iconBackgroundImage;
-        [SerializeField] Color iconBackgroundColor;
-        [SerializeField] Color iconBackgroundEvoColor;
+        [SerializeField] private Image iconBackgroundImage;
+        [SerializeField] private Color iconBackgroundColor;
+        [SerializeField] private Color iconBackgroundEvoColor;
 
         private Vector2 shineStartPosition;
 
         public AbilityData Data { get; private set; }
-
         private Action<AbilityData> onAbilitySelected;
 
         private void Awake()
         {
             button.onClick.AddListener(OnAbilitySelected);
-
             shineStartPosition = shineRect.anchoredPosition;
         }
 
@@ -85,38 +87,65 @@ namespace OctoberStudio.Abilities.UI
             titleText.text = abilityData.Title;
             descriptionText.text = abilityData.Description;
 
+            // --- Stars Root is ALWAYS ON, we only toggle starActives ---
+            // Decide how many stars:
+            //  - Normal: displayLevel = level + 2 (как у тебя было LVL {level+2})
+            //  - NEW/EVO: ставим 0 (или можно 1/3 — см. ниже)
+            int starsCount = 0;
+
             if (abilityData.IsEvolution)
             {
                 levelBackgroundImage.color = levelBackgroundEvoColor;
-                levelText.text = $"EVO";
+
+                // Если EVO хочешь показывать как максимум:
+                starsCount = 3;
+
+                // Если хочешь EVO текстом — оставь:
+                if (levelText != null)
+                {
+                    levelText.gameObject.SetActive(true);
+                    levelText.text = "EVO";
+                }
             }
             else if (level == -1 || abilityData.IsEndgameAbility)
             {
                 levelBackgroundImage.color = levelBackgroundNewColor;
-                levelText.text = $"NEW!";
+
+                // NEW: обычно это первый уровень => 1 звезда (логичнее)
+                starsCount = 1;
+
+                if (levelText != null)
+                {
+                    levelText.gameObject.SetActive(true);
+                    levelText.text = "NEW!";
+                }
             }
             else
             {
                 levelBackgroundImage.color = levelBackgroundColor;
-                levelText.text = $"LVL {level + 2}";
+
+                // Прячем текст, если он есть
+                if (levelText != null)
+                    levelText.gameObject.SetActive(false);
+
+                int displayLevel = level + 2;               // как раньше
+                starsCount = Mathf.Clamp(displayLevel, 1, 3);
             }
 
+            SetStars(starsCount);
+
+            // ----- Icon background -----
             if (abilityData.IsEvolution)
-            {
                 iconBackgroundImage.color = iconBackgroundEvoColor;
-            }
             else
-            {
                 iconBackgroundImage.color = iconBackgroundColor;
-            }
 
+            // ----- Evolution block -----
             if (StageController.AbilityManager.HasEvolution(Data.AbilityType, out var otherType))
             {
                 var otherData = StageController.AbilityManager.GetAbilityData(otherType);
-                var otherIcon = otherData.Icon;
-
                 evolutionBlock.SetActive(true);
-                evolutionIcon.sprite = otherIcon;
+                evolutionIcon.sprite = otherData.Icon;
             }
             else
             {
@@ -124,30 +153,39 @@ namespace OctoberStudio.Abilities.UI
             }
         }
 
+        private void SetStars(int activeCount)
+        {
+            if (starActives == null || starActives.Length == 0) return;
+
+            activeCount = Mathf.Clamp(activeCount, 0, 3);
+
+            for (int i = 0; i < starActives.Length; i++)
+            {
+                if (starActives[i] != null)
+                    starActives[i].SetActive(i < activeCount);
+            }
+        }
+
         private void ApplyTypeStyle(bool isActive)
         {
-            // Background
             if (backgroundImage != null)
             {
                 var sprite = isActive ? backgroundSpriteActive : backgroundSpritePassive;
                 if (sprite != null) backgroundImage.sprite = sprite;
             }
 
-            // Title/Ribbon
             if (titleImage != null)
             {
                 var sprite = isActive ? titleSpriteActive : titleSpritePassive;
                 if (sprite != null) titleImage.sprite = sprite;
             }
 
-            // Type badge/icon
             if (abilityTypeImage != null)
             {
                 var sprite = isActive ? abilityTypeSpriteActive : abilityTypeSpritePassive;
                 if (sprite != null) abilityTypeImage.sprite = sprite;
             }
 
-            // Type label text
             if (abilityTypeText != null)
             {
                 abilityTypeText.text = isActive ? "ACTIVE" : "PASSIVE";
