@@ -16,7 +16,8 @@ namespace GameCore.UI
         [SerializeField] private AutoChestRunner autoRunner; // ? ????????
 
         private bool _busy;           // protects from spam clicks while opening / popup open
-        private ItemDef _pendingItem; // item awaiting decision
+        private ItemDef _pendingItem; // item awaiting decisio
+        private bool _pausedAutoByManualClick;
 
         public bool IsBusy => _busy;
         public ItemDef PendingItem => _pendingItem;
@@ -81,6 +82,18 @@ namespace GameCore.UI
 
             if (gi != null)
                 gi.SaveAllNow();
+
+            ResumeAutoIfManualPaused();
+        }
+
+        private void ResumeAutoIfManualPaused()
+        {
+            if (!_pausedAutoByManualClick) return;
+
+            _pausedAutoByManualClick = false;
+
+            if (autoRunner != null)
+                autoRunner.ResumeAuto();
         }
 
         private void RestorePendingIfAny()
@@ -270,6 +283,12 @@ namespace GameCore.UI
             var gi = GameCore.GameInstance.I;
             if (gi == null || dropTable == null || popup == null)
                 return;
+
+            if (autoRunner != null && autoRunner.IsRunning && !_pausedAutoByManualClick)
+            {
+                autoRunner.PauseAuto();
+                _pausedAutoByManualClick = true;
+            }
 
             if (gi.HasPendingChestReward)
             {
