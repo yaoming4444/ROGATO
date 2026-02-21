@@ -38,22 +38,6 @@ MonoBehaviour:
     throwingForce: 8
     spread: 20
     damage: 1.5
-    projectileSize: 1
-  - projectileCount: 2
-    projectileLifetime: 4
-    timeBetweenProjectiles: 0.2
-    abilityCooldown: 5
-    throwingForce: 8
-    spread: 20
-    damage: 1.5
-    projectileSize: 1.2
-  - projectileCount: 3
-    projectileLifetime: 4
-    timeBetweenProjectiles: 0.2
-    abilityCooldown: 5
-    throwingForce: 8
-    spread: 20
-    damage: 1.5
     projectileSize: 1.2
   - projectileCount: 3
     projectileLifetime: 4

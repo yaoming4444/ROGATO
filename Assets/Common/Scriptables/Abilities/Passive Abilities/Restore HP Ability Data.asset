@@ -19,16 +19,13 @@ MonoBehaviour:
   prefab: {fileID: 1574058401009310863, guid: 141088cc56070244d84dccf079efb43d, type: 3}
   isActiveAbility: 0
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - restoredHPPercent: 1
     cooldown: 5
-  - restoredHPPercent: 2
-    cooldown: 5
   - restoredHPPercent: 3
-    cooldown: 5
-  - restoredHPPercent: 4
     cooldown: 5
   - restoredHPPercent: 5
     cooldown: 5

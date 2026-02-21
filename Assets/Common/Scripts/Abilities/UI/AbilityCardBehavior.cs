@@ -54,6 +54,9 @@ namespace OctoberStudio.Abilities.UI
 
         [Space]
         [SerializeField] private RectTransform shineRect;
+        [SerializeField] private float shineStartY = -1000f;
+        [SerializeField] private float shineEndY = 1000f;
+        [SerializeField] private float shineDuration = 0.5f;
 
         [Header("Icon Background")]
         [SerializeField] private Image iconBackgroundImage;
@@ -195,11 +198,18 @@ namespace OctoberStudio.Abilities.UI
 
         public void Show(float delay)
         {
-            var targetShinePosition = shineStartPosition;
-            targetShinePosition.x *= -1;
+            var from = shineRect.anchoredPosition;
+            from.y = shineStartY;
 
-            shineRect.anchoredPosition = shineStartPosition;
-            shineRect.DoAnchorPosition(targetShinePosition, 0.5f, delay).SetUnscaledTime(true);
+            var to = shineRect.anchoredPosition;
+            to.y = shineEndY;
+
+            // ¬—≈√ƒј сбрасываем в старт
+            shineRect.anchoredPosition = from;
+
+            shineRect
+                .DoAnchorPosition(to, shineDuration, delay)
+                .SetUnscaledTime(true);
         }
 
         private void OnAbilitySelected()

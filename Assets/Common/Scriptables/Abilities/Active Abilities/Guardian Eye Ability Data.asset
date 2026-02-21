@@ -26,13 +26,7 @@ MonoBehaviour:
   - fieldRadius: 0.8
     damage: 0.5
     damageCooldown: 1
-  - fieldRadius: 1
-    damage: 1
-    damageCooldown: 1
   - fieldRadius: 1.2
-    damage: 1.5
-    damageCooldown: 1
-  - fieldRadius: 1.4
     damage: 1.5
     damageCooldown: 1
   - fieldRadius: 1.6

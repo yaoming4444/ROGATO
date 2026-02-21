@@ -19,11 +19,10 @@ MonoBehaviour:
   prefab: {fileID: 3978403754796854433, guid: d12261c054d3d8b4eb9c812d48a838d0, type: 3}
   isActiveAbility: 0
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - speedMultiplier: 1.1
-  - speedMultiplier: 1.2
   - speedMultiplier: 1.3
-  - speedMultiplier: 1.4
   - speedMultiplier: 1.5

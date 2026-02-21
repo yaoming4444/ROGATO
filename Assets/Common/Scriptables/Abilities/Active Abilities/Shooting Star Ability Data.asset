@@ -32,21 +32,9 @@ MonoBehaviour:
   - damage: 1
     abilityCooldown: 6
     projectileLifetime: 3
-    projectilesCount: 3
-    radius: 1.5
-    angularSpeed: -200
-  - damage: 1
-    abilityCooldown: 6
-    projectileLifetime: 3
     projectilesCount: 4
     radius: 1.5
     angularSpeed: -200
-  - damage: 1.5
-    abilityCooldown: 6
-    projectileLifetime: 3
-    projectilesCount: 5
-    radius: 1.5
-    angularSpeed: -250
   - damage: 2
     abilityCooldown: 6
     projectileLifetime: 3

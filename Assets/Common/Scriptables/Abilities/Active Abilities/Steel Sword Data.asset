@@ -29,17 +29,7 @@ MonoBehaviour:
     slashSize: 1
     timeBetweenSlashes: 0.2
   - abilityCooldown: 2
-    slashesCount: 2
-    damage: 1
-    slashSize: 1
-    timeBetweenSlashes: 0.2
-  - abilityCooldown: 2
     slashesCount: 3
-    damage: 1.5
-    slashSize: 1.2
-    timeBetweenSlashes: 0.2
-  - abilityCooldown: 2
-    slashesCount: 4
     damage: 1.5
     slashSize: 1.2
     timeBetweenSlashes: 0.2

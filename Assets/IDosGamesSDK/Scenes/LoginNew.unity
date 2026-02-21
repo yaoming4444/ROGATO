@@ -2519,6 +2519,11 @@ PrefabInstance:
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
       objectReference: {fileID: 0}
+    - target: {fileID: 9186863984898817589, guid: 8512bf6e263dece468540071a8c9d4bc,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 120
+      objectReference: {fileID: 0}
     - target: {fileID: 9186863984898817591, guid: 8512bf6e263dece468540071a8c9d4bc,
         type: 3}
       propertyPath: m_Sprite

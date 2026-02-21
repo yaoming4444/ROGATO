@@ -176,17 +176,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1305658594641486105}
-  m_LocalRotation: {x: 0, y: 0, z: -0.22707629, w: 0.97387695}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 1.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8545806743282467824}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -26.25}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -600, y: 0}
-  m_SizeDelta: {x: 100, y: 400}
+  m_AnchoredPosition: {x: 0, y: -1000}
+  m_SizeDelta: {x: 155, y: 607.14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9143293240560022638
 CanvasRenderer:
@@ -392,7 +392,6 @@ MonoBehaviour:
   levelBackgroundColor: {r: 0.67058825, g: 0.36078432, b: 0.36078432, a: 1}
   levelBackgroundNewColor: {r: 0.9254902, g: 0.32156864, b: 0.32156864, a: 1}
   levelBackgroundEvoColor: {r: 0.6784314, g: 0.20784314, b: 0.83137256, a: 1}
-  starsRoot: {fileID: 4578824554070082703}
   starActives:
   - {fileID: 5312665490747176828}
   - {fileID: 8252982526512857077}

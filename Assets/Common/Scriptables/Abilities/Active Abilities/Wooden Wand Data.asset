@@ -28,19 +28,9 @@ MonoBehaviour:
     damage: 1
     projectileSize: 1
     projectileLifetime: 5
-  - abilityCooldown: 0.5
-    projectileSpeed: 6
-    damage: 1
-    projectileSize: 1
-    projectileLifetime: 5
   - abilityCooldown: 0.4
     projectileSpeed: 7
     damage: 1.5
-    projectileSize: 1
-    projectileLifetime: 5
-  - abilityCooldown: 0.35
-    projectileSpeed: 8
-    damage: 2
     projectileSize: 1
     projectileLifetime: 5
   - abilityCooldown: 0.25

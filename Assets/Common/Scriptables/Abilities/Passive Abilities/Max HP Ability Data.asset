@@ -19,11 +19,10 @@ MonoBehaviour:
   prefab: {fileID: 5795888989804479914, guid: 2f1a6ab57a918ed498acc33a711c2c27, type: 3}
   isActiveAbility: 0
   isWeaponAbility: 0
+  isEndgameAbility: 0
   isEvolution: 0
   evolutionRequirements: []
   levels:
   - maxHPMultiplier: 1.2
-  - maxHPMultiplier: 1.4
   - maxHPMultiplier: 1.6
-  - maxHPMultiplier: 1.8
   - maxHPMultiplier: 2
