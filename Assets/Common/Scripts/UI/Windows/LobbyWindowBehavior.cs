@@ -98,8 +98,8 @@ namespace OctoberStudio.UI
 
             if (save.IsPlaying && GameController.FirstTimeLoaded)
             {
-                continueBackgroundImage.gameObject.SetActive(true);
-                contituePopupRect.gameObject.SetActive(true);
+                //continueBackgroundImage.gameObject.SetActive(true);
+                //contituePopupRect.gameObject.SetActive(true);
 
                 EventSystem.current.SetSelectedGameObject(confirmButton.gameObject);
 
