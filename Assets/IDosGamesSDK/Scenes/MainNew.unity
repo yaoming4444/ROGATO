@@ -20770,7 +20770,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -280}
-  m_SizeDelta: {x: 700, y: 400}
+  m_SizeDelta: {x: 750, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1069879342
 MonoBehaviour:
@@ -20785,15 +20785,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
-    m_Left: 0
+    m_Left: 55
     m_Right: 0
     m_Top: 20
     m_Bottom: 0
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 100, y: 100}
-  m_Spacing: {x: 50, y: 0}
+  m_CellSize: {x: 130, y: 130}
+  m_Spacing: {x: 40, y: 10}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1 &1071429298
@@ -26322,7 +26322,7 @@ PrefabInstance:
     - target: {fileID: 3380765460122810646, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 5.5075073
+      value: 5.5082397
       objectReference: {fileID: 0}
     - target: {fileID: 3380765460122810646, guid: 71e632174bd46f946a7f5619acb25ee5,
         type: 3}
@@ -54884,6 +54884,9 @@ MonoBehaviour:
   contituePopupRect: {fileID: 4704438123649316418}
   confirmButton: {fileID: 1404053565231759755}
   cancelButton: {fileID: 2216834928383701364}
+  rewardsContainer: {fileID: 1069879341}
+  rewardSlotPrefab: {fileID: 3201058407637892464, guid: 007639072456f3749924ddff905a2c4d,
+    type: 3}
   startCurrencyId: 4
   startRunCost: 1
   chargeOnContinue: 0

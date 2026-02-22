@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
 
@@ -50,6 +52,29 @@ namespace OctoberStudio
 
         [SerializeField] string musicName;
         public string MusicName => musicName;
+
+        // =========================
+        // Rewards
+        // =========================
+        [Header("Rewards")]
+        [SerializeField] private List<StageReward> rewards = new List<StageReward>();
+        public IReadOnlyList<StageReward> Rewards => rewards;
+    }
+
+    [Serializable]
+    public class StageReward
+    {
+        [SerializeField] private Sprite backgroundIcon;
+        public Sprite BackgroundIcon => backgroundIcon;
+
+        [SerializeField] private Sprite icon;
+        public Sprite Icon => icon;
+
+        [SerializeField] private string title;
+        public string Title => title;
+
+        [SerializeField] private int amount = 1;
+        public int Amount => amount;
     }
 
     public enum StageType

@@ -25,3 +25,8 @@ MonoBehaviour:
   enemyHP: 1
   useCustomMusic: 0
   musicName: Stage Music
+  rewards:
+  - backgroundIcon: {fileID: 21300000, guid: 35d7e6588f1f34db1b9a5e62f4efdf77, type: 3}
+    icon: {fileID: 21300000, guid: 75bc6e7eb8272354db593887932eb4b3, type: 3}
+    title: Gold
+    amount: 3100

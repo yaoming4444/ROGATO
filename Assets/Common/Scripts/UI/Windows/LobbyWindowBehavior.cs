@@ -1,14 +1,14 @@
+using IDosGames;
 using OctoberStudio.Audio;
 using OctoberStudio.Easing;
 using OctoberStudio.Input;
 using OctoberStudio.Save;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
-using IDosGames;
 
 namespace OctoberStudio.UI
 {
@@ -36,6 +36,11 @@ namespace OctoberStudio.UI
         [SerializeField] RectTransform contituePopupRect;
         [SerializeField] Button confirmButton;
         [SerializeField] Button cancelButton;
+
+        [Header("Rewards UI")]
+        [SerializeField] private Transform rewardsContainer;              // объект с HorizontalLayoutGroup
+        [SerializeField] private StageRewardSlotView rewardSlotPrefab;    // префаб слота
+        private readonly List<GameObject> _spawnedRewardSlots = new();
 
         // =========================
         // Серверная валюта на старт
@@ -136,6 +141,8 @@ namespace OctoberStudio.UI
                 playButton.image.sprite = playButtonEnabledSprite;
             }
 
+            RefreshRewards(stage);
+
             leftButton.gameObject.SetActive(!save.IsFirstStageSelected);
             rightButton.gameObject.SetActive(save.SelectedStageId != stagesDatabase.StagesCount - 1);
         }
@@ -161,6 +168,36 @@ namespace OctoberStudio.UI
 
             _startInFlight = false;
             _flowStep = FlowStep.None;
+        }
+
+
+
+        // Stage Rewards
+        private void RefreshRewards(StageData stage)
+        {
+            if (rewardsContainer == null || rewardSlotPrefab == null || stage == null)
+                return;
+
+            // очистка старых слотов
+            for (int i = 0; i < _spawnedRewardSlots.Count; i++)
+            {
+                if (_spawnedRewardSlots[i] != null)
+                    Destroy(_spawnedRewardSlots[i]);
+            }
+            _spawnedRewardSlots.Clear();
+
+            var rewards = stage.Rewards;
+            if (rewards == null || rewards.Count == 0)
+                return;
+
+            // создаём новые
+            for (int i = 0; i < rewards.Count; i++)
+            {
+                var r = rewards[i];
+                var slot = Instantiate(rewardSlotPrefab, rewardsContainer);
+                slot.Bind(r.BackgroundIcon, r.Icon, r.Amount);
+                _spawnedRewardSlots.Add(slot.gameObject);
+            }
         }
 
         // =========================
