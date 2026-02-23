@@ -26,6 +26,10 @@ namespace OctoberStudio
         [Tooltip("Maximum amount of alive enemies at a time. No more enemies will be spawned until some of existing aren't defeated")]
         [SerializeField] protected int enemiesCap = 2000;
 
+        [Header("Spawn Bounds")]
+        [Tooltip("Safety padding from map borders for enemy spawn/teleport. Prevents enemies from spawning partially outside the map.")]
+        [SerializeField] protected float enemySpawnPadding = 0.6f;
+
         [Header("Offscreen Teleport")]
         [Tooltip("When enabled, enemies that are behaind of the player will teleport to the front")]
         [SerializeField] protected bool isOffscreenTeleportEnabled = true;
@@ -63,7 +67,7 @@ namespace OctoberStudio
 
             var waves = director.GetAssets<WaveTrack, WaveAsset>();
 
-            for(int i = 0; i < waves.Count; i++)
+            for (int i = 0; i < waves.Count; i++)
             {
                 var wave = waves[i];
                 var enemyType = wave.EnemyType;
@@ -85,7 +89,7 @@ namespace OctoberStudio
             var trackEnemies = new List<EnemyType>();
             foreach (var output in director.playableAsset.outputs)
             {
-                if(output.sourceObject is WaveTrack waveTrack)
+                if (output.sourceObject is WaveTrack waveTrack)
                 {
                     if (!trackEnemies.Contains(waveTrack.EnemyType))
                     {
@@ -96,7 +100,7 @@ namespace OctoberStudio
 
             enemyPools = new Dictionary<EnemyType, PoolComponent<EnemyBehavior>>();
 
-            foreach(var enemyType in enemiesOnLevel.Keys)
+            foreach (var enemyType in enemiesOnLevel.Keys)
             {
                 var data = database.GetEnemyData(enemyType);
 
@@ -109,7 +113,7 @@ namespace OctoberStudio
                 enemyPools.Add(data.Type, pool);
             }
 
-            foreach(var enemyType in trackEnemies)
+            foreach (var enemyType in trackEnemies)
             {
                 if (!enemyPools.ContainsKey(enemyType))
                 {
@@ -125,7 +129,7 @@ namespace OctoberStudio
             {
                 enemiesDiedCounter = stageSave.EnemiesKilled;
             }
-            
+
             enemiesDiedLabel.SetAmount(enemiesDiedCounter);
         }
 
@@ -139,19 +143,27 @@ namespace OctoberStudio
             var dotValue = teleportConeSize - 1;
             var modValue = Mathf.Clamp(enemies.Count / 20, 1, 100);
             int frame = Time.frameCount % modValue;
-            for(int i = frame; i < enemies.Count; i += modValue)
+
+            for (int i = frame; i < enemies.Count; i += modValue)
             {
                 var enemy = enemies[i];
 
+                if (enemy == null) continue;
                 if (enemy.WaveOverride != null && enemy.WaveOverride.DisableOffscreenTeleport) continue;
 
                 var enemyToPlayer = enemy.transform.position - PlayerBehavior.Player.transform.position;
                 var direction = enemyToPlayer.normalized;
                 var dot = Vector2.Dot(direction, PlayerBehavior.Player.LookDirection);
 
-                if(diagonalSqr < enemyToPlayer.sqrMagnitude && dot < dotValue)
+                if (diagonalSqr < enemyToPlayer.sqrMagnitude && dot < dotValue)
                 {
-                    var teleportPosition = PlayerBehavior.Player.transform.position + Quaternion.Euler(0, 0, Random.Range(-45, 45)) * PlayerBehavior.Player.LookDirection * diagonal;
+                    var teleportPosition =
+                        PlayerBehavior.Player.transform.position +
+                        Quaternion.Euler(0, 0, Random.Range(-45, 45)) * PlayerBehavior.Player.LookDirection * diagonal;
+
+                    // Clamp teleport strictly inside map
+                    teleportPosition = StageController.FieldManager.ClampPositionInsideField(teleportPosition, enemySpawnPadding);
+
                     enemy.transform.position = teleportPosition;
                 }
             }
@@ -162,7 +174,7 @@ namespace OctoberStudio
             EnemyBehavior closestEnemy = null;
             float closestDistance = float.MaxValue;
 
-            for(int i = 0; i < enemies.Count; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
                 if (enemies[i] == null)
                 {
@@ -173,7 +185,7 @@ namespace OctoberStudio
 
                 float distance = (point - enemies[i].transform.position.XY()).sqrMagnitude;
 
-                if(distance < closestDistance)
+                if (distance < closestDistance)
                 {
                     closestEnemy = enemies[i];
                     closestDistance = distance;
@@ -200,6 +212,8 @@ namespace OctoberStudio
 
             enemy.SetData(enemyData);
 
+            // Safety clamp in case someone calls Spawn(...) with an out-of-map position
+            position = StageController.FieldManager.ClampPositionInsideField(position, enemySpawnPadding);
             enemy.transform.position = position;
 
             enemy.onEnemyDied += OnEnemyDied;
@@ -233,21 +247,25 @@ namespace OctoberStudio
                 var position = Vector3.zero;
                 var foundPosition = false;
 
-                while(triesCount < maxTriesCount)
+                while (triesCount < maxTriesCount)
                 {
                     triesCount++;
 
                     // when spawning a lot of enemies at once we want to offset them to not overload physics computations
-                    var additionalDistance = amount > 100 ? Mathf.Sqrt(enemies.Count) * 0.1f : 0;
+                    var additionalDistance = amount > 100 ? Mathf.Sqrt(enemies.Count) * 0.1f : 0f;
+
                     if (circularSpawn)
                     {
-                        position = PlayerBehavior.Player.transform.position + Random.onUnitSphere.SetZ(0).normalized * (cameraDiagonal * 1.05f + Random.value * 0.2f + additionalDistance);
-                    } else
+                        position = PlayerBehavior.Player.transform.position +
+                                   Random.onUnitSphere.SetZ(0).normalized *
+                                   (cameraDiagonal * 1.05f + Random.value * 0.2f + additionalDistance);
+                    }
+                    else
                     {
                         position = CameraManager.GetRandomPointOutsideCamera(0.5f + Random.value * 0.2f + additionalDistance);
                     }
-                    
-                    if(StageController.FieldManager.ValidatePosition(position, Vector2.zero))
+
+                    if (StageController.FieldManager.ValidatePositionWithPadding(position, enemySpawnPadding))
                     {
                         foundPosition = true;
                         break;
@@ -258,9 +276,9 @@ namespace OctoberStudio
                 {
                     for (int j = 1; j < 10; j++)
                     {
-                        var middlePosition = Vector3.Lerp(position, PlayerBehavior.Player.transform.position, 1 - j / 10f);
+                        var middlePosition = Vector3.Lerp(position, PlayerBehavior.Player.transform.position, 1f - j / 10f);
 
-                        if (StageController.FieldManager.ValidatePosition(middlePosition, Vector2.zero))
+                        if (StageController.FieldManager.ValidatePositionWithPadding(middlePosition, enemySpawnPadding))
                         {
                             foundPosition = true;
                             position = middlePosition;
@@ -271,7 +289,13 @@ namespace OctoberStudio
 
                 if (!foundPosition)
                 {
-                    position = StageController.FieldManager.GetRandomPositionOnBorder();
+                    // Fallback to safe border point already moved inside by padding
+                    position = StageController.FieldManager.GetRandomPositionOnBorder(enemySpawnPadding);
+                }
+                else
+                {
+                    // Final safety clamp (handles edge cases near corners)
+                    position = StageController.FieldManager.ClampPositionInsideField(position, enemySpawnPadding);
                 }
 
                 enemy.transform.position = position;
@@ -290,7 +314,7 @@ namespace OctoberStudio
             if (enemies.Count == 0) return null;
 
             // Trying to find random visible enemy 10 times
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var randomIndex = Random.Range(0, enemies.Count);
 
@@ -299,7 +323,7 @@ namespace OctoberStudio
                 if (enemy.IsVisible) return enemy;
             }
 
-            for(int i = 0; i < enemies.Count; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
                 var enemy = enemies[i];
 
@@ -315,7 +339,7 @@ namespace OctoberStudio
 
             float radiusSqr = radius * radius;
 
-            for(int i = 0; i < enemies.Count; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
                 if ((enemies[i].transform.position.XY() - position).sqrMagnitude <= radiusSqr)
                 {
@@ -328,7 +352,7 @@ namespace OctoberStudio
 
         public virtual void KillEveryEnemy()
         {
-            foreach(var enemy in enemies)
+            foreach (var enemy in enemies)
             {
                 enemy.onEnemyDied -= OnEnemyDied;
                 enemy.Kill();
@@ -346,12 +370,12 @@ namespace OctoberStudio
         {
             var aliveEnemies = new List<EnemyBehavior>();
 
-            foreach(var enemy in enemies)
+            foreach (var enemy in enemies)
             {
-                if(enemy.HP <= damage)
+                if (enemy.HP <= damage)
                 {
                     // if enemy is not a boss
-                    if(enemy.Data != null)
+                    if (enemy.Data != null)
                     {
                         enemy.onEnemyDied -= OnEnemyDied;
                         enemy.Kill();
@@ -365,7 +389,8 @@ namespace OctoberStudio
                                 StageController.DropManager.Drop(dropData.DropType, enemy.transform.position.XY() + Random.insideUnitCircle * 0.2f);
                             }
                         }
-                    } else
+                    }
+                    else
                     {
                         aliveEnemies.Add(enemy);
                     }
@@ -395,10 +420,10 @@ namespace OctoberStudio
             enemies.RemoveSwapBack(enemy);
             enemy.onEnemyDied -= OnEnemyDied;
 
-            foreach(var dropData in enemy.GetDropData())
+            foreach (var dropData in enemy.GetDropData())
             {
-                if(dropData.Chance == 0) continue;
-                if(Random.value * 100 <= dropData.Chance && StageController.DropManager.CheckDropCooldown(dropData.DropType))
+                if (dropData.Chance == 0) continue;
+                if (Random.value * 100 <= dropData.Chance && StageController.DropManager.CheckDropCooldown(dropData.DropType))
                 {
                     StageController.DropManager.Drop(dropData.DropType, enemy.transform.position.XY() + Random.insideUnitCircle * 0.2f);
                 }
@@ -428,6 +453,9 @@ namespace OctoberStudio
             var bossData = bossfightDatabase.GetBossfight(bossType);
 
             var boss = Instantiate(bossData.BossPrefab).GetComponent<EnemyBehavior>();
+
+            // На всякий случай тоже не даём боссу появиться вне карты
+            spawnPosition = StageController.FieldManager.ClampPositionInsideField(spawnPosition, enemySpawnPadding);
             boss.transform.position = spawnPosition;
 
             boss.Play();

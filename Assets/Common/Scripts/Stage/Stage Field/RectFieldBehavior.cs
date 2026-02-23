@@ -77,11 +77,10 @@ namespace OctoberStudio
             bottomBound = -halfH;
             topBound = halfH;
 
-            // Borders are placed outside by half chunk (same logic as old single-chunk: border at +/- chunk.Size)
+            // Borders are placed outside by half chunk
             float borderX = halfW + chunkSize.x / 2f;
             float borderY = halfH + chunkSize.y / 2f;
 
-            // --- NEW: tile borders along the whole perimeter (no gaps) ---
             // Top/Bottom: one segment per column
             for (int x = 0; x < cols; x++)
             {
@@ -168,7 +167,7 @@ namespace OctoberStudio
 
         public override Vector2 GetRandomPositionOnBorder()
         {
-            // Pick random side and point on that edge
+            // Старое поведение: ровно по границе
             int side = Random.Range(0, 4); // 0=top 1=bottom 2=left 3=right
             switch (side)
             {
@@ -179,21 +178,58 @@ namespace OctoberStudio
             }
         }
 
+        /// <summary>
+        /// Возвращает позицию у края карты, но с уводом внутрь на inset.
+        /// Нужен для безопасного спавна, чтобы враг не торчал за пределами карты.
+        /// </summary>
+        public Vector2 GetRandomPositionOnBorder(float inset)
+        {
+            inset = Mathf.Max(0f, inset);
+
+            // Если inset слишком большой — безопасно ограничим
+            float maxInsetX = Mathf.Max(0f, (rightBound - leftBound) * 0.5f - 0.001f);
+            float maxInsetY = Mathf.Max(0f, (topBound - bottomBound) * 0.5f - 0.001f);
+            float safeInset = Mathf.Min(inset, maxInsetX, maxInsetY);
+
+            float innerLeft = leftBound + safeInset;
+            float innerRight = rightBound - safeInset;
+            float innerBottom = bottomBound + safeInset;
+            float innerTop = topBound - safeInset;
+
+            // Если карта совсем маленькая — fallback в центр
+            if (innerLeft > innerRight || innerBottom > innerTop)
+            {
+                return Vector2.zero;
+            }
+
+            int side = Random.Range(0, 4); // 0=top 1=bottom 2=left 3=right
+            switch (side)
+            {
+                case 0: return new Vector2(Random.Range(innerLeft, innerRight), innerTop);
+                case 1: return new Vector2(Random.Range(innerLeft, innerRight), innerBottom);
+                case 2: return new Vector2(innerLeft, Random.Range(innerBottom, innerTop));
+                default: return new Vector2(innerRight, Random.Range(innerBottom, innerTop));
+            }
+        }
+
         public override Vector2 GetBossSpawnPosition(BossFenceBehavior fence, Vector2 offset)
         {
             var playerPosition = PlayerBehavior.Player.transform.position.XY();
             var desired = playerPosition + offset;
 
-            // clamp into field (with fence size)
+            // Clamp into field (with fence size)
             if (fence is CircleFenceBehavior c)
             {
-                desired.x = Mathf.Clamp(desired.x, leftBound + c.Radius, rightBound - c.Radius);
-                desired.y = Mathf.Clamp(desired.y, bottomBound + c.Radius, topBound - c.Radius);
+                desired = ClampInsideBounds(desired, c.Radius);
             }
             else if (fence is RectFenceBehavior r)
             {
-                desired.x = Mathf.Clamp(desired.x, leftBound + r.Width / 2f, rightBound - r.Width / 2f);
-                desired.y = Mathf.Clamp(desired.y, bottomBound + r.Height / 2f, topBound - r.Height / 2f);
+                // Для прямоугольного фэнса нужен отдельный clamp по X/Y
+                float halfW = r.Width * 0.5f;
+                float halfH = r.Height * 0.5f;
+
+                desired.x = Mathf.Clamp(desired.x, leftBound + halfW, rightBound - halfW);
+                desired.y = Mathf.Clamp(desired.y, bottomBound + halfH, topBound - halfH);
             }
 
             return desired;
@@ -202,28 +238,28 @@ namespace OctoberStudio
         public override bool IsPointOutsideRight(Vector2 point, out float distance)
         {
             bool result = point.x > rightBound;
-            distance = result ? point.x - rightBound : 0;
+            distance = result ? point.x - rightBound : 0f;
             return result;
         }
 
         public override bool IsPointOutsideLeft(Vector2 point, out float distance)
         {
             bool result = point.x < leftBound;
-            distance = result ? leftBound - point.x : 0;
+            distance = result ? leftBound - point.x : 0f;
             return result;
         }
 
         public override bool IsPointOutsideTop(Vector2 point, out float distance)
         {
             bool result = point.y > topBound;
-            distance = result ? point.y - topBound : 0;
+            distance = result ? point.y - topBound : 0f;
             return result;
         }
 
         public override bool IsPointOutsideBottom(Vector2 point, out float distance)
         {
             bool result = point.y < bottomBound;
-            distance = result ? bottomBound - point.y : 0;
+            distance = result ? bottomBound - point.y : 0f;
             return result;
         }
 
@@ -238,6 +274,10 @@ namespace OctoberStudio
                 (rightBound - leftBound) - offset * 2f,
                 (topBound - bottomBound) - offset * 2f
             );
+
+            // Если offset слишком большой и прямоугольник схлопнулся
+            if (rect.width <= 0f || rect.height <= 0f)
+                return start;
 
             float tx1, tx2, ty1, ty2;
 
@@ -288,6 +328,37 @@ namespace OctoberStudio
             for (int i = 0; i < borders.Count; i++)
                 Object.Destroy(borders[i].gameObject);
             borders.Clear();
+        }
+
+        /// <summary>
+        /// Clamp точки внутрь прямоугольного поля с одинаковым отступом по всем сторонам.
+        /// </summary>
+        private Vector2 ClampInsideBounds(Vector2 point, float padding)
+        {
+            padding = Mathf.Max(0f, padding);
+
+            float minX = leftBound + padding;
+            float maxX = rightBound - padding;
+            float minY = bottomBound + padding;
+            float maxY = topBound - padding;
+
+            // Если padding слишком большой — схлопываем в центр оси
+            if (minX > maxX)
+            {
+                float midX = (leftBound + rightBound) * 0.5f;
+                minX = maxX = midX;
+            }
+
+            if (minY > maxY)
+            {
+                float midY = (bottomBound + topBound) * 0.5f;
+                minY = maxY = midY;
+            }
+
+            point.x = Mathf.Clamp(point.x, minX, maxX);
+            point.y = Mathf.Clamp(point.y, minY, maxY);
+
+            return point;
         }
     }
 }
