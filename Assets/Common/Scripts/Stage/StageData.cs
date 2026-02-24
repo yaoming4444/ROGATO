@@ -64,6 +64,10 @@ namespace OctoberStudio
     [Serializable]
     public class StageReward
     {
+
+        [SerializeField] private StageRewardType rewardType;
+        public StageRewardType RewardType => rewardType;
+
         [SerializeField] private Sprite backgroundIcon;
         public Sprite BackgroundIcon => backgroundIcon;
 
@@ -75,6 +79,12 @@ namespace OctoberStudio
 
         [SerializeField] private int amount = 1;
         public int Amount => amount;
+    }
+
+    public enum StageRewardType
+    {
+        Coins,
+        Exp
     }
 
     public enum StageType
