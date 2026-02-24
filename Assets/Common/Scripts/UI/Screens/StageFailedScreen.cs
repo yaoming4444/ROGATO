@@ -1,3 +1,4 @@
+using System.Collections;
 using OctoberStudio.Audio;
 using OctoberStudio.Easing;
 using OctoberStudio.Input;
@@ -7,7 +8,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 using IDosGames;
 
 namespace OctoberStudio.UI
@@ -44,8 +44,15 @@ namespace OctoberStudio.UI
         [SerializeField] private bool requireReviveUpgrade = false;
 
         [Header("Rewards panel")]
-        [Tooltip("Reward panel GO that should open when countdown reaches 0 (or when player presses the force button).")]
+        [Tooltip("Reward panel root GO that becomes visible when player can no longer revive.")]
         [SerializeField] private GameObject timeoutActivateGO;
+
+        [Tooltip("UI builder that spawns reward slots into layout group.")]
+        [SerializeField] private StageRewardsPanelUI rewardsPanelUI;
+
+        [Header("Debug / Fallback StageData")]
+        [Tooltip("Optional fallback if runtime StageData was not resolved.")]
+        [SerializeField] private StageData fallbackStageData;
 
         [Header("Not enough coins popup (SDK)")]
         [Tooltip("Optional. If empty, script will try to find PopUp_Coin in DontDestroyOnLoad.")]
@@ -59,14 +66,34 @@ namespace OctoberStudio.UI
 
         private bool _reviveInFlight;
         private int _revivesUsedThisRun;
-        private bool _timedOut; // countdown/revive phase finished
-        private bool _rewardsShown; // rewards panel already shown
+        private bool _timedOut;
+        private bool _rewardsShown;
+
+        // Optional runtime override (can still be set externally if needed)
+        private StageData _currentStageData;
 
         private void Awake()
         {
             if (reviveButton != null) reviveButton.onClick.AddListener(ReviveButtonClick);
             if (showRewardsButton != null) showRewardsButton.onClick.AddListener(ShowRewardsButtonClick);
             if (finalExitButton != null) finalExitButton.onClick.AddListener(FinalExitButtonClick);
+        }
+
+        /// <summary>
+        /// Optional external setter. If not called, script will use StageController.Stage automatically.
+        /// </summary>
+        public void SetStageData(StageData stageData)
+        {
+            _currentStageData = stageData;
+        }
+
+        /// <summary>
+        /// Optional overload.
+        /// </summary>
+        public void Show(StageData stageData)
+        {
+            _currentStageData = stageData;
+            Show();
         }
 
         // Can be called externally at the start of a new run if needed.
@@ -89,7 +116,9 @@ namespace OctoberStudio.UI
             if (timeoutActivateGO != null)
                 timeoutActivateGO.SetActive(false);
 
-            // Initial button states:
+            if (rewardsPanelUI != null)
+                rewardsPanelUI.Clear();
+
             if (showRewardsButton != null)
                 showRewardsButton.gameObject.SetActive(true);
 
@@ -103,8 +132,7 @@ namespace OctoberStudio.UI
 
             RefreshReviveUI();
 
-            // Если ревив больше недоступен (например, после 3-го ревива),
-            // сразу показываем панель наград вместо дефолтного экрана смерти.
+            // If revive is not available, immediately show rewards panel
             if (!CanReviveNow())
             {
                 ShowRewardsPanel(forceFromButton: false);
@@ -140,7 +168,6 @@ namespace OctoberStudio.UI
             if (reviveButton != null)
                 reviveButton.gameObject.SetActive(canRevive);
 
-            // Hide timer/cost UI if revive is not available
             if (countdownText != null)
                 countdownText.gameObject.SetActive(canRevive);
 
@@ -150,14 +177,15 @@ namespace OctoberStudio.UI
             if (canRevive)
             {
                 int cost = GetCurrentReviveCost();
-                if (gemValueText != null) gemValueText.text = cost.ToString();
+
+                if (gemValueText != null)
+                    gemValueText.text = cost.ToString();
 
                 if (reviveButton != null)
                     EventSystem.current.SetSelectedGameObject(reviveButton.gameObject);
             }
             else
             {
-                // If rewards already shown - focus final exit; otherwise focus force-rewards button
                 if (_rewardsShown && finalExitButton != null && finalExitButton.gameObject.activeSelf)
                     EventSystem.current.SetSelectedGameObject(finalExitButton.gameObject);
                 else if (showRewardsButton != null && showRewardsButton.gameObject.activeSelf)
@@ -202,8 +230,8 @@ namespace OctoberStudio.UI
             StopCountdown();
 
             int cost = GetCurrentReviveCost();
-
             int current = UserInventory.GetVirtualCurrencyAmount(reviveCurrencyId);
+
             if (current < cost)
             {
                 TryShowCoinOfferPopup();
@@ -224,7 +252,6 @@ namespace OctoberStudio.UI
             CleanupServerCurrencyHandlers();
 
             _reviveInFlight = false;
-
             SetButtonsInteractable(true);
 
             _revivesUsedThisRun++;
@@ -264,6 +291,12 @@ namespace OctoberStudio.UI
             ReturnToMainMenu();
         }
 
+        /// <summary>
+        /// Финальный экран фейла:
+        /// - останавливает revive-flow
+        /// - показывает панель наград
+        /// - строит слоты наград
+        /// </summary>
         private void ShowRewardsPanel(bool forceFromButton)
         {
             if (_rewardsShown)
@@ -279,38 +312,82 @@ namespace OctoberStudio.UI
             if (countdownText != null)
                 UpdateCountdownText(0);
 
-            // Disable revive once reward flow starts
             if (reviveButton != null)
             {
                 reviveButton.interactable = false;
                 reviveButton.gameObject.SetActive(false);
             }
 
-            // Hide "force rewards" button after use
             if (showRewardsButton != null)
             {
                 showRewardsButton.interactable = false;
                 showRewardsButton.gameObject.SetActive(false);
             }
 
-            // Show rewards panel
             if (timeoutActivateGO != null)
                 timeoutActivateGO.SetActive(true);
 
-            // Show final exit button now
+            if (countdownText != null)
+                countdownText.gameObject.SetActive(false);
+
+            if (gemValueText != null)
+                gemValueText.gameObject.SetActive(false);
+
+            // Build UI reward slots here (for now from stage raw rewards)
+            BuildRewardsUIForFailedState();
+
             if (finalExitButton != null)
             {
                 finalExitButton.gameObject.SetActive(true);
                 finalExitButton.interactable = true;
                 EventSystem.current.SetSelectedGameObject(finalExitButton.gameObject);
             }
+        }
 
-            // Hide revive-related texts once rewards are shown
-            if (countdownText != null)
-                countdownText.gameObject.SetActive(false);
+        private void BuildRewardsUIForFailedState()
+        {
+            if (rewardsPanelUI == null)
+            {
+                Debug.LogError("[StageFailedScreen] rewardsPanelUI is NULL");
+                return;
+            }
 
-            if (gemValueText != null)
-                gemValueText.gameObject.SetActive(false);
+            rewardsPanelUI.Clear();
+
+            StageData stageData = ResolveStageDataForRewards();
+            if (stageData == null)
+            {
+                Debug.LogError("[StageFailedScreen] StageData is null. Rewards panel opened without slots.");
+                return;
+            }
+
+            if (stageData.Rewards == null)
+            {
+                Debug.LogError("[StageFailedScreen] stageData.Rewards is null.");
+                return;
+            }
+
+            // Пока просто показываем награды stage как UI (без частичного расчета).
+            // Следующий шаг: заменить на CalculateFailedRewards + ShowCalculatedRewards(...)
+            rewardsPanelUI.ShowStageRewards(stageData);
+        }
+
+        private StageData ResolveStageDataForRewards()
+        {
+            // 1) If explicitly assigned somewhere
+            if (_currentStageData != null)
+                return _currentStageData;
+
+            // 2) Main source: active stage from StageController
+            if (StageController.Stage != null)
+                return StageController.Stage;
+
+            // 3) Fallback from inspector (testing)
+            if (fallbackStageData != null)
+                return fallbackStageData;
+
+            Debug.LogError("[StageFailedScreen] Could not resolve StageData (_currentStageData, StageController.Stage, fallbackStageData are null)");
+            return null;
         }
 
         private void ReturnToMainMenu()
@@ -377,7 +454,7 @@ namespace OctoberStudio.UI
             }
         }
 
-        private System.Collections.IEnumerator CountdownRoutine()
+        private IEnumerator CountdownRoutine()
         {
             while (_remainingSeconds > 0)
             {
@@ -398,7 +475,6 @@ namespace OctoberStudio.UI
 
         private void OnCountdownFinished()
         {
-            // Timer end should open rewards panel automatically
             ShowRewardsPanel(forceFromButton: false);
         }
 
@@ -413,7 +489,6 @@ namespace OctoberStudio.UI
             if (reviveButton != null) reviveButton.interactable = interactable;
             if (showRewardsButton != null) showRewardsButton.interactable = interactable;
 
-            // finalExitButton is only interactable when shown
             if (finalExitButton != null && finalExitButton.gameObject.activeSelf)
                 finalExitButton.interactable = interactable;
         }
@@ -446,7 +521,6 @@ namespace OctoberStudio.UI
 
         private void TryShowCoinOfferPopup()
         {
-            // 1) If assigned in inspector
             if (coinOfferPopupRoot != null)
             {
                 HookCoinPopup(coinOfferPopupRoot);
@@ -454,7 +528,6 @@ namespace OctoberStudio.UI
                 return;
             }
 
-            // 2) Try to find by name even if inactive (DontDestroyOnLoad)
             var all = Resources.FindObjectsOfTypeAll<GameObject>();
             for (int i = 0; i < all.Length; i++)
             {
