@@ -14,18 +14,45 @@ namespace OctoberStudio.UI
 
         private static readonly int STAGE_COMPLETE_HASH = "Stage Complete".GetHashCode();
 
-        [SerializeField] CanvasGroup canvasGroup;
-        [SerializeField] Button button;
+        [Header("Main UI")]
+        [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private Button button;
+
+        [Header("Rewards UI")]
+        [SerializeField] private StageRewardsPanelUI rewardsPanelUI;
+        [SerializeField] private Sprite coinsRewardIcon;
+        [SerializeField] private Sprite expRewardIcon;
+
+        [Header("Reward Calc")]
+        [Tooltip("Usually 360 seconds (6 min). Used only for reward metadata.")]
+        [SerializeField] private float stageTotalSeconds = 360f;
+
+        [Header("Debug / Fallback")]
+        [Tooltip("Optional fallback if StageController.Stage is null (for testing).")]
+        [SerializeField] private StageData fallbackStageData;
+
+        private bool _completeRewardsGranted;
+        private StageRewardService.CalculatedStageRewards _cachedCompleteRewards;
 
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
 
-            button.onClick.AddListener(OnButtonClicked);
+            if (button != null)
+                button.onClick.AddListener(OnButtonClicked);
         }
 
         public void Show(UnityAction onFinish = null)
         {
+            // Reset per-open state
+            _completeRewardsGranted = false;
+            _cachedCompleteRewards = default;
+
+            // Calculate + show + grant rewards before/while showing screen
+            CalculateCompleteRewardsForThisRun();
+            BuildRewardsUIForCompleteState();
+            GrantCompleteRewardsIfNeeded();
+
             canvasGroup.alpha = 0;
             canvasGroup.DoAlpha(1f, 0.3f).SetUnscaledTime(true).SetOnFinish(onFinish);
 
@@ -33,7 +60,8 @@ namespace OctoberStudio.UI
 
             GameController.AudioManager.PlaySound(STAGE_COMPLETE_HASH);
 
-            EventSystem.current.SetSelectedGameObject(button.gameObject);
+            if (button != null)
+                EventSystem.current.SetSelectedGameObject(button.gameObject);
 
             GameController.InputManager.onInputChanged += OnInputChanged;
         }
@@ -48,6 +76,74 @@ namespace OctoberStudio.UI
             GameController.InputManager.onInputChanged -= OnInputChanged;
         }
 
+        private void CalculateCompleteRewardsForThisRun()
+        {
+            StageData stageData = ResolveStageDataForRewards();
+            if (stageData == null)
+            {
+                _cachedCompleteRewards = default;
+                Debug.LogError("[StageCompleteScreen] StageData is null. Complete rewards cannot be calculated.");
+                return;
+            }
+
+            _cachedCompleteRewards = StageRewardService.CalculateCompleteRewards(stageData, stageTotalSeconds);
+
+            Debug.Log($"[StageCompleteScreen] Complete rewards calculated. Coins={_cachedCompleteRewards.Coins}, Exp={_cachedCompleteRewards.Exp}");
+        }
+
+        private void BuildRewardsUIForCompleteState()
+        {
+            if (rewardsPanelUI == null)
+            {
+                Debug.LogWarning("[StageCompleteScreen] rewardsPanelUI is not assigned.");
+                return;
+            }
+
+            rewardsPanelUI.Clear();
+
+            // Preferred: calculated rewards (UI matches actual grant)
+            if (_cachedCompleteRewards.Coins > 0 || _cachedCompleteRewards.Exp > 0)
+            {
+                rewardsPanelUI.ShowCalculatedRewards(_cachedCompleteRewards, coinsRewardIcon, expRewardIcon);
+                return;
+            }
+
+            // Optional fallback: show raw stage rewards if calculated is empty
+            StageData stageData = ResolveStageDataForRewards();
+            if (stageData != null)
+                rewardsPanelUI.ShowStageRewards(stageData);
+        }
+
+        private void GrantCompleteRewardsIfNeeded()
+        {
+            if (_completeRewardsGranted)
+                return;
+
+            _completeRewardsGranted = true;
+
+            if (_cachedCompleteRewards.Coins <= 0 && _cachedCompleteRewards.Exp <= 0)
+            {
+                Debug.Log("[StageCompleteScreen] No complete rewards to grant.");
+                return;
+            }
+
+            StageRewardService.GrantRewards(_cachedCompleteRewards);
+        }
+
+        private StageData ResolveStageDataForRewards()
+        {
+            // Main source: active stage from StageController
+            if (StageController.Stage != null)
+                return StageController.Stage;
+
+            // Fallback for tests
+            if (fallbackStageData != null)
+                return fallbackStageData;
+
+            Debug.LogError("[StageCompleteScreen] Could not resolve StageData (StageController.Stage and fallbackStageData are null)");
+            return null;
+        }
+
         private void OnButtonClicked()
         {
             GameController.AudioManager.PlaySound(AudioManager.BUTTON_CLICK_HASH);
@@ -59,7 +155,7 @@ namespace OctoberStudio.UI
 
         private void OnInputChanged(InputType prevInput, InputType inputType)
         {
-            if (prevInput == InputType.UIJoystick)
+            if (prevInput == InputType.UIJoystick && button != null)
             {
                 EventSystem.current.SetSelectedGameObject(button.gameObject);
             }

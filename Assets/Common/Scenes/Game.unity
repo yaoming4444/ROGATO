@@ -23802,6 +23802,12 @@ MonoBehaviour:
   requireReviveUpgrade: 0
   timeoutActivateGO: {fileID: 1762488231}
   rewardsPanelUI: {fileID: 1762488237}
+  coinsRewardIcon: {fileID: 21300000, guid: 75bc6e7eb8272354db593887932eb4b3, type: 3}
+  expRewardIcon: {fileID: 21300000, guid: ca079d5780152e44aac25bb827e359f4, type: 3}
+  fallbackStageData: {fileID: 0}
+  useDebugElapsedTime: 0
+  debugElapsedSeconds: 190
+  stageTotalSeconds: 360
   coinOfferPopupRoot: {fileID: 0}
 --- !u!114 &2114921371189389236
 MonoBehaviour:
@@ -28856,6 +28862,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1719152023971826125}
   button: {fileID: 590395283}
+  rewardsPanelUI: {fileID: 1500103728}
+  coinsRewardIcon: {fileID: 21300000, guid: 75bc6e7eb8272354db593887932eb4b3, type: 3}
+  expRewardIcon: {fileID: 21300000, guid: ca079d5780152e44aac25bb827e359f4, type: 3}
+  stageTotalSeconds: 360
+  fallbackStageData: {fileID: 0}
 --- !u!1 &7192852963726593819
 GameObject:
   m_ObjectHideFlags: 0

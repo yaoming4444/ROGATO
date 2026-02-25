@@ -50,9 +50,22 @@ namespace OctoberStudio.UI
         [Tooltip("UI builder that spawns reward slots into layout group.")]
         [SerializeField] private StageRewardsPanelUI rewardsPanelUI;
 
-        [Header("Debug / Fallback StageData")]
+        [Header("Reward Icons (for calculated rewards UI)")]
+        [SerializeField] private Sprite coinsRewardIcon;
+        [SerializeField] private Sprite expRewardIcon;
+
+        [Header("Debug / Fallback")]
         [Tooltip("Optional fallback if runtime StageData was not resolved.")]
         [SerializeField] private StageData fallbackStageData;
+
+        [Tooltip("Use this elapsed time if you haven't wired real stage timer yet.")]
+        [SerializeField] private bool useDebugElapsedTime = false;
+
+        [Tooltip("Debug elapsed seconds for reward calculation (only if useDebugElapsedTime = true).")]
+        [SerializeField] private float debugElapsedSeconds = 190f;
+
+        [Tooltip("Total stage duration in seconds (default 6 minutes = 360).")]
+        [SerializeField] private float stageTotalSeconds = 360f;
 
         [Header("Not enough coins popup (SDK)")]
         [Tooltip("Optional. If empty, script will try to find PopUp_Coin in DontDestroyOnLoad.")]
@@ -68,6 +81,10 @@ namespace OctoberStudio.UI
         private int _revivesUsedThisRun;
         private bool _timedOut;
         private bool _rewardsShown;
+
+        // Reward grant protection / cache
+        private bool _failedRewardsGranted;
+        private StageRewardService.CalculatedStageRewards _cachedFailedRewards;
 
         // Optional runtime override (can still be set externally if needed)
         private StageData _currentStageData;
@@ -100,6 +117,8 @@ namespace OctoberStudio.UI
         public void ResetRevivesForRun()
         {
             _revivesUsedThisRun = 0;
+            _failedRewardsGranted = false;
+            _cachedFailedRewards = default;
         }
 
         public void Show()
@@ -110,6 +129,10 @@ namespace OctoberStudio.UI
             _rewardsShown = false;
             _reviveInFlight = false;
             _pausedByCoinPopup = false;
+
+            // new run / new fail screen appearance => reset grant guard
+            _failedRewardsGranted = false;
+            _cachedFailedRewards = default;
 
             SetButtonsInteractable(true);
 
@@ -294,8 +317,9 @@ namespace OctoberStudio.UI
         /// <summary>
         /// Финальный экран фейла:
         /// - останавливает revive-flow
+        /// - рассчитывает частичные/утешительные награды
         /// - показывает панель наград
-        /// - строит слоты наград
+        /// - выдает награды (один раз)
         /// </summary>
         private void ShowRewardsPanel(bool forceFromButton)
         {
@@ -333,8 +357,14 @@ namespace OctoberStudio.UI
             if (gemValueText != null)
                 gemValueText.gameObject.SetActive(false);
 
-            // Build UI reward slots here (for now from stage raw rewards)
+            // 1) Calculate failed rewards (by elapsed stage time)
+            CalculateFailedRewardsForThisRun();
+
+            // 2) Build reward UI (calculated values)
             BuildRewardsUIForFailedState();
+
+            // 3) Grant rewards once
+            GrantFailedRewardsIfNeeded();
 
             if (finalExitButton != null)
             {
@@ -342,6 +372,28 @@ namespace OctoberStudio.UI
                 finalExitButton.interactable = true;
                 EventSystem.current.SetSelectedGameObject(finalExitButton.gameObject);
             }
+        }
+
+        private void CalculateFailedRewardsForThisRun()
+        {
+            StageData stageData = ResolveStageDataForRewards();
+            if (stageData == null)
+            {
+                _cachedFailedRewards = default;
+                Debug.LogError("[StageFailedScreen] StageData is null. Failed rewards cannot be calculated.");
+                return;
+            }
+
+            float elapsedSeconds = ResolveRunElapsedSecondsForRewards();
+
+            _cachedFailedRewards = StageRewardService.CalculateFailedRewards(
+                stageData,
+                elapsedSeconds,
+                stageTotalSeconds
+            );
+
+            Debug.Log($"[StageFailedScreen] Failed rewards calculated. " +
+                      $"Elapsed={elapsedSeconds:F1}s, Coins={_cachedFailedRewards.Coins}, Exp={_cachedFailedRewards.Exp}, Outcome={_cachedFailedRewards.OutcomeType}");
         }
 
         private void BuildRewardsUIForFailedState()
@@ -354,22 +406,33 @@ namespace OctoberStudio.UI
 
             rewardsPanelUI.Clear();
 
-            StageData stageData = ResolveStageDataForRewards();
-            if (stageData == null)
+            // Preferred: show calculated rewards (matches actual grant)
+            if (_cachedFailedRewards.Coins > 0 || _cachedFailedRewards.Exp > 0)
             {
-                Debug.LogError("[StageFailedScreen] StageData is null. Rewards panel opened without slots.");
+                rewardsPanelUI.ShowCalculatedRewards(_cachedFailedRewards, coinsRewardIcon, expRewardIcon);
                 return;
             }
 
-            if (stageData.Rewards == null)
+            // If zero rewards (edge case), still allow panel to show empty.
+            // Optional fallback preview:
+            // var stageData = ResolveStageDataForRewards();
+            // if (stageData != null) rewardsPanelUI.ShowStageRewards(stageData);
+        }
+
+        private void GrantFailedRewardsIfNeeded()
+        {
+            if (_failedRewardsGranted)
+                return;
+
+            _failedRewardsGranted = true;
+
+            if (_cachedFailedRewards.Coins <= 0 && _cachedFailedRewards.Exp <= 0)
             {
-                Debug.LogError("[StageFailedScreen] stageData.Rewards is null.");
+                Debug.Log("[StageFailedScreen] No failed rewards to grant.");
                 return;
             }
 
-            // Пока просто показываем награды stage как UI (без частичного расчета).
-            // Следующий шаг: заменить на CalculateFailedRewards + ShowCalculatedRewards(...)
-            rewardsPanelUI.ShowStageRewards(stageData);
+            StageRewardService.GrantRewards(_cachedFailedRewards);
         }
 
         private StageData ResolveStageDataForRewards()
@@ -388,6 +451,15 @@ namespace OctoberStudio.UI
 
             Debug.LogError("[StageFailedScreen] Could not resolve StageData (_currentStageData, StageController.Stage, fallbackStageData are null)");
             return null;
+        }
+
+        /// <summary>
+        /// Возвращает elapsed time игрового stage (НЕ revive countdown).
+        /// Подставь здесь точное поле/свойство из StageController.
+        /// </summary>
+        private float ResolveRunElapsedSecondsForRewards()
+        {
+            return Mathf.Max(0f, (float)StageController.Director.time);
         }
 
         private void ReturnToMainMenu()
