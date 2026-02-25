@@ -433,6 +433,8 @@ namespace OctoberStudio.UI
             }
 
             StageRewardService.GrantRewards(_cachedFailedRewards);
+            GameCore.GameInstance.I?.SaveLocalNow();
+            GameCore.GameInstance.I?.SaveServerNow();
         }
 
         private StageData ResolveStageDataForRewards()
