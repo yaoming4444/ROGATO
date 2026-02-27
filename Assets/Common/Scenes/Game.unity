@@ -18575,7 +18575,13 @@ MonoBehaviour:
   enemiesDiedLabel: {fileID: 4251854428697888384}
   enemiesCap: 1500
   enemySpawnPadding: 0.6
-  isOffscreenTeleportEnabled: 1
+  spawnPreviewPrefab: {fileID: 322296415806433090, guid: 50ceae3354b8f4843a1ce492360092ed,
+    type: 3}
+  spawnPreviewDelay: 1
+  spawnHitGraceDuration: 0.2
+  spawnNearPlayerMinRadius: 1
+  spawnNearPlayerMaxRadius: 4
+  isOffscreenTeleportEnabled: 0
   diagonalDistanceMultiplier: 1.2
   teleportConeSize: 0.8
   enemiesTeleportCap: 100
