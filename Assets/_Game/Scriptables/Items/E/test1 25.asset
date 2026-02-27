@@ -16,10 +16,10 @@ MonoBehaviour:
   displayName: Head
   slot: 1
   rarity: 2
-  power: 42
+  power: 87
   previewLevel: 3
   stats:
-    Atk: 25
+    Atk: 4
     Def: 0
     Hp: 15
   extraStats: []
@@ -31,6 +31,7 @@ MonoBehaviour:
   iconRarity_Legacy: {fileID: 21300000, guid: 517470cae7e55a944aad84ac31575d5a, type: 3}
   statsScalePerLevel: 0.05
   powerScalePerLevel: 0.02
+  powerScale: 5
   atkPowerWeight: 1
   hpPowerWeight: 0.8
   rarityBaseline: 2
