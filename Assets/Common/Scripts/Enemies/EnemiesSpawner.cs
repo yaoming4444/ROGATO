@@ -41,6 +41,9 @@ namespace OctoberStudio
         [Tooltip("After enemy appears, disable its colliders for this duration so it can't hit the player instantly.")]
         [SerializeField] private float spawnHitGraceDuration = 0.2f;
 
+        [Tooltip("Initial pool size for SpawnPreviewPrefab. Will expand automatically if needed.")]
+        [SerializeField] private int spawnPreviewPoolSize = 32;
+
         [Header("Spawn Near Player")]
         [Tooltip("Enemies will spawn around the player within this radius range (instead of only outside the camera).")]
         [SerializeField] protected float spawnNearPlayerMinRadius = 3f;
@@ -66,6 +69,10 @@ namespace OctoberStudio
         public bool IsBossfightActive { get; set; }
 
         protected Camera mainCamera;
+
+        // Spawn preview pooling (local simple pool)
+        private Queue<GameObject> spawnPreviewPool;
+        private Transform spawnPreviewPoolRoot;
 
         protected virtual void Awake()
         {
@@ -147,6 +154,76 @@ namespace OctoberStudio
             }
 
             enemiesDiedLabel.SetAmount(enemiesDiedCounter);
+
+            InitSpawnPreviewPool();
+        }
+
+        private void InitSpawnPreviewPool()
+        {
+            // Reset pool (if Init called multiple times)
+            if (spawnPreviewPool == null) spawnPreviewPool = new Queue<GameObject>();
+            else spawnPreviewPool.Clear();
+
+            if (spawnPreviewPoolRoot == null)
+            {
+                var rootGo = new GameObject("SpawnPreviewPool");
+                rootGo.transform.SetParent(transform, false);
+                spawnPreviewPoolRoot = rootGo.transform;
+            }
+
+            if (spawnPreviewPrefab == null) return;
+
+            int prewarm = Mathf.Max(0, spawnPreviewPoolSize);
+            for (int i = 0; i < prewarm; i++)
+            {
+                var go = Instantiate(spawnPreviewPrefab, spawnPreviewPoolRoot);
+                go.SetActive(false);
+                spawnPreviewPool.Enqueue(go);
+            }
+        }
+
+        private GameObject GetSpawnPreview(Vector3 position)
+        {
+            if (spawnPreviewPrefab == null) return null;
+
+            GameObject go = null;
+
+            if (spawnPreviewPool != null && spawnPreviewPool.Count > 0)
+            {
+                go = spawnPreviewPool.Dequeue();
+                if (go == null)
+                {
+                    // In case something got destroyed unexpectedly, fallback
+                    go = Instantiate(spawnPreviewPrefab);
+                }
+            }
+            else
+            {
+                // Pool can expand if needed
+                go = Instantiate(spawnPreviewPrefab);
+            }
+
+            // Keep it organized
+            go.transform.SetParent(null);
+
+            position.z = 0f;
+            go.transform.position = position;
+            go.transform.rotation = Quaternion.identity;
+            go.SetActive(true);
+
+            return go;
+        }
+
+        private void ReleaseSpawnPreview(GameObject go)
+        {
+            if (go == null) return;
+
+            go.SetActive(false);
+            if (spawnPreviewPoolRoot != null)
+                go.transform.SetParent(spawnPreviewPoolRoot, false);
+
+            if (spawnPreviewPool == null) spawnPreviewPool = new Queue<GameObject>();
+            spawnPreviewPool.Enqueue(go);
         }
 
         protected virtual void Update()
@@ -211,22 +288,18 @@ namespace OctoberStudio
             return closestEnemy;
         }
 
-        /// <summary>
-        /// Instant spawn (kept for backwards compatibility / special cases).
-        /// </summary>
+        // Instant spawn (kept for backwards compatibility / special cases).
         public virtual EnemyBehavior Spawn(EnemyType enemyType, Vector2 position, UnityAction<EnemyBehavior> onEnemyDiedCallback = null)
         {
             return SpawnInternal(enemyType, position, null, onEnemyDiedCallback);
         }
 
-        /// <summary>
-        /// Spawn with preview marker (red dot) then enemy appears after delay.
-        /// </summary>
+        // Spawn with preview marker (from pool) then enemy appears after delay.
         public virtual Coroutine SpawnWithPreview(EnemyType enemyType, Vector2 position, WaveOverride waveOverride = null, UnityAction<EnemyBehavior> onEnemyDiedCallback = null)
         {
             if (enemies.Count >= enemiesCap) return null;
 
-            // Always clamp preview position too
+            // Ensure preview & enemy share the same final safe position
             position = StageController.FieldManager.ClampPositionInsideField(position, enemySpawnPadding);
 
             return StartCoroutine(SpawnWithPreviewRoutine(enemyType, position, waveOverride, onEnemyDiedCallback));
@@ -238,14 +311,14 @@ namespace OctoberStudio
 
             if (spawnPreviewPrefab != null)
             {
-                preview = Instantiate(spawnPreviewPrefab, position, Quaternion.identity);
+                preview = GetSpawnPreview(position);
             }
 
             if (spawnPreviewDelay > 0f)
                 yield return new WaitForSeconds(spawnPreviewDelay);
 
             if (preview != null)
-                Destroy(preview);
+                ReleaseSpawnPreview(preview);
 
             var enemy = SpawnInternal(enemyType, position, waveOverride, onEnemyDiedCallback);
 
@@ -294,6 +367,7 @@ namespace OctoberStudio
             var enemy = enemyPools[enemyType].GetEntity();
 
             enemy.SetData(enemyData);
+
             enemy.SetWaveOverride(waveOverride);
 
             // Safety clamp in case someone calls Spawn(...) with an out-of-map position
@@ -304,15 +378,12 @@ namespace OctoberStudio
             if (onEnemyDiedCallback != null) enemy.onEnemyDied += onEnemyDiedCallback;
 
             enemy.Play();
+
             enemies.Add(enemy);
 
             return enemy;
         }
 
-        /// <summary>
-        /// Wave spawn (now spawns around the player (nearby) instead of only outside the camera).
-        /// Still uses preview marker before spawning each enemy.
-        /// </summary>
         public virtual void Spawn(EnemyType type, WaveOverride waveOverride, bool circularSpawn = false, int amount = 1, UnityAction<EnemyBehavior> onEnemyDiedCallback = null)
         {
             for (int i = 0; i < amount; i++)
@@ -332,12 +403,11 @@ namespace OctoberStudio
                     // when spawning a lot of enemies at once we want to offset them to not overload physics computations
                     var additionalDistance = amount > 100 ? Mathf.Sqrt(enemies.Count) * 0.1f : 0f;
 
-                    // Spawn around the player (nearby), not only outside the camera
                     var minRadius = Mathf.Max(0f, spawnNearPlayerMinRadius) + additionalDistance;
                     var maxRadius = Mathf.Max(minRadius + 0.01f, spawnNearPlayerMaxRadius + additionalDistance);
 
-                    // Keep the old "circularSpawn" flag behavior (just affects direction source), but both spawn modes are around player now.
-                    var dir = circularSpawn ? Random.onUnitSphere.SetZ(0).normalized : (Vector3)Random.insideUnitCircle.normalized;
+                    // Spawn around the player (nearby)
+                    Vector3 dir = circularSpawn ? Random.onUnitSphere.SetZ(0).normalized : (Vector3)Random.insideUnitCircle.normalized;
                     position = PlayerBehavior.Player.transform.position + dir * Random.Range(minRadius, maxRadius);
 
                     if (StageController.FieldManager.ValidatePositionWithPadding(position, enemySpawnPadding))
@@ -373,7 +443,7 @@ namespace OctoberStudio
                     position = StageController.FieldManager.ClampPositionInsideField(position, enemySpawnPadding);
                 }
 
-                // Spawn with telegraph preview
+                // Use telegraph + grace period
                 SpawnWithPreview(type, position, waveOverride, onEnemyDiedCallback);
             }
         }
