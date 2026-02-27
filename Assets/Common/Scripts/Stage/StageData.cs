@@ -15,6 +15,9 @@ namespace OctoberStudio
         [SerializeField] string displayName;
         public string DisplayName => displayName;
 
+        [SerializeField] string stageNumber;
+        public string StageNumber => stageNumber;
+
         [Header("Timeline Data")]
         [SerializeField] TimelineAsset timeline;
         public TimelineAsset Timeline => timeline;
