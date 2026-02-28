@@ -31,12 +31,13 @@ namespace OctoberStudio.Abilities
         private void OnTriggerEnter2D(Collider2D collision)
         {
             EnemyBehavior enemy = collision.GetComponent<EnemyBehavior>();
+            if (enemy == null) return;
 
             if (!enemies.ContainsKey(enemy))
             {
                 enemies.Add(enemy, Time.time);
 
-                enemy.TakeDamage(AbilityLevel.Damage * PlayerBehavior.Player.Damage);
+                ApplyDamageWithCrit(enemy);
             }
         }
 
@@ -44,27 +45,41 @@ namespace OctoberStudio.Abilities
         {
             foreach (var enemy in enemies.Keys.ToList())
             {
+                if (enemy == null) continue;
+
                 float time = enemies[enemy];
 
-                if(Time.time - time > AbilityLevel.DamageCooldown * PlayerBehavior.Player.CooldownMultiplier)
+                if (Time.time - time > AbilityLevel.DamageCooldown * PlayerBehavior.Player.CooldownMultiplier)
                 {
                     enemies[enemy] = Time.time;
 
-                    enemy.TakeDamage(AbilityLevel.Damage * PlayerBehavior.Player.Damage);
+                    ApplyDamageWithCrit(enemy);
                 }
             }
 
-            if(Time.time - lastTimeSound > 5f)
+            if (Time.time - lastTimeSound > 5f)
             {
                 lastTimeSound = Time.time;
-
                 GameController.AudioManager.PlaySound(GUARDIAN_EYE_HASH);
             }
+        }
+
+        private void ApplyDamageWithCrit(EnemyBehavior enemy)
+        {
+            float baseDamage = AbilityLevel.Damage * PlayerBehavior.Player.Damage;
+
+            bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+            float finalDamage = isCrit
+                ? baseDamage * PlayerBehavior.Player.CritDamage
+                : baseDamage;
+
+            enemy.TakeDamage(finalDamage, isCrit);
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
             EnemyBehavior enemy = collision.GetComponent<EnemyBehavior>();
+            if (enemy == null) return;
 
             if (enemies.ContainsKey(enemy))
             {

@@ -47,11 +47,19 @@ namespace OctoberStudio.Abilities
 
             var enemies = StageController.EnemiesSpawner.GetEnemiesInRadius(transform.position, ExplosionRadius);
 
+            float baseDamage = PlayerBehavior.Player.Damage * DamageMultiplier;
+
             for (int i = 0; i < enemies.Count; i++)
             {
                 var enemy = enemies[i];
 
-                enemy.TakeDamage(PlayerBehavior.Player.Damage * DamageMultiplier);
+                // ---- CRIT LOGIC ----
+                bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                float finalDamage = isCrit
+                    ? baseDamage * PlayerBehavior.Player.CritDamage
+                    : baseDamage;
+
+                enemy.TakeDamage(finalDamage, isCrit);
             }
 
             explosionParticle.Play();

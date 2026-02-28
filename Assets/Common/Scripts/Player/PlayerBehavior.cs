@@ -37,6 +37,9 @@ namespace OctoberStudio
         [SerializeField, Min(1f)] protected float initialSizeMultiplier = 1f;
         [SerializeField, Min(1f)] protected float initialDurationMultiplier = 1f;
         [SerializeField, Min(1f)] protected float initialGoldMultiplier = 1;
+        [SerializeField, Range(0f, 1f)] protected float initialCritChanceMultiplier = 0.2f;
+        [SerializeField, Min(1f)] protected float initialCritDamageMultiplier = 1.5f;
+        [SerializeField, Range(0f, 0.6f)] protected float initialDodgeMultiplier = 0.2f;
 
         [Header("References")]
         [SerializeField] protected HealthbarBehavior healthbar;
@@ -89,6 +92,9 @@ namespace OctoberStudio
         public float SizeMultiplier { get; protected set; }
         public float DurationMultiplier { get; protected set; }
         public float GoldMultiplier { get; protected set; }
+        public float CritChance { get; protected set; }
+        public float CritDamage { get; protected set; }
+        public float Dodge { get; protected set; }
 
         public Vector2 LookDirection { get; protected set; }
         public bool IsMovingAlowed { get; set; }
@@ -165,6 +171,9 @@ namespace OctoberStudio
             RecalculateSizeMultiplier(1f);
             RecalculateDurationMultiplier(1);
             RecalculateGoldMultiplier(1);
+            RecalculateCritChance(0.2f);
+            RecalculateCritDamage(1.5f);
+            RecalculateDodge(0.2f);
 
             LookDirection = Vector2.right;
             IsMovingAlowed = true;
@@ -378,6 +387,28 @@ namespace OctoberStudio
             GoldMultiplier = initialGoldMultiplier * goldMultiplier;
         }
 
+        public virtual void RecalculateCritChance(float critChanceMultiplier)
+        {
+            // CritChance хранитс€ как шанс 0..1 (рекомендую именно так)
+            CritChance = initialCritChanceMultiplier * critChanceMultiplier;
+            CritChance = Mathf.Clamp01(CritChance);
+        }
+
+        public virtual void RecalculateCritDamage(float critDamageMultiplier)
+        {
+            // CritDamage = множитель (2 = x2). Ќе даЄм упасть ниже 1.
+            CritDamage = initialCritDamageMultiplier * critDamageMultiplier;
+            CritDamage = Mathf.Max(1f, CritDamage);
+        }
+
+        public virtual void RecalculateDodge(float dodgeMultiplier)
+        {
+            // Dodge как шанс 0..1
+            Dodge = initialDodgeMultiplier * dodgeMultiplier;
+
+            // ћожно капнуть, чтобы не было 100% уклонени€
+            Dodge = Mathf.Clamp(Dodge, 0f, 0.60f);
+        }
         public virtual void RestoreHP(float hpPercent)
         {
             healthbar.AddPercentage(hpPercent);
@@ -468,6 +499,16 @@ namespace OctoberStudio
         public virtual void TakeDamage(float damage)
         {
             if (invincible || healthbar.IsZero) return;
+
+            // Dodge (chance 0..1). If dodged - no damage taken.
+            if (Dodge > 0f && Random.value < Dodge)
+            {
+                StageController.WorldSpaceTextManager.SpawnText(
+                    CenterPosition + new Vector2(Random.Range(-0.1f, 0.1f), Random.Range(0.05f, 0.15f)),
+                    "DODGE"
+                );
+                return;
+            }
 
             healthbar.Subtract(damage * DamageReductionMultiplier);
             _character?.FlashHit();

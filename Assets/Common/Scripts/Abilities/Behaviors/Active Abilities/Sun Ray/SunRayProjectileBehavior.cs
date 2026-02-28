@@ -34,13 +34,14 @@ namespace OctoberStudio
         {
             Target = target;
 
-            if(Target != null)
+            if (Target != null)
             {
                 transform.position = Target.transform.position;
                 IsTargetLocked = true;
 
                 Target.onEnemyDied += OnEnemyDied;
-            } else
+            }
+            else
             {
                 IsTargetLocked = false;
 
@@ -57,7 +58,7 @@ namespace OctoberStudio
 
         private IEnumerator WaitingForTarget()
         {
-            while(Target == null)
+            while (Target == null)
             {
                 yield return null;
 
@@ -76,25 +77,40 @@ namespace OctoberStudio
 
             if (Time.time > lastDamageTime + DamageInterval)
             {
+                float targetBaseDamage = DamagePerSecond * PlayerBehavior.Player.Damage * DamageInterval;
+                float aoeBaseDamage = AdditionalDamagePerSecond * PlayerBehavior.Player.Damage * DamageInterval;
+
+                // ---- DAMAGE TO MAIN TARGET ----
                 if (IsTargetLocked && Target != null)
                 {
-                    Target.TakeDamage(DamagePerSecond * PlayerBehavior.Player.Damage * DamageInterval);
+                    bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                    float finalDamage = isCrit
+                        ? targetBaseDamage * PlayerBehavior.Player.CritDamage
+                        : targetBaseDamage;
+
+                    Target.TakeDamage(finalDamage, isCrit);
                 }
 
+                // ---- DAMAGE TO CLOSE ENEMIES ----
                 var closeEnemies = StageController.EnemiesSpawner.GetEnemiesInRadius(transform.position, AdditionalDamageRadius);
 
-                foreach(var enemy in closeEnemies)
+                foreach (var enemy in closeEnemies)
                 {
-                    if(enemy != Target)
-                    {
-                        enemy.TakeDamage(AdditionalDamagePerSecond * PlayerBehavior.Player.Damage * DamageInterval);
-                    }
+                    if (enemy == null) continue;
+                    if (enemy == Target) continue;
+
+                    bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                    float finalDamage = isCrit
+                        ? aoeBaseDamage * PlayerBehavior.Player.CritDamage
+                        : aoeBaseDamage;
+
+                    enemy.TakeDamage(finalDamage, isCrit);
                 }
 
                 lastDamageTime = Time.time;
             }
 
-            if(Time.time > spawnTime + Lifetime)
+            if (Time.time > spawnTime + Lifetime)
             {
                 onFinished?.Invoke(this);
                 Disable();
@@ -109,7 +125,9 @@ namespace OctoberStudio
             var time = distanve / (Speed * PlayerBehavior.Player.ProjectileSpeedMultiplier);
 
             movementCoroutine.StopIfExists();
-            movementCoroutine = transform.DoPosition(Target.transform, time).SetEasing(EasingType.SineIn).SetOnFinish(() => IsTargetLocked = true);
+            movementCoroutine = transform.DoPosition(Target.transform, time)
+                .SetEasing(EasingType.SineIn)
+                .SetOnFinish(() => IsTargetLocked = true);
         }
 
         private void OnEnemyDied(EnemyBehavior enemy)
@@ -119,10 +137,11 @@ namespace OctoberStudio
 
             Target = StageController.EnemiesSpawner.GetClosestEnemy(transform.position);
 
-            if(Target != null)
+            if (Target != null)
             {
                 MoveToTarget();
-            } else
+            }
+            else
             {
                 waitingCoroutine = StartCoroutine(WaitingForTarget());
             }
@@ -130,11 +149,11 @@ namespace OctoberStudio
 
         public void Disable()
         {
-            if(Target != null)
+            if (Target != null)
             {
                 Target.onEnemyDied -= OnEnemyDied;
             }
-            
+
             movementCoroutine.StopIfExists();
 
             IsTargetLocked = false;

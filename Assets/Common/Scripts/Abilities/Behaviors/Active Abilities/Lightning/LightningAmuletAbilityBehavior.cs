@@ -35,7 +35,7 @@ namespace OctoberStudio.Abilities
         {
             while (true)
             {
-                for(int i = 0; i < AbilityLevel.LightningsCount; i++)
+                for (int i = 0; i < AbilityLevel.LightningsCount; i++)
                 {
                     yield return new WaitForSeconds(AbilityLevel.DurationBetweenHits);
 
@@ -44,21 +44,44 @@ namespace OctoberStudio.Abilities
                     var spawner = StageController.EnemiesSpawner;
                     var enemy = spawner.GetRandomVisibleEnemy();
 
-                    if(enemy != null)
+                    if (enemy != null)
                     {
                         particle.transform.position = enemy.transform.position;
 
-                        enemy.TakeDamage(PlayerBehavior.Player.Damage * AbilityLevel.Damage);
+                        // -------- MAIN TARGET DAMAGE --------
+                        float baseDamage = PlayerBehavior.Player.Damage * AbilityLevel.Damage;
 
-                        var enemiesInRadius = StageController.EnemiesSpawner.GetEnemiesInRadius(enemy.transform.position, AbilityLevel.AdditionalDamageRadius);
+                        bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                        float finalDamage = isCrit
+                            ? baseDamage * PlayerBehavior.Player.CritDamage
+                            : baseDamage;
 
-                        foreach(var closeEnemy in enemiesInRadius)
+                        enemy.TakeDamage(finalDamage, isCrit);
+
+                        // -------- CHAIN / ADDITIONAL DAMAGE --------
+                        var enemiesInRadius = StageController.EnemiesSpawner.GetEnemiesInRadius(
+                            enemy.transform.position,
+                            AbilityLevel.AdditionalDamageRadius
+                        );
+
+                        foreach (var closeEnemy in enemiesInRadius)
                         {
-                            if (closeEnemy != enemy) closeEnemy.TakeDamage(PlayerBehavior.Player.Damage * AbilityLevel.AdditionalDamage);
+                            if (closeEnemy == null || closeEnemy == enemy) continue;
+
+                            float chainBaseDamage = PlayerBehavior.Player.Damage * AbilityLevel.AdditionalDamage;
+
+                            bool chainCrit = Random.value < PlayerBehavior.Player.CritChance;
+                            float chainFinalDamage = chainCrit
+                                ? chainBaseDamage * PlayerBehavior.Player.CritDamage
+                                : chainBaseDamage;
+
+                            closeEnemy.TakeDamage(chainFinalDamage, chainCrit);
                         }
-                    } else
+                    }
+                    else
                     {
-                        particle.transform.position = PlayerBehavior.Player.transform.position + Vector3.up + Vector3.left;
+                        particle.transform.position =
+                            PlayerBehavior.Player.transform.position + Vector3.up + Vector3.left;
                     }
 
                     IEasingCoroutine easingCoroutine = null;
@@ -73,7 +96,10 @@ namespace OctoberStudio.Abilities
                     GameController.AudioManager.PlaySound(LIGHTNING_AMULET_HASH);
                 }
 
-                yield return new WaitForSeconds(AbilityLevel.AbilityCooldown * PlayerBehavior.Player.CooldownMultiplier - AbilityLevel.DurationBetweenHits);
+                yield return new WaitForSeconds(
+                    AbilityLevel.AbilityCooldown * PlayerBehavior.Player.CooldownMultiplier
+                    - AbilityLevel.DurationBetweenHits
+                );
             }
         }
 

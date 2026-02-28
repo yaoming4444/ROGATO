@@ -12,7 +12,15 @@ namespace OctoberStudio.UI
 
         public void SetText(string text)
         {
+            // reset pooled state to default
+            textComponent.color = Color.white;
+
             textComponent.text = text;
+        }
+
+        public void SetColor(Color color)
+        {
+            textComponent.color = color;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

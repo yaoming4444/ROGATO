@@ -91,19 +91,32 @@ namespace OctoberStudio.UI
 
             var indicator = indicatorsPool.GetEntity();
 
-            indicator.SetText(text);
+            indicator.SetText(text);           // теперь внутри SetText сбрасывает белый
+            indicator.SetColor(Color.white);   // можно оставить, не мешает
             indicator.SetAnchors(viewportPos);
             indicator.SetPosition(Vector2.zero);
 
             var data = new IndicatorData { indicator = indicator, spawnTime = Time.time, worldPosition = worldPos };
 
-            if (isJobRunning)
-            {
-                waitingIndicators.Add(data);
-            } else
-            {
-                AddIndicatorData(data);
-            }
+            if (isJobRunning) waitingIndicators.Add(data);
+            else AddIndicatorData(data);
+        }
+
+        public void SpawnText(Vector2 worldPos, string text, Color color)
+        {
+            var viewportPos = mainCamera.WorldToViewportPoint(worldPos);
+
+            var indicator = indicatorsPool.GetEntity();
+
+            indicator.SetText(text);       // сбросит белый
+            indicator.SetColor(color);     // перекрасим в нужный цвет
+            indicator.SetAnchors(viewportPos);
+            indicator.SetPosition(Vector2.zero);
+
+            var data = new IndicatorData { indicator = indicator, spawnTime = Time.time, worldPosition = worldPos };
+
+            if (isJobRunning) waitingIndicators.Add(data);
+            else AddIndicatorData(data);
         }
 
         protected virtual void AddIndicatorData(IndicatorData data)

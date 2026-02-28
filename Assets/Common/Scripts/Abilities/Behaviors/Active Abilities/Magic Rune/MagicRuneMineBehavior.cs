@@ -23,13 +23,11 @@ namespace OctoberStudio.Abilities
             mineTriggerCollider.radius = stage.MineTriggerRadius / size;
 
             DamageMultiplier = stage.Damage;
-
             DamageRadius = stage.MineDamageRadius * PlayerBehavior.Player.SizeMultiplier;
 
             mineVisuals.SetActive(true);
 
             EasingManager.DoAfter(0.2f, () => mineTriggerCollider.enabled = true);
-
             lifetimeCoroutine = EasingManager.DoAfter(stage.MineLifetime, Explode);
         }
 
@@ -37,7 +35,7 @@ namespace OctoberStudio.Abilities
         {
             var enemy = collision.GetComponent<EnemyBehavior>();
 
-            if(enemy != null)
+            if (enemy != null)
             {
                 Explode();
             }
@@ -50,11 +48,18 @@ namespace OctoberStudio.Abilities
 
             var enemies = StageController.EnemiesSpawner.GetEnemiesInRadius(transform.position, DamageRadius);
 
-            for(int i = 0; i < enemies.Count; i++)
+            float baseDamage = PlayerBehavior.Player.Damage * DamageMultiplier;
+
+            for (int i = 0; i < enemies.Count; i++)
             {
                 var enemy = enemies[i];
 
-                enemy.TakeDamage(PlayerBehavior.Player.Damage * DamageMultiplier);
+                bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                float finalDamage = isCrit
+                    ? baseDamage * PlayerBehavior.Player.CritDamage
+                    : baseDamage;
+
+                enemy.TakeDamage(finalDamage, isCrit);
             }
 
             explosionParticle.Play();

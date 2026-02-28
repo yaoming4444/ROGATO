@@ -26,7 +26,6 @@ namespace OctoberStudio.Abilities
         public override void Init(AbilityData data, int stageId)
         {
             base.Init(data, stageId);
-
             slowDownEffect.SetModifier(AbilityLevel.SlowDownMultiplier);
         }
 
@@ -37,10 +36,9 @@ namespace OctoberStudio.Abilities
             visuals.localScale = Vector2.one * AbilityLevel.FieldRadius * 2 * PlayerBehavior.Player.SizeMultiplier;
             abilityCollider.radius = AbilityLevel.FieldRadius * PlayerBehavior.Player.SizeMultiplier;
 
-            if(Time.time - lastTimeSound > 5)
+            if (Time.time - lastTimeSound > 5)
             {
                 lastTimeSound = Time.time;
-
                 GameController.AudioManager.PlaySound(TIME_GAZER_HASH);
             }
         }
@@ -48,12 +46,13 @@ namespace OctoberStudio.Abilities
         private void OnTriggerEnter2D(Collider2D collision)
         {
             EnemyBehavior enemy = collision.GetComponent<EnemyBehavior>();
+            if (enemy == null) return;
 
             if (!enemies.ContainsKey(enemy))
             {
                 enemies.Add(enemy, Time.time);
 
-                enemy.TakeDamage(AbilityLevel.Damage * PlayerBehavior.Player.Damage);
+                ApplyDamageWithCrit(enemy);
 
                 enemy.AddEffect(slowDownEffect);
             }
@@ -63,25 +62,39 @@ namespace OctoberStudio.Abilities
         {
             foreach (var enemy in enemies.Keys.ToList())
             {
+                if (enemy == null) continue;
+
                 float time = enemies[enemy];
 
                 if (Time.time - time > AbilityLevel.DamageCooldown * PlayerBehavior.Player.CooldownMultiplier)
                 {
                     enemies[enemy] = Time.time;
 
-                    enemy.TakeDamage(AbilityLevel.Damage * PlayerBehavior.Player.Damage);
+                    ApplyDamageWithCrit(enemy);
                 }
             }
+        }
+
+        private void ApplyDamageWithCrit(EnemyBehavior enemy)
+        {
+            float baseDamage = AbilityLevel.Damage * PlayerBehavior.Player.Damage;
+
+            bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+            float finalDamage = isCrit
+                ? baseDamage * PlayerBehavior.Player.CritDamage
+                : baseDamage;
+
+            enemy.TakeDamage(finalDamage, isCrit);
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
             EnemyBehavior enemy = collision.GetComponent<EnemyBehavior>();
+            if (enemy == null) return;
 
             if (enemies.ContainsKey(enemy))
             {
                 enemies.Remove(enemy);
-
                 enemy.RemoveEffect(slowDownEffect);
             }
         }

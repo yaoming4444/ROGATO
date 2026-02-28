@@ -53,7 +53,14 @@ namespace OctoberStudio.Abilities
                     {
                         particle.transform.position = enemy.transform.position;
 
-                        enemy.TakeDamage(PlayerBehavior.Player.Damage * AbilityLevel.Damage);
+                        float baseDamage = PlayerBehavior.Player.Damage * AbilityLevel.Damage;
+
+                        bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                        float finalDamage = isCrit
+                            ? baseDamage * PlayerBehavior.Player.CritDamage
+                            : baseDamage;
+
+                        enemy.TakeDamage(finalDamage, isCrit);
                     }
                     else
                     {
@@ -62,7 +69,7 @@ namespace OctoberStudio.Abilities
 
                     float angle = Random.Range(0, 180f);
 
-                    for (int j = 0; j < AbilityLevel.BallLightningCount; j++) 
+                    for (int j = 0; j < AbilityLevel.BallLightningCount; j++)
                     {
                         var ball = ballLightningPool.GetEntity();
 
@@ -94,7 +101,7 @@ namespace OctoberStudio.Abilities
         {
             StopCoroutine(abilityCoroutine);
 
-            for(int i = 0; i < easingCoroutines.Count; i++)
+            for (int i = 0; i < easingCoroutines.Count; i++)
             {
                 var easingCoroutine = easingCoroutines[i];
                 if (easingCoroutine.ExistsAndActive()) easingCoroutine.Stop();

@@ -173,18 +173,25 @@ namespace OctoberStudio
         {
             ProjectileBehavior projectile = other.GetComponent<ProjectileBehavior>();
 
-            if(projectile != null)
+            if (projectile != null)
             {
-                TakeDamage(PlayerBehavior.Player.Damage * projectile.DamageMultiplier);
+                float baseDamage = PlayerBehavior.Player.Damage * projectile.DamageMultiplier;
 
-                if(HP > 0)
+                bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
+                float finalDamage = isCrit
+                    ? baseDamage * PlayerBehavior.Player.CritDamage
+                    : baseDamage;
+
+                TakeDamage(finalDamage, isCrit);
+
+                if (HP > 0)
                 {
                     if (projectile.KickBack && canBeKickedBack)
                     {
                         KickBack(PlayerBehavior.CenterPosition);
                     }
 
-                    if(projectile.Effects != null && projectile.Effects.Count > 0)
+                    if (projectile.Effects != null && projectile.Effects.Count > 0)
                     {
                         AddEffects(projectile.Effects);
                     }
@@ -222,6 +229,11 @@ namespace OctoberStudio
 
         public void TakeDamage(float damage)
         {
+            TakeDamage(damage, false);
+        }
+
+        public void TakeDamage(float damage, bool isCrit)
+        {
             if (!IsAlive) return;
             if (IsInvulnerable) return;
 
@@ -230,27 +242,48 @@ namespace OctoberStudio
             onHealthChanged?.Invoke(HP, MaxHP);
 
             // Showing Damage Text
-            damageTextValue += damage;
-            if (Time.unscaledTime - lastTimeDamageText > 0.2f && damageTextValue >= 1)
+            if (isCrit)
             {
-                var damageText = Mathf.RoundToInt(damageTextValue).ToString();
-                StageController.WorldSpaceTextManager.SpawnText(transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.value * 0.1f), damageText);
+                // Crit: показываем сразу, не копим (иначе цвет/флаг потер€етс€)
+                var critText = Mathf.RoundToInt(damage).ToString();
 
+                StageController.WorldSpaceTextManager.SpawnText(
+                    transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.value * 0.1f),
+                    critText,
+                    new Color(1f, 0.82f, 0f) // yellow
+                );
+
+                // —брасываем накопление обычного текста, чтобы крит не смешивалс€ с ним
                 damageTextValue = 0;
                 lastTimeDamageText = Time.unscaledTime;
-            } else
+            }
+            else
             {
                 damageTextValue += damage;
+
+                if (Time.unscaledTime - lastTimeDamageText > 0.2f && damageTextValue >= 1f)
+                {
+                    var damageText = Mathf.RoundToInt(damageTextValue).ToString();
+
+                    StageController.WorldSpaceTextManager.SpawnText(
+                        transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.value * 0.1f),
+                        damageText
+                    );
+
+                    damageTextValue = 0;
+                    lastTimeDamageText = Time.unscaledTime;
+                }
+                // Ќичего не делаем в else: уже накопили damageTextValue выше
             }
 
             // Playing Damage Sound
-            if(Time.frameCount != lastFrameHitSound && Time.unscaledTime - lastTimeHitSound > 0.2f)
+            if (Time.frameCount != lastFrameHitSound && Time.unscaledTime - lastTimeHitSound > 0.2f)
             {
                 GameController.AudioManager.PlaySound(HIT_HASH);
 
                 lastFrameHitSound = Time.frameCount;
                 lastTimeHitSound = Time.unscaledTime;
-            }   
+            }
 
             if (HP <= 0)
             {
@@ -269,10 +302,12 @@ namespace OctoberStudio
                 {
                     var x = transform.localScale.x;
 
-                    scaleCoroutine = transform.DoLocalScale(new Vector3(x * (1 - hitScaleAmount), (1 + hitScaleAmount), 1), 0.07f).SetEasing(EasingType.SineOut).SetOnFinish(() =>
-                    {
-                        scaleCoroutine = transform.DoLocalScale(new Vector3(x, 1, 1), 0.07f).SetEasing(EasingType.SineInOut);
-                    });
+                    scaleCoroutine = transform.DoLocalScale(new Vector3(x * (1 - hitScaleAmount), (1 + hitScaleAmount), 1), 0.07f)
+                        .SetEasing(EasingType.SineOut)
+                        .SetOnFinish(() =>
+                        {
+                            scaleCoroutine = transform.DoLocalScale(new Vector3(x, 1, 1), 0.07f).SetEasing(EasingType.SineInOut);
+                        });
                 }
             }
         }
