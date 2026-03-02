@@ -15,9 +15,8 @@ GameObject:
   - component: {fileID: 1983819935290200800}
   - component: {fileID: 1194193530152128223}
   - component: {fileID: 8551481805000714828}
-  - component: {fileID: 4555290640399509651}
   m_Layer: 0
-  m_Name: Character_20260102_020944
+  m_Name: PET
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -675,34 +674,3 @@ MonoBehaviour:
   partsManager: {fileID: 2252021300350340567}
   autoInit: 1
   allowPrefixMatch: 1
---- !u!114 &4555290640399509651
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3564766641511995288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1061c56794a23ad47b3e6846c87c83c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OctoberStudio.CharacterBehavior
-  skeletonAnimation: {fileID: 1983819935290200800}
-  idleAnim: Idle
-  runAnim: Run
-  walkAnim: 
-  defeatAnim: Die
-  reviveAnim: 
-  hitAnim: Hit
-  moveThreshold: 0.05
-  hitColor: {r: 1, g: 0.3882353, b: 0.3882353, a: 0.6666667}
-  hitFlashDuration: 0.1
-  centerTransform: {fileID: 0}
-  visualRoot: {fileID: 1084302725158477326}
-  invertFlip: 1
-  autoFindCenterInParents: 1
-  centerNames:
-  - Center
-  - center
-  - CenterPoint
-  - Center Point
