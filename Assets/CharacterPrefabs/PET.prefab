@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 315023164161182415}
   - component: {fileID: 1983819935290200800}
   - component: {fileID: 1194193530152128223}
-  - component: {fileID: 8551481805000714828}
+  - component: {fileID: 5111038132588474726}
+  - component: {fileID: 2711734132178663641}
   m_Layer: 0
   m_Name: PET
   m_TagString: Untagged
@@ -659,7 +660,7 @@ SortingGroup:
   m_SortingLayer: 0
   m_SortingOrder: 102
   m_SortAtRoot: 0
---- !u!114 &8551481805000714828
+--- !u!114 &5111038132588474726
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -668,9 +669,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 3564766641511995288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f053a6191dbd4f3478d4da2acd04bc6a, type: 3}
+  m_Script: {fileID: 11500000, guid: 73e5edf08706050468ce682c3ba1f47a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameCore.Visual.PartsManagerStateBinder
+  m_EditorClassIdentifier: Assembly-CSharp::GameCore.Visual.CompanionAppearanceBinder
   partsManager: {fileID: 2252021300350340567}
+  appearance: {fileID: 11400000, guid: e8576b55b42a8734382e0f9ce2e961a2, type: 2}
   autoInit: 1
   allowPrefixMatch: 1
+  applyOnEnable: 1
+--- !u!114 &2711734132178663641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3564766641511995288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 184ba22b3c171c144865ce9760dff66d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpineArmsTool
+  sa: {fileID: 1983819935290200800}
+  removeArms: 1
+  armSlots:
+  - arm_l
+  - arm_r
+  - top_arm_l
+  - top_arm_r
+  - gloves_l
+  - gloves_r

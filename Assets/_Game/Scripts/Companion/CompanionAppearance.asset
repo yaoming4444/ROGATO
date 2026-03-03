@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc8c45fae4b7ea45850295d1a669523, type: 3}
+  m_Name: CompanionAppearance
+  m_EditorClassIdentifier: Assembly-CSharp::CompanionAppearance
+  parts:
+  - Category: 1
+    SkinKey: back/back_c_1
+  - Category: 2
+    SkinKey: 
+  - Category: 3
+    SkinKey: boots/boots_c_1
+  - Category: 4
+    SkinKey: bottom/bottom_c_1
+  - Category: 5
+    SkinKey: brow/brow_c_1
+  - Category: 6
+    SkinKey: eyes/eyes_c_1
+  - Category: 7
+    SkinKey: 
+  - Category: 8
+    SkinKey: hair_short/hair_short_c_1
+  - Category: 9
+    SkinKey: hair_hat/hair_hat_c_1
+  - Category: 10
+    SkinKey: 
+  - Category: 12
+    SkinKey: 
+  - Category: 13
+    SkinKey: 
+  - Category: 14
+    SkinKey: 
+  - Category: 15
+    SkinKey: top/top_c_1
+  - Category: 11
+    SkinKey: mouth/mouth_c_1
+  - Category: 16
+    SkinKey: skin/skin_c_1
+  colors:
+    UseSkinColor: 1
+    Skin:
+      serializedVersion: 2
+      rgba: 4278225919
+    UseEyeColor: 0
+    Eyes:
+      serializedVersion: 2
+      rgba: 4278202111
+    UseHairColor: 0
+    Hair:
+      serializedVersion: 2
+      rgba: 4279836200
+    UseBrowColor: 0
+    Brows:
+      serializedVersion: 2
+      rgba: 4279836200
+    UseBeardColor: 0
+    Beard:
+      serializedVersion: 2
+      rgba: 4279836200
+    UseExtra1: 0
+    Extra1:
+      serializedVersion: 2
+      rgba: 4294967295
+    UseExtra2: 0
+    Extra2:
+      serializedVersion: 2
+      rgba: 4294967295
+  hideSlots:
+    Enabled: 1
+    SlotsToHide:
+    - arm_l
+    - arm_r
+    - top_arm_l
+    - top_arm_r
