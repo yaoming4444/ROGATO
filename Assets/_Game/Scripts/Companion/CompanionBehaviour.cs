@@ -8,7 +8,7 @@ using OctoberStudio.Abilities;
 public class CompanionBehaviour : MonoBehaviour
 {
     [Header("Follow")]
-    [SerializeField] private Transform followTarget;
+    [SerializeField] private Transform followTarget;               // auto-find PlayerBehavior in Start if null
     [SerializeField] private float followDistance = 1.5f;
     [SerializeField] private float stopDistance = 1.2f;
     [SerializeField] private float moveSpeed = 3.0f;
@@ -17,25 +17,44 @@ public class CompanionBehaviour : MonoBehaviour
     [Header("Visual / Flip")]
     [Tooltip("Transform that contains the visuals (Skeleton, weapon, etc.). Flip happens here, not on the root.")]
     [SerializeField] private Transform visualRoot;
-    [SerializeField] private bool flipByMovement = true;
-    [SerializeField] private float flipDeadZone = 0.01f; // avoid jitter
+
+    [Tooltip("Face enemy when possible. If no enemies -> fallback to movement flip.")]
+    [SerializeField] private bool faceEnemyWhenPossible = true;
+
+    [SerializeField] private bool flipByMovementFallback = true;
+    [SerializeField] private float flipDeadZone = 0.01f;
+
+    [Header("Target Stabilization")]
+    [Tooltip("How often companion is allowed to reacquire/switch targets (seconds).")]
+    [SerializeField] private float targetReacquireInterval = 0.25f;
+
+    [Tooltip("New target must be closer by this amount to force a switch (prevents jitter between similar distances).")]
+    [SerializeField] private float switchDistanceBias = 0.75f;
 
     [Header("Spine")]
     [SerializeField] private SkeletonAnimation skeletonAnimation;
     [SerializeField] private string idleAnim = "Idle2";
     [SerializeField] private string runAnim = "Run";
 
+    [Header("Animation Stability")]
+    [SerializeField] private float runEnterSpeed = 0.05f;
+    [SerializeField] private float runExitSpeed = 0.02f;
+
     [Header("Weapon / Shooting")]
     [SerializeField] private Transform firePoint;
-    [SerializeField] private Transform weaponRoot; // rotate this around Z
-    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform weaponRoot;                 // rotate this around Z
+    [SerializeField] private GameObject projectilePrefab;          // same prefab as wand
     [SerializeField] private float projectileSpeed = 8f;
     [SerializeField] private float projectileLifeTime = 1.25f;
     [SerializeField] private float projectileSize = 1f;
     [SerializeField] private float damageMultiplier = 1f;
 
     [Header("Aim")]
-    [SerializeField] private float maxAimAngle = 90f;
+    [Tooltip("If your weapon art points UP when Z=0, set +90. If it points RIGHT when Z=0, set 0.")]
+    [SerializeField] private float weaponAngleOffset = 0f;
+
+    [Tooltip("Your proven fix: pistol art faces LEFT by default; when NOT flipped we add 180 to aim correctly.")]
+    [SerializeField] private bool enableFlipAimFix = true;
 
     [Header("Fire Rate")]
     [SerializeField] private float shootCooldown = 0.6f;
@@ -49,20 +68,24 @@ public class CompanionBehaviour : MonoBehaviour
 
     private Vector2 _velRef;
     private Vector2 _lastMoveDir;
-    private bool _isMoving;
+    private float _currentSpeed;
+
+    private bool _isRunning;
     private string _currentAnim;
 
     private float _visualBaseScaleX;
+
+    // Enemy facing data (no dynamic/object)
+    private bool _hasEnemyTarget;
+    private Vector2 _enemyCenter;      // chosen target center
+    private float _nextReacquireTime;
 
     private void Awake()
     {
         if (!skeletonAnimation) skeletonAnimation = GetComponentInChildren<SkeletonAnimation>(true);
 
         if (!visualRoot)
-        {
-            // Prefer SkeletonAnimation transform as visual root
             visualRoot = skeletonAnimation ? skeletonAnimation.transform : transform;
-        }
 
         _visualBaseScaleX = Mathf.Abs(visualRoot.localScale.x);
 
@@ -82,6 +105,9 @@ public class CompanionBehaviour : MonoBehaviour
 
         if (followTarget == null)
             Debug.LogWarning("[CompanionBehaviour] followTarget not found. Companion will not move until assigned.", this);
+
+        PlayAnim(idleAnim);
+        _isRunning = false;
     }
 
     private void OnEnable()
@@ -99,11 +125,30 @@ public class CompanionBehaviour : MonoBehaviour
     {
         if (followTarget == null) return;
 
+        Vector3 before = transform.position;
+
         Follow();
-        // flipByMovement больше не нужен если враг всегда есть,
-        // но можно оставить как fallback когда врагов нет
-        //if (flipByMovement && !HasNearbyEnemy()) UpdateFlip();
-        UpdateAnimation();
+
+        Vector3 after = transform.position;
+        float dt = Mathf.Max(Time.deltaTime, 0.0001f);
+        _currentSpeed = (after - before).magnitude / dt;
+
+        // 1) Update stable enemy target (center only)
+        if (faceEnemyWhenPossible)
+            UpdateEnemyTargetStable();
+
+        // 2) Flip logic: face enemy if exists, otherwise fallback to movement
+        if (_hasEnemyTarget)
+        {
+            Vector2 dirToEnemy = _enemyCenter - (Vector2)transform.position;
+            FlipTowardsTarget(dirToEnemy);
+        }
+        else if (flipByMovementFallback)
+        {
+            UpdateFlipByMovement(before, after);
+        }
+
+        UpdateAnimationStable();
     }
 
     private void Follow()
@@ -119,31 +164,140 @@ public class CompanionBehaviour : MonoBehaviour
             Vector2 desired = targetPos - dirToTarget * stopDistance;
 
             Vector2 newPos = Vector2.SmoothDamp(pos, desired, ref _velRef, smoothTime, moveSpeed);
-            Vector2 delta = newPos - pos;
-
             transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
-
-            _isMoving = delta.sqrMagnitude > (flipDeadZone * flipDeadZone);
-            if (_isMoving) _lastMoveDir = delta.normalized;
         }
         else
         {
             _velRef = Vector2.zero;
-            _isMoving = false;
         }
     }
 
-    private void UpdateAnimation()
+    /// <summary>
+    /// Stabilized target picking:
+    /// - Reacquire no more often than targetReacquireInterval
+    /// - Switch only if new target is closer by switchDistanceBias
+    /// Stores only enemy.Center (Vector2), no references needed.
+    /// </summary>
+    private void UpdateEnemyTargetStable()
+    {
+        _hasEnemyTarget = false;
+
+        if (StageController.EnemiesSpawner == null)
+            return;
+
+        Vector2 origin = firePoint ? (Vector2)firePoint.position : (Vector2)transform.position;
+
+        // If we already have a target and it's too soon to reacquire, keep it
+        if (Time.time < _nextReacquireTime && _enemyCenter != Vector2.zero)
+        {
+            if (maxTargetDistance > 0f && Vector2.Distance(origin, _enemyCenter) > maxTargetDistance)
+            {
+                _enemyCenter = Vector2.zero;
+                return;
+            }
+
+            _hasEnemyTarget = true;
+            return;
+        }
+
+        _nextReacquireTime = Time.time + targetReacquireInterval;
+
+        var candidate = StageController.EnemiesSpawner.GetClosestEnemy(origin);
+        if (candidate == null)
+        {
+            _enemyCenter = Vector2.zero;
+            return;
+        }
+
+        Vector2 candidateCenter = candidate.Center;
+
+        if (maxTargetDistance > 0f && Vector2.Distance(origin, candidateCenter) > maxTargetDistance)
+        {
+            _enemyCenter = Vector2.zero;
+            return;
+        }
+
+        // If we had a previous center, only switch if candidate is meaningfully closer
+        if (_enemyCenter != Vector2.zero)
+        {
+            float currentDist = Vector2.Distance(origin, _enemyCenter);
+            float candDist = Vector2.Distance(origin, candidateCenter);
+
+            if (candDist + switchDistanceBias < currentDist)
+                _enemyCenter = candidateCenter; // switch
+            // else keep old
+        }
+        else
+        {
+            _enemyCenter = candidateCenter;
+        }
+
+        _hasEnemyTarget = (_enemyCenter != Vector2.zero);
+    }
+
+    private void FlipTowardsTarget(Vector2 dirToEnemy)
+    {
+        if (visualRoot == null) return;
+        if (Mathf.Abs(dirToEnemy.x) < flipDeadZone) return;
+
+        // Base companion art faces LEFT at positive scale.
+        // Enemy on the RIGHT -> negative scale to face RIGHT.
+        float sign = dirToEnemy.x >= 0f ? -1f : 1f;
+
+        var s = visualRoot.localScale;
+        s.x = _visualBaseScaleX * sign;
+        visualRoot.localScale = s;
+    }
+
+    private void UpdateFlipByMovement(Vector3 before, Vector3 after)
+    {
+        if (visualRoot == null) return;
+
+        Vector2 delta = (Vector2)(after - before);
+        if (delta.sqrMagnitude <= (flipDeadZone * flipDeadZone)) return;
+
+        _lastMoveDir = delta.normalized;
+
+        if (Mathf.Abs(_lastMoveDir.x) < flipDeadZone)
+            return;
+
+        // Same base-facing-left convention:
+        float sign = _lastMoveDir.x >= 0f ? -1f : 1f;
+
+        var s = visualRoot.localScale;
+        s.x = _visualBaseScaleX * sign;
+        visualRoot.localScale = s;
+    }
+
+    private void UpdateAnimationStable()
     {
         if (!skeletonAnimation) return;
 
-        var desired = _isMoving ? runAnim : idleAnim;
-        if (_currentAnim == desired) return;
+        if (!_isRunning)
+        {
+            if (_currentSpeed >= runEnterSpeed)
+                _isRunning = true;
+        }
+        else
+        {
+            if (_currentSpeed <= runExitSpeed)
+                _isRunning = false;
+        }
 
-        skeletonAnimation.AnimationState.SetAnimation(0, desired, true);
-        _currentAnim = desired;
+        string desired = _isRunning ? runAnim : idleAnim;
+        PlayAnim(desired);
     }
 
+    private void PlayAnim(string animName)
+    {
+        if (string.IsNullOrWhiteSpace(animName) || !skeletonAnimation) return;
+        if (_currentAnim == animName) return;
+
+        skeletonAnimation.AnimationState.SetAnimation(0, animName, true);
+        _currentAnim = animName;
+    }
+
+    // ---------------- Shooting ----------------
     private IEnumerator ShootLoop()
     {
         yield return null;
@@ -167,27 +321,12 @@ public class CompanionBehaviour : MonoBehaviour
         if (maxTargetDistance > 0f && Vector2.Distance(origin, enemy.Center) > maxTargetDistance)
             return;
 
-        Vector2 dir = (enemy.Center - origin).normalized;
+        Vector2 dir = (enemy.Center - origin);
         if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
-
-        // Флип по врагу (как в Brotato)
-        FlipTowardsTarget(dir);
+        dir.Normalize();
 
         AimWeapon(origin, enemy.Center);
         SpawnProjectile(origin, dir);
-    }
-
-    private void FlipTowardsTarget(Vector2 dirToEnemy)
-    {
-        if (visualRoot == null) return;
-        if (Mathf.Abs(dirToEnemy.x) < flipDeadZone) return;
-
-        // враг справа ? смотрим вправо (sign = -1 если базовый спрайт смотрит влево, подстрой под свой)
-        float sign = dirToEnemy.x >= 0f ? -1f : 1f;
-
-        var s = visualRoot.localScale;
-        s.x = _visualBaseScaleX * sign;
-        visualRoot.localScale = s;
     }
 
     private void AimWeapon(Vector2 origin, Vector2 target)
@@ -198,11 +337,11 @@ public class CompanionBehaviour : MonoBehaviour
         if (d.sqrMagnitude < 0.0001f) d = Vector2.right;
 
         float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
+        angle += weaponAngleOffset;
 
-        // weapon sprite points LEFT at Z=0 (per your screenshot)
-        // When NOT flipped, we must rotate 180 to match the sprite's forward direction.
+        // Your proven fix:
         bool flipped = visualRoot != null && visualRoot.lossyScale.x < 0f;
-        if (!flipped)
+        if (enableFlipAimFix && !flipped)
             angle += 180f;
 
         weaponRoot.rotation = Quaternion.Euler(0f, 0f, angle);
@@ -222,7 +361,6 @@ public class CompanionBehaviour : MonoBehaviour
         {
             projectile.Speed *= PlayerBehavior.Player.ProjectileSpeedMultiplier;
             projectile.transform.localScale *= PlayerBehavior.Player.SizeMultiplier;
-            projectile.DamageMultiplier *= PlayerBehavior.Player.Damage;
         }
 
         if (playWandSfx)
