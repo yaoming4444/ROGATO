@@ -100,7 +100,9 @@ public class CompanionBehaviour : MonoBehaviour
         if (followTarget == null) return;
 
         Follow();
-        if (flipByMovement) UpdateFlip();
+        // flipByMovement больше не нужен если враг всегда есть,
+        // но можно оставить как fallback когда врагов нет
+        //if (flipByMovement && !HasNearbyEnemy()) UpdateFlip();
         UpdateAnimation();
     }
 
@@ -129,23 +131,6 @@ public class CompanionBehaviour : MonoBehaviour
             _velRef = Vector2.zero;
             _isMoving = false;
         }
-    }
-
-    private void UpdateFlip()
-    {
-        if (visualRoot == null) return;
-
-        // flip based on last movement direction (stable)
-        if (!_isMoving) return;
-
-        if (Mathf.Abs(_lastMoveDir.x) < flipDeadZone)
-            return;
-
-        float sign = (_lastMoveDir.x >= 0f) ? -1f : 1f;
-
-        var s = visualRoot.localScale;
-        s.x = _visualBaseScaleX * sign;
-        visualRoot.localScale = s;
     }
 
     private void UpdateAnimation()
@@ -182,29 +167,45 @@ public class CompanionBehaviour : MonoBehaviour
         if (maxTargetDistance > 0f && Vector2.Distance(origin, enemy.Center) > maxTargetDistance)
             return;
 
-        Vector2 dir = (enemy.Center - origin);
+        Vector2 dir = (enemy.Center - origin).normalized;
         if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
-        dir.Normalize();
+
+        // Флип по врагу (как в Brotato)
+        FlipTowardsTarget(dir);
 
         AimWeapon(origin, enemy.Center);
-
         SpawnProjectile(origin, dir);
+    }
+
+    private void FlipTowardsTarget(Vector2 dirToEnemy)
+    {
+        if (visualRoot == null) return;
+        if (Mathf.Abs(dirToEnemy.x) < flipDeadZone) return;
+
+        // враг справа ? смотрим вправо (sign = -1 если базовый спрайт смотрит влево, подстрой под свой)
+        float sign = dirToEnemy.x >= 0f ? -1f : 1f;
+
+        var s = visualRoot.localScale;
+        s.x = _visualBaseScaleX * sign;
+        visualRoot.localScale = s;
     }
 
     private void AimWeapon(Vector2 origin, Vector2 target)
     {
         if (weaponRoot == null) return;
 
-        Vector2 d = (target - origin);
+        Vector2 d = target - origin;
         if (d.sqrMagnitude < 0.0001f) d = Vector2.right;
 
         float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
 
-        // If weapon art is "up" at Z=0, add +90 (or -90) here:
-        // angle += 90f;
+        // weapon sprite points LEFT at Z=0 (per your screenshot)
+        // When NOT flipped, we must rotate 180 to match the sprite's forward direction.
+        bool flipped = visualRoot != null && visualRoot.lossyScale.x < 0f;
+        if (!flipped)
+            angle += 180f;
 
-        angle = Mathf.Clamp(angle, -maxAimAngle, maxAimAngle);
-        weaponRoot.localRotation = Quaternion.Euler(0f, 0f, angle);
+        weaponRoot.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
     private void SpawnProjectile(Vector2 position, Vector2 direction)

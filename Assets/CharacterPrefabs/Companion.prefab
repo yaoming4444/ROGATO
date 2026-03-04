@@ -35,7 +35,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.036, z: 0}
   m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8719340316717446634}
   m_Father: {fileID: 0}
@@ -572,7 +572,7 @@ MonoBehaviour:
   flipByMovement: 1
   flipDeadZone: 0.01
   skeletonAnimation: {fileID: 1983819935290200800}
-  idleAnim: Idle
+  idleAnim: Idle2
   runAnim: Run
   firePoint: {fileID: 4080395762280880070}
   weaponRoot: {fileID: 8719340316717446634}
