@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4691701ef039352428d677bdad7caacb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 298279
+  packageName: 2D Fantasy Monster Pack 1
+  packageVersion: 2.0
+  assetPath: Assets/yyart/2D Fantasy Monster Pack 1/Script/CharacterSelect.cs
+  uploadId: 729621

@@ -1,0 +1,1815 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &24437625779401174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8356286320602633229}
+  m_Layer: 0
+  m_Name: Medusa03Hair02 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8356286320602633229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24437625779401174}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.00000017881389, w: 1}
+  m_LocalPosition: {x: 0.959, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3465602428839725367}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &474031724736458897
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2216498427618481209}
+  - component: {fileID: 2995379885756329401}
+  m_Layer: 0
+  m_Name: Medusa02Hair02 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2216498427618481209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474031724736458897}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2995379885756329401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474031724736458897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 7516321956355920328}
+    m_TargetTransform: {fileID: 3553819055468707421}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 5643884339751176345}
+    - {fileID: 6497317709918713001}
+    - {fileID: 7516321956355920328}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: 0.95659643, w: 0.29141596}
+    - {x: 0, y: 0, z: -0.78851426, w: 0.6150165}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 0
+--- !u!1 &647303283979349495
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4917561346335361195}
+  - component: {fileID: 3232359254790799908}
+  m_Layer: 0
+  m_Name: Medusa03Hair02 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4917561346335361195
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647303283979349495}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3232359254790799908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647303283979349495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 8356286320602633229}
+    m_TargetTransform: {fileID: 1283998944420258879}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 7300320579681562634}
+    - {fileID: 3465602428839725367}
+    - {fileID: 8356286320602633229}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: -0.7746194, w: 0.6324277}
+    - {x: 0, y: 0, z: 0.3101791, w: 0.95067817}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 1
+--- !u!1 &693550539825092382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8854936032570581140}
+  - component: {fileID: 873954476950464650}
+  m_Layer: 0
+  m_Name: Medusa01Hair03 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8854936032570581140
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 693550539825092382}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &873954476950464650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 693550539825092382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 6008723032546505274}
+    m_TargetTransform: {fileID: 3654369066731904994}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 1990234449506884105}
+    - {fileID: 1089369444929777524}
+    - {fileID: 6008723032546505274}
+    m_DefaultLocalRotations:
+    - {x: 0, y: 0, z: 0.11005179, w: 0.99392587}
+    - {x: 0, y: 0, z: -0.2850311, w: 0.95851827}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 0
+--- !u!1 &699383000873963908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9049094043870591942}
+  m_Layer: 0
+  m_Name: Medusa02Hair03 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9049094043870591942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699383000873963908}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.000000029802315, w: 1}
+  m_LocalPosition: {x: 0.963, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4549782484778857112}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &765640085824335578
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6923562160954851082}
+  - component: {fileID: 6515028896820564202}
+  m_Layer: 0
+  m_Name: Medusa04Hair03 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6923562160954851082
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765640085824335578}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6515028896820564202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765640085824335578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 8785284854073731633}
+    m_TargetTransform: {fileID: 6412786956867182719}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 3263232989780031332}
+    - {fileID: 1577313963457964241}
+    - {fileID: 8785284854073731633}
+    m_DefaultLocalRotations:
+    - {x: 0, y: 0, z: 0.6336234, w: 0.77364165}
+    - {x: 0, y: 0, z: -0.62366575, w: 0.7816912}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 0
+--- !u!1 &873671930757643376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5366670064658747334}
+  m_Layer: 0
+  m_Name: Medusa01Hair01 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5366670064658747334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873671930757643376}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.47896835, w: -0.8778322}
+  m_LocalPosition: {x: -1.2114046, y: 4.0146, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1896880217849356867
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4094594520903975195}
+  - component: {fileID: 5763443330314984682}
+  m_Layer: 0
+  m_Name: Medusa01Hair02 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4094594520903975195
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896880217849356867}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5763443330314984682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896880217849356867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 6440751542995822370}
+    m_TargetTransform: {fileID: 2100257357244068004}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 2880043086823610388}
+    - {fileID: 1597587453699675}
+    - {fileID: 6440751542995822370}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: -0.75639975, w: 0.6541097}
+    - {x: 0, y: 0, z: 0.52073133, w: 0.85372066}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 1
+--- !u!1 &2154459923276675154
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3654369066731904994}
+  m_Layer: 0
+  m_Name: Medusa01Hair03 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3654369066731904994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2154459923276675154}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.23922035, w: 0.9709654}
+  m_LocalPosition: {x: 1.650416, y: 3.3949857, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2316450164093857443
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1283998944420258879}
+  m_Layer: 0
+  m_Name: Medusa03Hair02 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1283998944420258879
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2316450164093857443}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.59199405, w: 0.80594236}
+  m_LocalPosition: {x: -0.48587972, y: 1.4700861, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2590891683191963689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2348391766926210415}
+  m_Layer: 0
+  m_Name: Medusa03Hair03 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2348391766926210415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2590891683191963689}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.6710113, w: 0.7414471}
+  m_LocalPosition: {x: -1.4173058, y: 1.8715867, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2591369880649253874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6412786956867182719}
+  m_Layer: 0
+  m_Name: Medusa04Hair03 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6412786956867182719
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2591369880649253874}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.04997381, w: 0.99875057}
+  m_LocalPosition: {x: 1.3000149, y: 3.928501, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2922963265601622026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8268855054352401795}
+  m_Layer: 0
+  m_Name: LeftArm Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8268855054352401795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922963265601622026}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.0000010877848, w: 1}
+  m_LocalPosition: {x: 0.452, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2086579682428628134}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3505959632092407574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9208613948026405674}
+  m_Layer: 0
+  m_Name: Medusa02Hair03 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9208613948026405674
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3505959632092407574}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.052689575, w: 0.998611}
+  m_LocalPosition: {x: 1.2570685, y: 4.3033624, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3730050606287732958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 873953748820581219}
+  m_Layer: 0
+  m_Name: Targets
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &873953748820581219
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3730050606287732958}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7704524636417752875}
+  - {fileID: 2342747663408409098}
+  - {fileID: 2100257357244068004}
+  - {fileID: 5366670064658747334}
+  - {fileID: 3654369066731904994}
+  - {fileID: 3553819055468707421}
+  - {fileID: 9208613948026405674}
+  - {fileID: 1283998944420258879}
+  - {fileID: 2348391766926210415}
+  - {fileID: 6412786956867182719}
+  m_Father: {fileID: 5707113368278493993}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4439153703105566042
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2993966546008009932}
+  m_Layer: 0
+  m_Name: Medusa01Hair01 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2993966546008009932
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4439153703105566042}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.00000047683704, w: 1}
+  m_LocalPosition: {x: 0.556, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8313296365568595291}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4881716298975943630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2474430649066370694}
+  - component: {fileID: 850635466216834735}
+  m_Layer: 0
+  m_Name: Medusa02Hair03 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2474430649066370694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4881716298975943630}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850635466216834735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4881716298975943630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 9049094043870591942}
+    m_TargetTransform: {fileID: 9208613948026405674}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 5454811976673441119}
+    - {fileID: 4549782484778857112}
+    - {fileID: 9049094043870591942}
+    m_DefaultLocalRotations:
+    - {x: 0, y: 0, z: 0.4577718, w: 0.88906974}
+    - {x: 0, y: 0, z: -0.4487823, w: 0.8936411}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 0
+--- !u!1 &5314347392550730044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9053516251204267231}
+  - component: {fileID: 5916748051913300967}
+  m_Layer: 0
+  m_Name: LeftArm Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9053516251204267231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5314347392550730044}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5916748051913300967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5314347392550730044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 8268855054352401795}
+    m_TargetTransform: {fileID: 2342747663408409098}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 5867956802637741611}
+    - {fileID: 2086579682428628134}
+    - {fileID: 8268855054352401795}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: -0.9175898, w: 0.3975286}
+    - {x: 0, y: 0, z: 0.19024767, w: 0.9817361}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 1
+--- !u!1 &5341595183163042353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 420958609155882942}
+  m_Layer: 0
+  m_Name: Medusa03Hair03 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &420958609155882942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5341595183163042353}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.00000044703478, w: 1}
+  m_LocalPosition: {x: 0.845, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4644896272586115197}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5472589911921673061
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2100257357244068004}
+  m_Layer: 0
+  m_Name: Medusa01Hair02 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2100257357244068004
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5472589911921673061}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.3643019, w: 0.9312809}
+  m_LocalPosition: {x: -0.21049632, y: 1.9655664, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6349712269408533715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3553819055468707421}
+  m_Layer: 0
+  m_Name: Medusa02Hair02 Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3553819055468707421
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6349712269408533715}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.2992449, w: 0.95417637}
+  m_LocalPosition: {x: -0.37062836, y: 4.6695805, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6556383245747473521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8785284854073731633}
+  m_Layer: 0
+  m_Name: Medusa04Hair03 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8785284854073731633
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6556383245747473521}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.00000065565104, w: 1}
+  m_LocalPosition: {x: 0.617, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1577313963457964241}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6912091937452726283
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 741955032849775467}
+  - component: {fileID: 7418313974946402260}
+  m_Layer: 0
+  m_Name: RightArm Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &741955032849775467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6912091937452726283}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7418313974946402260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6912091937452726283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 4113542042289862529}
+    m_TargetTransform: {fileID: 7704524636417752875}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 1495595460121294768}
+    - {fileID: 2849511683531170731}
+    - {fileID: 4113542042289862529}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: 0.96350384, w: 0.26769462}
+    - {x: 0, y: 0, z: 0.2299398, w: 0.97320485}
+    - {x: -0, y: -0, z: -0.00000004470348, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 1
+--- !u!1 &7003271790035785099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9159897815430435565}
+  - component: {fileID: 5636955485875129831}
+  m_Layer: 0
+  m_Name: Medusa03Hair03 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9159897815430435565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7003271790035785099}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5636955485875129831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7003271790035785099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 420958609155882942}
+    m_TargetTransform: {fileID: 2348391766926210415}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 9212802385789138947}
+    - {fileID: 4644896272586115197}
+    - {fileID: 420958609155882942}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: -0.92544675, w: 0.3788778}
+    - {x: 0, y: 0, z: 0.48768854, w: 0.8730177}
+    - {x: 0, y: 0, z: 0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 1
+--- !u!1 &7230963324515483451
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2342747663408409098}
+  m_Layer: 0
+  m_Name: LeftArm Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2342747663408409098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230963324515483451}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.18410562, w: 0.98290646}
+  m_LocalPosition: {x: 1.1622849, y: 1.4144325, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7615285078039095437
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6008723032546505274}
+  m_Layer: 0
+  m_Name: Medusa01Hair03 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6008723032546505274
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7615285078039095437}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.00000023841855, w: 1}
+  m_LocalPosition: {x: 0.666, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1089369444929777524}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7753357316333072188
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7516321956355920328}
+  m_Layer: 0
+  m_Name: Medusa02Hair02 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7516321956355920328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7753357316333072188}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.0000004768371, w: 1}
+  m_LocalPosition: {x: 0.686, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6497317709918713001}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7861493275068383258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4688640397643518685}
+  - component: {fileID: 413476290124346563}
+  m_Layer: 0
+  m_Name: Medusa01Hair01 Solver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4688640397643518685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7861493275068383258}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2701236455002706264}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &413476290124346563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7861493275068383258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ae93fb156fc6d4c828c64571fc3edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ConstrainRotation: 1
+  m_SolveFromDefaultPose: 1
+  m_Weight: 1
+  m_Chain:
+    m_EffectorTransform: {fileID: 2993966546008009932}
+    m_TargetTransform: {fileID: 5366670064658747334}
+    m_TransformCount: 3
+    m_Transforms:
+    - {fileID: 6497911954714325601}
+    - {fileID: 8313296365568595291}
+    - {fileID: 2993966546008009932}
+    m_DefaultLocalRotations:
+    - {x: 0, y: -0, z: -0.9962673, w: 0.08632175}
+    - {x: 0, y: 0, z: -0.8889042, w: 0.4580932}
+    - {x: -0, y: -0, z: -0, w: 1}
+    m_StoredLocalRotations:
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+    - {x: 0, y: 0, z: 0, w: 0}
+  m_Flip: 0
+--- !u!1 &8001915974516078988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6440751542995822370}
+  m_Layer: 0
+  m_Name: Medusa01Hair02 Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6440751542995822370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8001915974516078988}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.00000020861621, w: 1}
+  m_LocalPosition: {x: 0.805, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1597587453699675}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8184795789646759611
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7704524636417752875}
+  m_Layer: 0
+  m_Name: RightArm Solver_Target
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7704524636417752875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8184795789646759611}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.73412824, w: -0.67901087}
+  m_LocalPosition: {x: -0.6179167, y: 0.9185791, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 873953748820581219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8388566469559755386
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2701236455002706264}
+  m_Layer: 0
+  m_Name: Solvers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2701236455002706264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8388566469559755386}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 741955032849775467}
+  - {fileID: 9053516251204267231}
+  - {fileID: 4094594520903975195}
+  - {fileID: 4688640397643518685}
+  - {fileID: 8854936032570581140}
+  - {fileID: 2216498427618481209}
+  - {fileID: 2474430649066370694}
+  - {fileID: 4917561346335361195}
+  - {fileID: 9159897815430435565}
+  - {fileID: 6923562160954851082}
+  m_Father: {fileID: 5707113368278493993}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8866916730566619742
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4113542042289862529}
+  m_Layer: 0
+  m_Name: RightArm Effector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4113542042289862529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8866916730566619742}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.0000002980232, w: 1}
+  m_LocalPosition: {x: 0.636, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2849511683531170731}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6349067591512396535
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8653719598885068355, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_Name
+      value: Medusa
+      objectReference: {fileID: 0}
+    - target: {fileID: -8542412829087126308, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.3975296
+      objectReference: {fileID: 0}
+    - target: {fileID: -8542412829087126308, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8542412829087126308, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.91758937
+      objectReference: {fileID: 0}
+    - target: {fileID: -7615743433809274258, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.29141638
+      objectReference: {fileID: 0}
+    - target: {fileID: -7615743433809274258, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7615743433809274258, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.9565963
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.083991766
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.509434
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7502043016269663566, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7464267948236825974, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8730177
+      objectReference: {fileID: 0}
+    - target: {fileID: -7464267948236825974, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.48768854
+      objectReference: {fileID: 0}
+    - target: {fileID: -6357365645882971404, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.37887815
+      objectReference: {fileID: 0}
+    - target: {fileID: -6357365645882971404, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6357365645882971404, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.9254466
+      objectReference: {fileID: 0}
+    - target: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.4580932
+      objectReference: {fileID: 0}
+    - target: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.8889042
+      objectReference: {fileID: 0}
+    - target: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -124.867
+      objectReference: {fileID: 0}
+    - target: {fileID: -5467858424293833592, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4804327367869848835, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6324278
+      objectReference: {fileID: 0}
+    - target: {fileID: -4804327367869848835, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4804327367869848835, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.77461934
+      objectReference: {fileID: 0}
+    - target: {fileID: -4480557873870965903, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4257750478517027247, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9817361
+      objectReference: {fileID: 0}
+    - target: {fileID: -4257750478517027247, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.19024767
+      objectReference: {fileID: 0}
+    - target: {fileID: -4144630584716144752, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -2875047350925626196, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.85372066
+      objectReference: {fileID: 0}
+    - target: {fileID: -2875047350925626196, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.52073133
+      objectReference: {fileID: 0}
+    - target: {fileID: -2276496491177046222, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1925005837400982082, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5738659198645533, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.65410984
+      objectReference: {fileID: 0}
+    - target: {fileID: -5738659198645533, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5738659198645533, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.75639963
+      objectReference: {fileID: 0}
+    - target: {fileID: 157998907115724950, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.08632129
+      objectReference: {fileID: 0}
+    - target: {fileID: 157998907115724950, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 157998907115724950, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.9962674
+      objectReference: {fileID: 0}
+    - target: {fileID: 229383580027689910, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1418363138169907112, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.45777184
+      objectReference: {fileID: 0}
+    - target: {fileID: 4572944711726880677, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4864680319834441982, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.11005157
+      objectReference: {fileID: 0}
+    - target: {fileID: 5516264553545630355, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538591295682766151, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.26769438
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538591295682766151, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538591295682766151, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.9635039
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545645060713625715, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7495151249842740160, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.3101791
+      objectReference: {fileID: 0}
+    - target: {fileID: 8454732356700743059, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.77364206
+      objectReference: {fileID: 0}
+    - target: {fileID: 8454732356700743059, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.6336229
+      objectReference: {fileID: 0}
+    - target: {fileID: 9193839784000876892, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.97320485
+      objectReference: {fileID: 0}
+    - target: {fileID: 9193839784000876892, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.2299398
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2701236455002706264}
+    - targetCorrespondingSourceObject: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 873953748820581219}
+    - targetCorrespondingSourceObject: {fileID: 9193839784000876892, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4113542042289862529}
+    - targetCorrespondingSourceObject: {fileID: -4257750478517027247, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8268855054352401795}
+    - targetCorrespondingSourceObject: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2993966546008009932}
+    - targetCorrespondingSourceObject: {fileID: -2875047350925626196, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6440751542995822370}
+    - targetCorrespondingSourceObject: {fileID: 6269675786601414019, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6008723032546505274}
+    - targetCorrespondingSourceObject: {fileID: 159727555317179998, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7516321956355920328}
+    - targetCorrespondingSourceObject: {fileID: -1785545012264361873, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9049094043870591942}
+    - targetCorrespondingSourceObject: {fileID: -7464267948236825974, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 420958609155882942}
+    - targetCorrespondingSourceObject: {fileID: 7495151249842740160, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8356286320602633229}
+    - targetCorrespondingSourceObject: {fileID: 5620446038233348646, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8785284854073731633}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8673277626613597110}
+    - targetCorrespondingSourceObject: {fileID: -8653719598885068355, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5493833740881816083}
+  m_SourcePrefab: {fileID: 4843985084834002234, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+--- !u!4 &1597587453699675 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2875047350925626196, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1089369444929777524 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6269675786601414019, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1495595460121294768 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5538591295682766151, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1577313963457964241 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5620446038233348646, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1990234449506884105 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4864680319834441982, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2086579682428628134 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4257750478517027247, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2849511683531170731 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9193839784000876892, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2880043086823610388 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5738659198645533, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3263232989780031332 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8454732356700743059, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3465602428839725367 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7495151249842740160, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4549782484778857112 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1785545012264361873, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4644896272586115197 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7464267948236825974, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5454811976673441119 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1418363138169907112, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5643884339751176345 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7615743433809274258, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5707113368278493993 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7552582706839291426, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5867956802637741611 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8542412829087126308, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6497317709918713001 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 159727555317179998, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6497911954714325601 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 157998907115724950, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6916302566000440138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8653719598885068355, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8673277626613597110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6916302566000440138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 097b551f2844b054290f18a39bf892e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Solvers:
+  - {fileID: 7418313974946402260}
+  - {fileID: 5916748051913300967}
+  - {fileID: 5763443330314984682}
+  - {fileID: 413476290124346563}
+  - {fileID: 873954476950464650}
+  - {fileID: 2995379885756329401}
+  - {fileID: 850635466216834735}
+  - {fileID: 3232359254790799908}
+  - {fileID: 5636955485875129831}
+  - {fileID: 6515028896820564202}
+  m_Weight: 1
+  m_SolverEditorData:
+  - color: {r: 0, g: 1, b: 0, a: 1}
+    showGizmo: 1
+  - color: {r: 0, g: 1, b: 0, a: 1}
+    showGizmo: 1
+  - color: {r: 0, g: 1, b: 0, a: 1}
+    showGizmo: 1
+  - color: {r: 0, g: 1, b: 0, a: 1}
+    showGizmo: 1
+  - color: {r: 0, g: 1, b: 0, a: 1}
+    showGizmo: 1
+  - color: {r: 0.92993355, g: 0, b: 1, a: 1}
+    showGizmo: 1
+  - color: {r: 0.9294118, g: 0, b: 1, a: 1}
+    showGizmo: 1
+  - color: {r: 0.37647063, g: 0.3372549, b: 0.39607847, a: 1}
+    showGizmo: 1
+  - color: {r: 0.37647063, g: 0.3372549, b: 0.39607847, a: 1}
+    showGizmo: 1
+  - color: {r: 0, g: 0.9696946, b: 1, a: 1}
+    showGizmo: 1
+--- !u!95 &5493833740881816083
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6916302566000440138}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5bcfd6610e3044f47bf237eea7aa5a49, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!4 &7300320579681562634 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4804327367869848835, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8313296365568595291 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6106131596056098900, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9212802385789138947 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6357365645882971404, guid: f91540af0f2bc8243897dc8fd9af73f6, type: 3}
+  m_PrefabInstance: {fileID: 6349067591512396535}
+  m_PrefabAsset: {fileID: 0}
