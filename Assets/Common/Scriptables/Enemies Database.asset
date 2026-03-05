@@ -31,7 +31,7 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 8
-    prefab: {fileID: 1090571174421192766, guid: 5dc89d49c6842b5409db52d345501d70,
+    prefab: {fileID: 7312454820599628704, guid: 9adda753ba590d846b6f6efd74695997,
       type: 3}
     icon: {fileID: 21300000, guid: 148058df3a6abb446b4e99942a200b65, type: 3}
     enemyDrop:
@@ -48,7 +48,7 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 0
-    prefab: {fileID: 1090571174421192766, guid: fbbda8dafe08b654f8e239cc4a20dad6,
+    prefab: {fileID: 2101069063660473889, guid: e771c1bbcfe1fb5438f4c22a1769d516,
       type: 3}
     icon: {fileID: 21300000, guid: 128a46be89fd93a42bc096292ec61c82, type: 3}
     enemyDrop:
@@ -69,7 +69,7 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 2
-    prefab: {fileID: 1090571174421192766, guid: 616763e865365904f81474b24c7dbd5a,
+    prefab: {fileID: 4861051946091847068, guid: ba402741996370b42a141d95a8462a13,
       type: 3}
     icon: {fileID: 21300000, guid: 3086c2163f612aa4eab4a1cc537a2874, type: 3}
     enemyDrop:
@@ -90,7 +90,7 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 4
-    prefab: {fileID: 1090571174421192766, guid: 448a3acc725a9854388bb61e498acffd,
+    prefab: {fileID: 7173357488011135237, guid: 43390b2a455ac14409bf0c958f3682a9,
       type: 3}
     icon: {fileID: 21300000, guid: c1add2dcde28f2a4a9eb8db6532bc6af, type: 3}
     enemyDrop:

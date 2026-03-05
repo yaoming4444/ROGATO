@@ -569,11 +569,16 @@ MonoBehaviour:
   moveSpeed: 2
   smoothTime: 0.12
   visualRoot: {fileID: 1084302725158477326}
-  flipByMovement: 1
+  faceEnemyWhenPossible: 1
+  flipByMovementFallback: 1
   flipDeadZone: 0.01
+  targetReacquireInterval: 0.25
+  switchDistanceBias: 0.75
   skeletonAnimation: {fileID: 1983819935290200800}
   idleAnim: Idle2
   runAnim: Run
+  runEnterSpeed: 0.05
+  runExitSpeed: 0.02
   firePoint: {fileID: 4080395762280880070}
   weaponRoot: {fileID: 8719340316717446634}
   projectilePrefab: {fileID: 330944705125390381, guid: 0c31b4594f203c5408278ee618129a83,
@@ -582,7 +587,8 @@ MonoBehaviour:
   projectileLifeTime: 1.25
   projectileSize: 1
   damageMultiplier: 1
-  maxAimAngle: 90
+  weaponAngleOffset: 0
+  enableFlipAimFix: 1
   shootCooldown: 0.6
   maxTargetDistance: 999
   playWandSfx: 1
@@ -695,7 +701,7 @@ SortingGroup:
   m_Enabled: 1
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 102
+  m_SortingOrder: -20
   m_SortAtRoot: 0
 --- !u!114 &5111038132588474726
 MonoBehaviour:

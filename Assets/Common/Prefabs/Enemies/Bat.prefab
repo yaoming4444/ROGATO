@@ -181,17 +181,17 @@ PrefabInstance:
     - target: {fileID: 4461198946777914130, guid: 979e15099ee95714aa341e908222721a,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 4461198946777914130, guid: 979e15099ee95714aa341e908222721a,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 4461198946777914130, guid: 979e15099ee95714aa341e908222721a,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.2
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 4461198946777914130, guid: 979e15099ee95714aa341e908222721a,
         type: 3}
@@ -403,6 +403,7 @@ MonoBehaviour:
   shadowSprite: {fileID: 5296041450643711476}
   enemyCollider: {fileID: 4117005830534613951}
   visualRoot: {fileID: 9145618159829350784}
+  dissolveRenderers: []
   hitScaleAmount: 0.2
   hitColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!58 &4117005830534613951
