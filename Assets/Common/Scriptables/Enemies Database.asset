@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - type: 1
-    prefab: {fileID: 1090571174421192766, guid: bdb159c5340f537448bf478665384e2d,
+    prefab: {fileID: 6967692258094678616, guid: 625641f1c62367c4db4ec3a3f1de34ec,
       type: 3}
     icon: {fileID: 21300000, guid: c7314c840a31eb342ae17551898d7fe1, type: 3}
     enemyDrop:
