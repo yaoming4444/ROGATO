@@ -95,9 +95,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -459125345
+      objectReference: {fileID: 0}
+    - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 673e62a7dea6eb041a1154f729145325, type: 2}
+    - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -459125345
+      objectReference: {fileID: 0}
     - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -268,6 +288,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6916547691420267358, guid: bd21be6fc4cedd44e93cefd12da1c8ed,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6916547691420267358, guid: bd21be6fc4cedd44e93cefd12da1c8ed,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -459125345
       objectReference: {fileID: 0}
     - target: {fileID: 8567192082132290159, guid: bd21be6fc4cedd44e93cefd12da1c8ed,
         type: 3}
