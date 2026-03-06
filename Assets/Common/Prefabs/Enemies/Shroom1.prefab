@@ -189,8 +189,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -459125345
-  m_SortingLayer: 1
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: 1
   m_Sprite: {fileID: -1558163703987641698, guid: 1c958830b083cbb429d2df229d45dd5d,
     type: 3}
@@ -447,8 +447,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -459125345
-  m_SortingLayer: 1
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -5205212472833182561, guid: 1c958830b083cbb429d2df229d45dd5d,
     type: 3}
@@ -850,6 +850,37 @@ MonoBehaviour:
     m_Extent: {x: 0.42000008, y: 0.25500005, z: 0}
   m_AlwaysUpdate: 1
   m_AutoRebind: 0
+--- !u!1 &3429453881503488853
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7391191146292374543}
+  m_Layer: 7
+  m_Name: SortingAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7391191146292374543
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3429453881503488853}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7758900459800325443}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3733011207588391806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1252,8 +1283,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -459125345
-  m_SortingLayer: 1
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: 2
   m_Sprite: {fileID: -1794460919392912393, guid: 1c958830b083cbb429d2df229d45dd5d,
     type: 3}
@@ -1300,6 +1331,7 @@ GameObject:
   - component: {fileID: 75146096031673274}
   - component: {fileID: 4361598846567462833}
   - component: {fileID: 39299645934509896}
+  - component: {fileID: 397117203242071218}
   m_Layer: 7
   m_Name: Shroom1
   m_TagString: Untagged
@@ -1326,6 +1358,7 @@ Transform:
   - {fileID: 5729059298781781795}
   - {fileID: 7390430573099262631}
   - {fileID: 3531888041133149418}
+  - {fileID: 7391191146292374543}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2860415471330122210
@@ -1439,6 +1472,36 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: -0.06645036, y: 1}
   m_Radius: 0.89335155
+--- !u!114 &397117203242071218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7312454820599628704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc3dd78d36c144747b356830028d8627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultipartEnemySorter
+  sortingAnchor: {fileID: 7391191146292374543}
+  sortingLayerName: Actors
+  baseOffset: 0
+  precision: 100
+  updateEveryFrame: 1
+  parts:
+  - name: Shroom01_Cap01
+    renderer: {fileID: 515056666252254684}
+    orderOffset: 2
+  - name: Shroom_Eyes01
+    renderer: {fileID: 4187110980155612149}
+    orderOffset: 1
+  - name: Shroom01_Body
+    renderer: {fileID: 1643056011672348871}
+    orderOffset: 0
+  - name: Shroom01_Cap02
+    renderer: {fileID: 4086099679343577513}
+    orderOffset: -1
 --- !u!1 &7773958523034627368
 GameObject:
   m_ObjectHideFlags: 0
@@ -1659,8 +1722,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -459125345
-  m_SortingLayer: 1
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: -1
   m_Sprite: {fileID: -5425631149442471451, guid: 1c958830b083cbb429d2df229d45dd5d,
     type: 3}

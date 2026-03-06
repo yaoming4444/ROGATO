@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &925964795396387816
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4600347498975352210}
+  m_Layer: 7
+  m_Name: SortingAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4600347498975352210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925964795396387816}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7131685470823307561}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6510880977850592479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96,7 +127,7 @@ PrefabInstance:
     - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
       propertyPath: m_SortingLayer
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
@@ -106,7 +137,7 @@ PrefabInstance:
     - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
       propertyPath: m_SortingLayerID
-      value: -459125345
+      value: -551940833
       objectReference: {fileID: 0}
     - target: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
@@ -116,7 +147,7 @@ PrefabInstance:
     - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
       propertyPath: m_SortingLayer
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
@@ -126,7 +157,7 @@ PrefabInstance:
     - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
       propertyPath: m_SortingLayerID
-      value: -459125345
+      value: -551940833
       objectReference: {fileID: 0}
     - target: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
@@ -150,6 +181,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 805806930357027842}
+    - targetCorrespondingSourceObject: {fileID: 4081279299865097718, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4600347498975352210}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1814571583032226115, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
         type: 3}
@@ -163,10 +198,20 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1189212383825349518}
+    - targetCorrespondingSourceObject: {fileID: 1814571583032226115, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1028972568188902385}
   m_SourcePrefab: {fileID: 100100000, guid: 57915e8b615a1d145bfa39a3d31fcd1c, type: 3}
 --- !u!212 &427054997862615432 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 6896840079252776279, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
+    type: 3}
+  m_PrefabInstance: {fileID: 6510880977850592479}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &2204537676302252167 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4954905818418123864, guid: 57915e8b615a1d145bfa39a3d31fcd1c,
     type: 3}
   m_PrefabInstance: {fileID: 6510880977850592479}
   m_PrefabAsset: {fileID: 0}
@@ -265,6 +310,30 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.12105197, y: 1}
   m_Radius: 1.0144049
+--- !u!114 &1028972568188902385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4861051946091847068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc3dd78d36c144747b356830028d8627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MultipartEnemySorter
+  sortingAnchor: {fileID: 4600347498975352210}
+  sortingLayerName: Actors
+  baseOffset: 0
+  precision: 100
+  updateEveryFrame: 1
+  parts:
+  - name: Slime_Eyes
+    renderer: {fileID: 2204537676302252167}
+    orderOffset: 1
+  - name: Slime01
+    renderer: {fileID: 427054997862615432}
+    orderOffset: 0
 --- !u!4 &7131685470823307561 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4081279299865097718, guid: 57915e8b615a1d145bfa39a3d31fcd1c,

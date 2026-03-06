@@ -47,5 +47,8 @@ TagManager:
   - name: Characters
     uniqueID: 3460967717
     locked: 0
+  - name: Actors
+    uniqueID: 3743026463
+    locked: 0
   m_RenderingLayers:
   - Default

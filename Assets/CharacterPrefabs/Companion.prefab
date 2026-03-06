@@ -701,8 +701,8 @@ SortingGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3564766641511995288}
   m_Enabled: 1
-  m_SortingLayerID: -833999579
-  m_SortingLayer: 2
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: -20
   m_SortAtRoot: 0
 --- !u!114 &5111038132588474726
@@ -738,9 +738,7 @@ MonoBehaviour:
   removeArms: 1
   armSlots:
   - arm_l
-  - arm_r
   - top_arm_l
-  - top_arm_r
   - gloves_l
   - gloves_r
 --- !u!114 &8072023388813569165
@@ -756,8 +754,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SortingGroupYSorter
   sortingGroup: {fileID: 1194193530152128223}
-  sortingAnchor: {fileID: 1084302725158477326}
-  baseOffset: 0
+  sortingAnchor: {fileID: 8460410268620256188}
+  baseOffset: 5
   precision: 100
   updateEveryFrame: 1
 --- !u!1 &5465935550877833026

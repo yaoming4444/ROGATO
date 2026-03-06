@@ -14,7 +14,7 @@ public class MultipartEnemySorter : MonoBehaviour
 
     [Header("Sorting")]
     [SerializeField] private Transform sortingAnchor;
-    [SerializeField] private string sortingLayerName = "Enemies";
+    [SerializeField] private string sortingLayerName = "Actors";
     [SerializeField] private int baseOffset = 0;
     [SerializeField] private float precision = 100f;
     [SerializeField] private bool updateEveryFrame = true;

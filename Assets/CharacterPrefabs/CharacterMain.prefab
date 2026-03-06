@@ -689,8 +689,8 @@ SortingGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3564766641511995288}
   m_Enabled: 1
-  m_SortingLayerID: -833999579
-  m_SortingLayer: 2
+  m_SortingLayerID: -551940833
+  m_SortingLayer: 3
   m_SortingOrder: 102
   m_SortAtRoot: 0
 --- !u!114 &8551481805000714828
@@ -752,7 +752,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SortingGroupYSorter
   sortingGroup: {fileID: 1194193530152128223}
-  sortingAnchor: {fileID: 1084302725158477326}
-  baseOffset: 0
+  sortingAnchor: {fileID: 2404882284152308401}
+  baseOffset: 10
   precision: 100
   updateEveryFrame: 1
