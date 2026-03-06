@@ -31,4 +31,4 @@ MonoBehaviour:
   levels:
   - projectileCount: 10
     abilityCooldown: 5
-    damage: 25
+    damage: 2.5

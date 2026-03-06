@@ -33,5 +33,5 @@ MonoBehaviour:
     abilityCooldown: 5
     projectileTravelDistance: 4
     angularSpeed: -300
-    damage: 30
+    damage: 3
     projectileSize: 1.2

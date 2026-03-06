@@ -30,6 +30,6 @@ MonoBehaviour:
     shouldRemoveAfterEvolution: 0
   levels:
   - projectileSpeed: 12
-    damage: 30
+    damage: 3
     projectileSize: 0.75
     projectilesCount: 5

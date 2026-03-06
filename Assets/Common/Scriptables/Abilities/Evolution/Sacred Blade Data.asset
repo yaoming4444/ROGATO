@@ -31,7 +31,7 @@ MonoBehaviour:
   levels:
   - abilityCooldown: 2
     slashesCount: 5
-    damage: 30
+    damage: 3
     waveDamage: 5
     slashSize: 1.4
     timeBetweenSlashes: 0.2

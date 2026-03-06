@@ -31,5 +31,5 @@ MonoBehaviour:
   levels:
   - fieldRadius: 1.75
     slowDownMultiplier: 0.5
-    damage: 15
+    damage: 1.5
     damageCooldown: 1

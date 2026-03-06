@@ -29,7 +29,7 @@ MonoBehaviour:
     requiredAbilityLevel: 0
     shouldRemoveAfterEvolution: 0
   levels:
-  - damage: 50
+  - damage: 5
     ballDamage: 10
     lightningsCount: 6
     ballLightningCount: 6

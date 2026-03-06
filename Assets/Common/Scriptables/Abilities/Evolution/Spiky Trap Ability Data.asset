@@ -34,8 +34,8 @@ MonoBehaviour:
     abilityCooldown: 6
     mineSpawnRadius: 3
     mineLifetime: 10
-    damage: 50
-    spikeDamage: 10
+    damage: 5
+    spikeDamage: 1
     mineSize: 2
     mineTriggerRadius: 0.6
     mineDamageRadius: 2
