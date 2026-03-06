@@ -42,7 +42,7 @@ namespace OctoberStudio
         [SerializeField, Range(0f, 0.6f)] protected float initialDodgeMultiplier = 0.2f;
 
         [Header("References")]
-        [SerializeField] protected HealthbarBehavior healthbar;
+        [SerializeField] protected PlayerHealthbarUI healthbar;
         [SerializeField] protected Transform centerPoint;
         [SerializeField] protected PlayerEnemyCollisionHelper collisionHelper;
 
@@ -151,10 +151,11 @@ namespace OctoberStudio
             // 2) Find binder on spawned prefab (optional)
             _binder = go.GetComponentInChildren<GameCore.Visual.PartsManagerStateBinder>(true);
 
-            // 3) Init HP UI (первичная инициализация)
+            // 3) Init HP UI
             healthbar.Init(baseHP);
-            healthbar.SetAutoHideWhenMax(true);
-            healthbar.SetAutoShowOnChanged(true);
+            healthbar.SetAutoHideWhenMax(false);
+            healthbar.SetAutoShowOnChanged(false);
+            healthbar.ForceShow();
 
             // 4) Первый пулл бонусов (если сервис уже есть)
             PullEquipmentBonusesOnly();
