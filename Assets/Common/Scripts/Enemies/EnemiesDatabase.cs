@@ -84,5 +84,11 @@ namespace OctoberStudio
         ShadeJellyfish = 16,
         ShadeBat = 17,
         ShadeVampire = 18,
+
+        Bat1 = 19,
+        Slime1 = 20,
+        SlimeSmall1 = 21,
+        Boar1 = 22,
+        Wolf1 = 23
     }
 }

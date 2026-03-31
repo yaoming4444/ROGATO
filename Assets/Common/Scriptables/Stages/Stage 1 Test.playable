@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3c1218c80952a14489e47b5be94c184, type: 3}
-  m_Name: Track (Bat)
+  m_Name: Track (Bat1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -754,7 +754,7 @@ MonoBehaviour:
     m_DisplayName: Maintain
   m_Markers:
     m_Objects: []
-  enemyType: 1
+  enemyType: 19
 --- !u!114 &-7860424880642223810
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -885,7 +885,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3c1218c80952a14489e47b5be94c184, type: 3}
-  m_Name: Track (Pumpkin)
+  m_Name: Track (Boar1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -1096,7 +1096,7 @@ MonoBehaviour:
     m_DisplayName: Maintain
   m_Markers:
     m_Objects: []
-  enemyType: 0
+  enemyType: 22
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1609,7 +1609,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3c1218c80952a14489e47b5be94c184, type: 3}
-  m_Name: Track (Plant)
+  m_Name: Track (Wolf1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -1949,7 +1949,7 @@ MonoBehaviour:
     m_DisplayName: Continuous
   m_Markers:
     m_Objects: []
-  enemyType: 4
+  enemyType: 23
 --- !u!114 &7619391673525448512
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1974,7 +1974,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3c1218c80952a14489e47b5be94c184, type: 3}
-  m_Name: Track (Slime)
+  m_Name: Track (Slime1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -2056,7 +2056,7 @@ MonoBehaviour:
     m_DisplayName: Continuous
   m_Markers:
     m_Objects: []
-  enemyType: 2
+  enemyType: 20
 --- !u!114 &7970935936969224680
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2141,7 +2141,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3c1218c80952a14489e47b5be94c184, type: 3}
-  m_Name: Track (Bug)
+  m_Name: Track (SlimeSmall1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -2472,7 +2472,7 @@ MonoBehaviour:
     m_DisplayName: Continuous
   m_Markers:
     m_Objects: []
-  enemyType: 8
+  enemyType: 21
 --- !u!114 &8988185293216246588
 MonoBehaviour:
   m_ObjectHideFlags: 1

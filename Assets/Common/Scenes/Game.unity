@@ -18800,7 +18800,7 @@ MonoBehaviour:
   database: {fileID: 11400000, guid: d2602d31e8c0b1b4797a4095529207e6, type: 2}
   bossfightDatabase: {fileID: 11400000, guid: af0db12f0f2b0e34992aebce178468a7, type: 2}
   enemiesDiedLabel: {fileID: 4251854428697888384}
-  enemiesCap: 100
+  enemiesCap: 500
   enemySpawnPadding: 0.6
   spawnPreviewPrefab: {fileID: 322296415806433090, guid: 50ceae3354b8f4843a1ce492360092ed,
     type: 3}
