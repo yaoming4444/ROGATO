@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - type: 1
-    prefab: {fileID: 6967692258094678616, guid: 625641f1c62367c4db4ec3a3f1de34ec,
+    prefab: {fileID: 1090571174421192766, guid: 4b376f4aae83e7e40b83e3168d150f4c,
       type: 3}
-    icon: {fileID: 21300000, guid: c7314c840a31eb342ae17551898d7fe1, type: 3}
+    icon: {fileID: 21300000, guid: 63510ea80f61d7848adc727feea78814, type: 3}
     enemyDrop:
     - dropType: 0
       chance: 80
@@ -31,9 +31,9 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 8
-    prefab: {fileID: 7312454820599628704, guid: 9adda753ba590d846b6f6efd74695997,
+    prefab: {fileID: 1090571174421192766, guid: 0a941e84509cb4440a7db781cf79f10d,
       type: 3}
-    icon: {fileID: 21300000, guid: 148058df3a6abb446b4e99942a200b65, type: 3}
+    icon: {fileID: 21300000, guid: 1679170bd56334e4cb7aa04741fd344a, type: 3}
     enemyDrop:
     - dropType: 0
       chance: 60
@@ -48,9 +48,9 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 0
-    prefab: {fileID: 2101069063660473889, guid: e771c1bbcfe1fb5438f4c22a1769d516,
+    prefab: {fileID: 1090571174421192766, guid: 01136e58ce67f48439043fcba827ba67,
       type: 3}
-    icon: {fileID: 21300000, guid: 128a46be89fd93a42bc096292ec61c82, type: 3}
+    icon: {fileID: 21300000, guid: 4b412ddff3de5c14abb22caf205bc758, type: 3}
     enemyDrop:
     - dropType: 0
       chance: 90
@@ -69,9 +69,9 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 2
-    prefab: {fileID: 4861051946091847068, guid: ba402741996370b42a141d95a8462a13,
+    prefab: {fileID: 1090571174421192766, guid: 31020862bb0ed0b48bb4f7141cf57243,
       type: 3}
-    icon: {fileID: 21300000, guid: 3086c2163f612aa4eab4a1cc537a2874, type: 3}
+    icon: {fileID: 21300000, guid: 725d69cb68ca6364293b380a18f2dad7, type: 3}
     enemyDrop:
     - dropType: 0
       chance: 90
@@ -90,9 +90,9 @@ MonoBehaviour:
     - dropType: 100
       chance: 0
   - type: 4
-    prefab: {fileID: 7173357488011135237, guid: 43390b2a455ac14409bf0c958f3682a9,
+    prefab: {fileID: 1090571174421192766, guid: 85b54352f7e16294fa752b32983bc377,
       type: 3}
-    icon: {fileID: 21300000, guid: c1add2dcde28f2a4a9eb8db6532bc6af, type: 3}
+    icon: {fileID: 21300000, guid: 611b1b0f2aed0f84fbf92af295f16671, type: 3}
     enemyDrop:
     - dropType: 0
       chance: 50

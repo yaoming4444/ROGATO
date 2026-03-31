@@ -34,21 +34,10 @@ namespace OctoberStudio
 
         [Header("References")]
         [SerializeField] Rigidbody2D rb;
-
-        // Один "главный" рендер (isVisible, fade-in, etc.)
         [SerializeField] SpriteRenderer spriteRenderer;
-
         [SerializeField] DissolveSettings dissolveSettings;
         [SerializeField] SpriteRenderer shadowSprite;
         [SerializeField] Collider2D enemyCollider;
-
-        [Header("Visual Root")]
-        [Tooltip("Flip/scale THIS object. Put all visuals under it. Root physics object can stay scale=1.")]
-        [SerializeField] Transform visualRoot;
-
-        [Header("Dissolve Renderers")]
-        [Tooltip("All SpriteRenderers that should dissolve (body, wings, eyes, etc). If empty, auto-fills from children.")]
-        [SerializeField] SpriteRenderer[] dissolveRenderers;
 
         public Vector2 Center => enemyCollider.bounds.center;
 
@@ -59,7 +48,7 @@ namespace OctoberStudio
         public EnemyData Data { get; private set; }
         public WaveOverride WaveOverride { get; protected set; }
 
-        public bool IsVisible => spriteRenderer != null && spriteRenderer.isVisible;
+        public bool IsVisible => spriteRenderer.isVisible;
         public bool IsAlive => HP > 0;
         public bool IsInvulnerable { get; protected set; }
 
@@ -69,6 +58,7 @@ namespace OctoberStudio
         public bool ShouldSpawnChestOnDeath { get; set; }
 
         IEasingCoroutine fallBackCoroutine;
+
         private Dictionary<EffectType, List<Effect>> appliedEffects = new Dictionary<EffectType, List<Effect>>();
 
         protected bool IsMoving { get; set; }
@@ -77,12 +67,15 @@ namespace OctoberStudio
 
         public float LastTimeDamagedPlayer { get; set; }
 
+        private Material sharedMaterial;
+        private Material effectsMaterial;
+
         private float shadowAlpha;
 
         public event UnityAction<EnemyBehavior> onEnemyDied;
         public event UnityAction<float, float> onHealthChanged;
 
-        private float lastTimeSwitchedDirection = 0;
+        private float lastTimeSwitchedDirection = 0f;
 
         IEasingCoroutine damageCoroutine;
         protected IEasingCoroutine scaleCoroutine;
@@ -94,42 +87,23 @@ namespace OctoberStudio
         private static int lastFrameHitSound;
         private float lastTimeHitSound;
 
-        // base scale for hit-scale & flip
-        private Vector3 _visualBaseScale;
-
-        // flip state
-        private bool _facingRight = true;
-
-        // Per-renderer materials (so we can animate all parts)
-        private Material[] sharedMaterials;
-        private Material[] effectsMaterials;
-
         protected virtual void Awake()
         {
-            if (visualRoot == null) visualRoot = transform;
-            _visualBaseScale = visualRoot.localScale;
+            sharedMaterial = spriteRenderer.sharedMaterial;
+            effectsMaterial = Instantiate(sharedMaterial);
 
-            if (dissolveRenderers == null || dissolveRenderers.Length == 0)
-                dissolveRenderers = GetComponentsInChildren<SpriteRenderer>(true);
-
-            sharedMaterials = new Material[dissolveRenderers.Length];
-            effectsMaterials = new Material[dissolveRenderers.Length];
-
-            for (int i = 0; i < dissolveRenderers.Length; i++)
-            {
-                var sr = dissolveRenderers[i];
-                if (sr == null) continue;
-
-                sharedMaterials[i] = sr.sharedMaterial;
-                effectsMaterials[i] = Instantiate(sharedMaterials[i]);
-            }
-
-            if (shadowSprite != null)
-                shadowAlpha = shadowSprite.color.a;
+            shadowAlpha = shadowSprite.color.a;
         }
 
-        public void SetData(EnemyData data) => Data = data;
-        public void SetWaveOverride(WaveOverride waveOverride) => WaveOverride = waveOverride;
+        public void SetData(EnemyData data)
+        {
+            Data = data;
+        }
+
+        public void SetWaveOverride(WaveOverride waveOverride)
+        {
+            WaveOverride = waveOverride;
+        }
 
         public virtual void Play()
         {
@@ -145,30 +119,14 @@ namespace OctoberStudio
             HP = MaxHP;
             IsMoving = true;
 
-            if (shadowSprite != null)
-                shadowSprite.SetAlpha(shadowAlpha);
+            shadowSprite.SetAlpha(shadowAlpha);
 
             enemyCollider.enabled = true;
 
-            // Reset visuals (pool-safe)
-            visualRoot.localScale = _visualBaseScale;
-
-            // Reset flip to default (facing right)
-            _facingRight = true;
-            SetFacing(true);
-
-            // Restore materials (pool-safe)
-            RestoreSharedMaterials();
-
             if (shouldFadeIn)
             {
-                SetAlphaAll(0f);
-
-                if (spriteRenderer != null)
-                    fadeInCoroutine = spriteRenderer.DoAlpha(1, 0.2f);
-
-                // остальные сразу в 1 (чтобы не моргали)
-                SetAlphaAll(1f, exceptMain: true);
+                spriteRenderer.SetAlpha(0);
+                fadeInCoroutine = spriteRenderer.DoAlpha(1, 0.2f);
             }
         }
 
@@ -176,50 +134,38 @@ namespace OctoberStudio
         {
             if (!IsAlive || !IsMoving || PlayerBehavior.Player == null) return;
 
-            Vector3 target = IsMovingToCustomPoint ? (Vector3)CustomPoint : PlayerBehavior.Player.transform.position;
+            Vector3 target = IsMovingToCustomPoint ? CustomPoint : PlayerBehavior.Player.transform.position;
             Vector3 direction = (target - transform.position).normalized;
 
-            float finalSpeed = Speed;
+            float speed = Speed;
 
             if (appliedEffects.TryGetValue(EffectType.Speed, out var speedEffects))
             {
                 for (int i = 0; i < speedEffects.Count; i++)
-                    finalSpeed *= speedEffects[i].Modifier;
+                {
+                    Effect effect = speedEffects[i];
+                    speed *= effect.Modifier;
+                }
             }
 
-            transform.position += direction * Time.deltaTime * finalSpeed;
+            transform.position += direction * Time.deltaTime * speed;
 
-            // Flip parent (visualRoot) by sign of scale.x
+            // Enemy looks in the direction it's moving
             if (!scaleCoroutine.ExistsAndActive())
             {
-                if (Mathf.Abs(direction.x) > 0.001f)
-                {
-                    bool shouldFaceRight = direction.x > 0f;
+                var scale = transform.localScale;
 
-                    if (shouldFaceRight != _facingRight && Time.unscaledTime - lastTimeSwitchedDirection > 0.1f)
+                if ((direction.x > 0 && scale.x < 0) || (direction.x < 0 && scale.x > 0))
+                {
+                    if (Time.unscaledTime - lastTimeSwitchedDirection > 0.1f)
                     {
-                        _facingRight = shouldFaceRight;
-                        SetFacing(_facingRight);
+                        scale.x *= -1;
+                        transform.localScale = scale;
+
                         lastTimeSwitchedDirection = Time.unscaledTime;
                     }
                 }
             }
-        }
-
-        private void SetFacing(bool faceRight)
-        {
-            if (visualRoot == null) return;
-
-            var s = visualRoot.localScale;
-
-            float absX = Mathf.Abs(_visualBaseScale.x);
-            float sign = faceRight ? 1f : -1f;
-
-            s.x = absX * sign;
-            s.y = _visualBaseScale.y;
-            s.z = _visualBaseScale.z;
-
-            visualRoot.localScale = s;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -228,38 +174,40 @@ namespace OctoberStudio
 
             if (projectile != null)
             {
-                float baseDamage = PlayerBehavior.Player.Damage * projectile.DamageMultiplier;
-
-                bool isCrit = Random.value < PlayerBehavior.Player.CritChance;
-                float finalDamage = isCrit
-                    ? baseDamage * PlayerBehavior.Player.CritDamage
-                    : baseDamage;
-
-                TakeDamage(finalDamage, isCrit);
+                TakeDamage(PlayerBehavior.Player.Damage * projectile.DamageMultiplier);
 
                 if (HP > 0)
                 {
                     if (projectile.KickBack && canBeKickedBack)
+                    {
                         KickBack(PlayerBehavior.CenterPosition);
+                    }
 
                     if (projectile.Effects != null && projectile.Effects.Count > 0)
+                    {
                         AddEffects(projectile.Effects);
+                    }
                 }
             }
         }
 
         public float GetDamage()
         {
-            var dmg = this.damage;
-            if (WaveOverride != null) dmg = WaveOverride.ApplyDamageOverride(dmg);
+            var damage = this.damage;
+            if (WaveOverride != null)
+                damage = WaveOverride.ApplyDamageOverride(damage);
 
-            var baseDamage = StageController.Stage.EnemyDamage * dmg;
+            var baseDamage = StageController.Stage.EnemyDamage * damage;
 
             if (appliedEffects.ContainsKey(EffectType.Damage))
             {
                 var damageEffects = appliedEffects[EffectType.Damage];
+
                 for (int i = 0; i < damageEffects.Count; i++)
-                    baseDamage *= damageEffects[i].Modifier;
+                {
+                    var effect = damageEffects[i];
+                    baseDamage *= effect.Modifier;
+                }
             }
 
             return baseDamage;
@@ -267,7 +215,9 @@ namespace OctoberStudio
 
         public List<EnemyDropData> GetDropData()
         {
-            if (WaveOverride != null) return WaveOverride.ApplyDropOverride(Data.EnemyDrop);
+            if (WaveOverride != null)
+                return WaveOverride.ApplyDropOverride(Data.EnemyDrop);
+
             return Data.EnemyDrop;
         }
 
@@ -279,6 +229,7 @@ namespace OctoberStudio
             if (IsInvulnerable) return;
 
             HP -= damage;
+
             onHealthChanged?.Invoke(HP, MaxHP);
 
             // Damage text
@@ -311,10 +262,29 @@ namespace OctoberStudio
                 }
             }
 
-            // Hit sound
+            // Showing Damage Text
+            damageTextValue += damage;
+            if (Time.unscaledTime - lastTimeDamageText > 0.2f && damageTextValue >= 1)
+            {
+                var damageText = Mathf.RoundToInt(damageTextValue).ToString();
+                StageController.WorldSpaceTextManager.SpawnText(
+                    transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.value * 0.1f),
+                    damageText
+                );
+
+                damageTextValue = 0;
+                lastTimeDamageText = Time.unscaledTime;
+            }
+            else
+            {
+                damageTextValue += damage;
+            }
+
+            // Playing Damage Sound
             if (Time.frameCount != lastFrameHitSound && Time.unscaledTime - lastTimeHitSound > 0.2f)
             {
                 GameController.AudioManager.PlaySound(HIT_HASH);
+
                 lastFrameHitSound = Time.frameCount;
                 lastTimeHitSound = Time.unscaledTime;
             }
@@ -325,79 +295,52 @@ namespace OctoberStudio
             }
             else
             {
-                // Flash on hit (all parts)
+                // Flashing Color on hit
                 if (!damageCoroutine.ExistsAndActive())
-                    FlashHitAll(true);
-
-                // Hit scale (preserve facing sign)
-                if (!scaleCoroutine.ExistsAndActive() && visualRoot != null)
                 {
-                    var baseScale = _visualBaseScale;
-                    baseScale.x = Mathf.Sign(visualRoot.localScale.x) * Mathf.Abs(baseScale.x);
+                    FlashHit(true);
+                }
 
-                    var hitScale = new Vector3(
-                        baseScale.x * (1f - hitScaleAmount),
-                        baseScale.y * (1f + hitScaleAmount),
-                        baseScale.z
+                // Scaling on Hit
+                if (!scaleCoroutine.ExistsAndActive())
+                {
+                    Vector3 currentScale = transform.localScale;
+
+                    Vector3 hitScale = new Vector3(
+                        currentScale.x * (1f - hitScaleAmount),
+                        currentScale.y * (1f + hitScaleAmount),
+                        currentScale.z
                     );
 
-                    scaleCoroutine = visualRoot.DoLocalScale(hitScale, 0.07f)
+                    scaleCoroutine = transform
+                        .DoLocalScale(hitScale, 0.07f)
                         .SetEasing(EasingType.SineOut)
                         .SetOnFinish(() =>
                         {
-                            scaleCoroutine = visualRoot.DoLocalScale(baseScale, 0.07f)
+                            scaleCoroutine = transform
+                                .DoLocalScale(currentScale, 0.07f)
                                 .SetEasing(EasingType.SineInOut);
                         });
                 }
             }
         }
 
-        private void FlashHitAll(bool resetMaterialsAfter, UnityAction onFinish = null)
+        private void FlashHit(bool resetMaterial, UnityAction onFinish = null)
         {
-            AssignEffectsMaterials();
+            spriteRenderer.material = effectsMaterial;
 
             var transparentColor = hitColor;
             transparentColor.a = 0;
 
-            for (int i = 0; i < effectsMaterials.Length; i++)
-            {
-                var mat = effectsMaterials[i];
-                if (mat == null) continue;
-                mat.SetColor(_Overlay, transparentColor);
-            }
+            effectsMaterial.SetColor(_Overlay, transparentColor);
 
-            // driver = first valid material
-            Material driver = null;
-            for (int i = 0; i < effectsMaterials.Length; i++)
+            damageCoroutine = effectsMaterial.DoColor(_Overlay, hitColor, 0.05f).SetOnFinish(() =>
             {
-                if (effectsMaterials[i] != null) { driver = effectsMaterials[i]; break; }
-            }
-
-            if (driver == null)
-            {
-                onFinish?.Invoke();
-                return;
-            }
-
-            damageCoroutine = driver.DoColor(_Overlay, hitColor, 0.05f).SetOnFinish(() =>
-            {
-                for (int i = 0; i < effectsMaterials.Length; i++)
+                damageCoroutine = effectsMaterial.DoColor(_Overlay, transparentColor, 0.05f).SetOnFinish(() =>
                 {
-                    var mat = effectsMaterials[i];
-                    if (mat == null) continue;
-                    mat.SetColor(_Overlay, hitColor);
-                }
+                    if (resetMaterial)
+                        spriteRenderer.material = sharedMaterial;
 
-                damageCoroutine = driver.DoColor(_Overlay, transparentColor, 0.05f).SetOnFinish(() =>
-                {
-                    for (int i = 0; i < effectsMaterials.Length; i++)
-                    {
-                        var mat = effectsMaterials[i];
-                        if (mat == null) continue;
-                        mat.SetColor(_Overlay, transparentColor);
-                    }
-
-                    if (resetMaterialsAfter) RestoreSharedMaterials();
                     onFinish?.Invoke();
                 });
             });
@@ -421,76 +364,40 @@ namespace OctoberStudio
 
             fadeInCoroutine.StopIfExists();
 
-            AssignEffectsMaterials();
+            spriteRenderer.material = effectsMaterial;
 
-            // Overlay color animation
             if (flash)
             {
-                FlashHitAll(false, () =>
+                FlashHit(false, () =>
                 {
-                    for (int i = 0; i < effectsMaterials.Length; i++)
-                    {
-                        var mat = effectsMaterials[i];
-                        if (mat == null) continue;
-                        mat.SetColor(_Overlay, Color.clear);
-                        mat.DoColor(_Overlay, dissolveSettings.DissolveColor, dissolveSettings.Duration - 0.1f);
-                    }
+                    effectsMaterial.SetColor(_Overlay, Color.clear);
+                    effectsMaterial.DoColor(_Overlay, dissolveSettings.DissolveColor, dissolveSettings.Duration - 0.1f);
                 });
             }
             else
             {
-                for (int i = 0; i < effectsMaterials.Length; i++)
+                effectsMaterial.SetColor(_Overlay, Color.clear);
+                effectsMaterial.DoColor(_Overlay, dissolveSettings.DissolveColor, dissolveSettings.Duration);
+            }
+
+            effectsMaterial.SetFloat(_Disolve, 0);
+            effectsMaterial
+                .DoFloat(_Disolve, 1, dissolveSettings.Duration + 0.02f)
+                .SetEasingCurve(dissolveSettings.DissolveCurve)
+                .SetOnFinish(() =>
                 {
-                    var mat = effectsMaterials[i];
-                    if (mat == null) continue;
-                    mat.SetColor(_Overlay, Color.clear);
-                    mat.DoColor(_Overlay, dissolveSettings.DissolveColor, dissolveSettings.Duration);
-                }
-            }
+                    effectsMaterial.SetColor(_Overlay, Color.clear);
+                    effectsMaterial.SetFloat(_Disolve, 0);
 
-            // Dissolve all parts
-            int remaining = 0;
-            for (int i = 0; i < effectsMaterials.Length; i++)
-                if (effectsMaterials[i] != null) remaining++;
+                    gameObject.SetActive(false);
+                    spriteRenderer.material = sharedMaterial;
+                });
 
-            if (remaining == 0)
-            {
-                gameObject.SetActive(false);
-                appliedEffects.Clear();
-                WaveOverride = null;
-                return;
-            }
+            shadowSprite.DoAlpha(0, dissolveSettings.Duration);
 
-            for (int i = 0; i < effectsMaterials.Length; i++)
-            {
-                var mat = effectsMaterials[i];
-                if (mat == null) continue;
+            appliedEffects.Clear();
 
-                mat.SetFloat(_Disolve, 0);
-
-                mat.DoFloat(_Disolve, 1, dissolveSettings.Duration + 0.02f)
-                    .SetEasingCurve(dissolveSettings.DissolveCurve)
-                    .SetOnFinish(() =>
-                    {
-                        remaining--;
-
-                        mat.SetColor(_Overlay, Color.clear);
-                        mat.SetFloat(_Disolve, 0);
-
-                        if (remaining <= 0)
-                        {
-                            RestoreSharedMaterials();
-
-                            gameObject.SetActive(false);
-
-                            appliedEffects.Clear();
-                            WaveOverride = null;
-                        }
-                    });
-            }
-
-            if (shadowSprite != null)
-                shadowSprite.DoAlpha(0, dissolveSettings.Duration);
+            WaveOverride = null;
         }
 
         public void KickBack(Vector3 position)
@@ -498,7 +405,8 @@ namespace OctoberStudio
             var direction = (transform.position - position).normalized;
             rb.simulated = false;
             fallBackCoroutine.StopIfExists();
-            fallBackCoroutine = transform.DoPosition(transform.position + direction * 0.6f, 0.15f)
+            fallBackCoroutine = transform
+                .DoPosition(transform.position + direction * 0.6f, 0.15f)
                 .SetEasing(EasingType.ExpoOut)
                 .SetOnFinish(() => rb.simulated = true);
         }
@@ -506,17 +414,24 @@ namespace OctoberStudio
         public void AddEffects(List<Effect> effects)
         {
             for (int i = 0; i < effects.Count; i++)
+            {
                 AddEffect(effects[i]);
+            }
         }
 
         public void AddEffect(Effect effect)
         {
             if (!appliedEffects.ContainsKey(effect.EffectType))
+            {
                 appliedEffects.Add(effect.EffectType, new List<Effect>());
+            }
 
             List<Effect> effects = appliedEffects[effect.EffectType];
+
             if (!effects.Contains(effect))
+            {
                 effects.Add(effect);
+            }
         }
 
         public void RemoveEffect(Effect effect)
@@ -524,47 +439,10 @@ namespace OctoberStudio
             if (!appliedEffects.ContainsKey(effect.EffectType)) return;
 
             List<Effect> effects = appliedEffects[effect.EffectType];
+
             if (effects.Contains(effect))
+            {
                 effects.Remove(effect);
-        }
-
-        // ---------- Helpers ----------
-
-        private void AssignEffectsMaterials()
-        {
-            for (int i = 0; i < dissolveRenderers.Length; i++)
-            {
-                var sr = dissolveRenderers[i];
-                if (sr == null) continue;
-
-                if (effectsMaterials[i] != null)
-                    sr.material = effectsMaterials[i];
-            }
-        }
-
-        private void RestoreSharedMaterials()
-        {
-            for (int i = 0; i < dissolveRenderers.Length; i++)
-            {
-                var sr = dissolveRenderers[i];
-                if (sr == null) continue;
-
-                if (sharedMaterials[i] != null)
-                    sr.material = sharedMaterials[i];
-            }
-        }
-
-        private void SetAlphaAll(float a, bool exceptMain = false)
-        {
-            if (dissolveRenderers == null) return;
-
-            for (int i = 0; i < dissolveRenderers.Length; i++)
-            {
-                var sr = dissolveRenderers[i];
-                if (sr == null) continue;
-                if (exceptMain && sr == spriteRenderer) continue;
-
-                sr.SetAlpha(a);
             }
         }
     }
