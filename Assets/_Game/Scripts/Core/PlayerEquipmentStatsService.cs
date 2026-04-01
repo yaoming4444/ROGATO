@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using GameCore.Items; // EquipmentService
-using GameCore.UI;    // VisualEquipmentService (если он тут)
+using GameCore.UI;    // VisualEquipmentService (если он тут) //
 
 namespace GameCore
 {
