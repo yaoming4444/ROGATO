@@ -1,4 +1,3 @@
-using GameCore.Items;
 using LayerLab.ArtMaker;
 using System;
 using UnityEngine;
@@ -8,7 +7,7 @@ namespace GameCore
     [Serializable]
     public class PlayerState
     {
-        public int Version = 3;
+        public int Version = 4;
 
         // -------- Core progression --------
         public int Level = 1;
@@ -17,41 +16,12 @@ namespace GameCore
         // -------- Currencies --------
         public long Gold = 100;
         public int Gems = 0;
-        public int Chests = 1;
 
-        // -------- Cosmetics --------
+        // -------- Cosmetics / meta --------
         public string SelectedSkinId = "default";
 
-        // -------- Chest --------
-        public int ChestLevel = 1;
-        public bool AutoSellEnabled = false;
-
-        /// <summary>
-        /// If not empty, the player has a chest drop that still requires a decision (Equip/Sell).
-        /// Must survive app restarts.
-        /// </summary>
-        public string pendingChestItemId = "";
-
-        /// <summary>
-        /// Level of the pending chest item (core gear).
-        /// Stored so it survives app restarts.
-        /// </summary>
-        public int pendingChestItemLevel = 1;
-
-        // Stores itemId for each slot. Empty string means slot is empty.
-        public string[] Equipped;
-
-        /// <summary>
-        /// Level for each equipped core item (parallel to Equipped[]).
-        /// If slot is empty, level can stay 1 (doesn't matter).
-        /// </summary>
-        public int[] EquippedLevels;
-
-        // Unix timestamp of last save; used for "newer save wins" logic.
+        // Unix timestamp of last save; used for save conflict logic if needed later.
         public long LastSavedUnix = 0;
-
-        // Number of slots in EquipSlot enum.
-        public static int SlotCount => Enum.GetValues(typeof(EquipSlot)).Length;
 
         // ============================================================
         // VISUAL (Spine skin names) - store full skin names as strings
@@ -91,6 +61,8 @@ namespace GameCore
         // ============================================================
         // COLOR (skin/hair/beard/brow) - store as Color32 components for JSON safety
         // ============================================================
+
+        // Skin
         public byte skinColorR = 255;
         public byte skinColorG = 255;
         public byte skinColorB = 255;
@@ -117,25 +89,37 @@ namespace GameCore
         public Color32 GetSkinColor32() => new Color32(skinColorR, skinColorG, skinColorB, skinColorA);
         public void SetSkinColor32(Color32 c)
         {
-            skinColorR = c.r; skinColorG = c.g; skinColorB = c.b; skinColorA = c.a;
+            skinColorR = c.r;
+            skinColorG = c.g;
+            skinColorB = c.b;
+            skinColorA = c.a;
         }
 
         public Color32 GetHairColor32() => new Color32(hairColorR, hairColorG, hairColorB, hairColorA);
         public void SetHairColor32(Color32 c)
         {
-            hairColorR = c.r; hairColorG = c.g; hairColorB = c.b; hairColorA = c.a;
+            hairColorR = c.r;
+            hairColorG = c.g;
+            hairColorB = c.b;
+            hairColorA = c.a;
         }
 
         public Color32 GetBeardColor32() => new Color32(beardColorR, beardColorG, beardColorB, beardColorA);
         public void SetBeardColor32(Color32 c)
         {
-            beardColorR = c.r; beardColorG = c.g; beardColorB = c.b; beardColorA = c.a;
+            beardColorR = c.r;
+            beardColorG = c.g;
+            beardColorB = c.b;
+            beardColorA = c.a;
         }
 
         public Color32 GetBrowColor32() => new Color32(browColorR, browColorG, browColorB, browColorA);
         public void SetBrowColor32(Color32 c)
         {
-            browColorR = c.r; browColorG = c.g; browColorB = c.b; browColorA = c.a;
+            browColorR = c.r;
+            browColorG = c.g;
+            browColorB = c.b;
+            browColorA = c.a;
         }
 
         /// <summary>
@@ -145,17 +129,12 @@ namespace GameCore
         {
             var s = new PlayerState
             {
-                Version = 3,
+                Version = 4,
                 Level = 1,
                 Exp = 0,
                 Gold = 100,
                 Gems = 30,
-                Chests = 200,
                 SelectedSkinId = "default",
-                ChestLevel = 1,
-                AutoSellEnabled = false,
-                pendingChestItemId = "",
-                pendingChestItemLevel = 1,
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
                 lvl_helmet = 1,
@@ -178,51 +157,36 @@ namespace GameCore
                 visual_brow = DEFAULT_BROW,
                 visual_eyes = DEFAULT_EYES,
                 visual_gloves = DEFAULT_GLOVES,
-
                 visual_hair_short = DEFAULT_HAIR_SHORT,
                 visual_hair_hat = DEFAULT_HAIR_HAT,
-
                 visual_mouth = DEFAULT_MOUTH,
                 visual_top = DEFAULT_TOP,
                 visual_skin = DEFAULT_SKIN,
+                visual_helmet = ""
             };
 
-            // Example default skin color
             s.SetSkinColor32(new Color32(255, 220, 200, 255));
-
             s.EnsureValid();
             return s;
         }
 
         /// <summary>
         /// MUST be called after loading from JSON (local/server).
-        /// Fixes:
-        /// - null Equipped
-        /// - incorrect array length (when enum changed)
-        /// - null strings
+        /// Fixes null strings and invalid values.
         /// </summary>
         public void EnsureValid()
         {
-            if (Equipped == null || Equipped.Length != SlotCount)
-                Equipped = new string[SlotCount];
+            if (Level < 1) Level = 1;
 
-            for (int i = 0; i < Equipped.Length; i++)
-                Equipped[i] ??= "";
+            if (lvl_helmet <= 0) lvl_helmet = 1;
+            if (lvl_top <= 0) lvl_top = 1;
+            if (lvl_bottom <= 0) lvl_bottom = 1;
+            if (lvl_boots <= 0) lvl_boots = 1;
+            if (lvl_gloves <= 0) lvl_gloves = 1;
+            if (lvl_gearRight <= 0) lvl_gearRight = 1;
+            if (lvl_back <= 0) lvl_back = 1;
+            if (lvl_eyewear <= 0) lvl_eyewear = 1;
 
-            // EquippedLevels must mirror Equipped
-            if (EquippedLevels == null || EquippedLevels.Length != SlotCount)
-                EquippedLevels = new int[SlotCount];
-
-            for (int i = 0; i < EquippedLevels.Length; i++)
-            {
-                if (EquippedLevels[i] <= 0)
-                    EquippedLevels[i] = 1;
-            }
-
-            pendingChestItemId ??= "";
-            if (pendingChestItemLevel <= 0) pendingChestItemLevel = 1;
-
-            // Visual strings must never be null
             visual_back ??= "";
             visual_beard ??= "";
             visual_boots ??= "";
@@ -244,50 +208,13 @@ namespace GameCore
             visual_top ??= "";
             visual_skin ??= "";
 
-            // If someone saved A=0
+            if (string.IsNullOrWhiteSpace(SelectedSkinId))
+                SelectedSkinId = "default";
+
             if (skinColorA == 0) skinColorA = 255;
-        }
-
-        public string GetEquippedId(EquipSlot slot)
-        {
-            EnsureValid();
-            return Equipped[(int)slot] ?? "";
-        }
-
-        public void SetEquippedId(EquipSlot slot, string itemId)
-        {
-            EnsureValid();
-            Equipped[(int)slot] = itemId ?? "";
-        }
-
-        public int GetEquippedLevel(EquipSlot slot)
-        {
-            EnsureValid();
-            int lvl = EquippedLevels[(int)slot];
-            return lvl <= 0 ? 1 : lvl;
-        }
-
-        public void SetEquippedLevel(EquipSlot slot, int level)
-        {
-            EnsureValid();
-            EquippedLevels[(int)slot] = Mathf.Max(1, level);
-        }
-
-        /// <summary>
-        /// Set both item id and its level in the slot.
-        /// If itemId is empty -> clears slot id and resets level to 1.
-        /// </summary>
-        public void SetEquipped(EquipSlot slot, string itemId, int itemLevel)
-        {
-            EnsureValid();
-
-            itemId ??= "";
-            Equipped[(int)slot] = itemId;
-
-            if (string.IsNullOrEmpty(itemId))
-                EquippedLevels[(int)slot] = 1;
-            else
-                EquippedLevels[(int)slot] = Mathf.Max(1, itemLevel);
+            if (hairColorA == 0) hairColorA = 255;
+            if (beardColorA == 0) beardColorA = 255;
+            if (browColorA == 0) browColorA = 255;
         }
 
         public int GetVisualSlotLevel(EquipmentType slot)
@@ -320,7 +247,6 @@ namespace GameCore
                 case EquipmentType.Gear_Right: lvl_gearRight = level; break;
                 case EquipmentType.Back: lvl_back = level; break;
                 case EquipmentType.Eyewear: lvl_eyewear = level; break;
-                default: return;
             }
         }
 
@@ -380,22 +306,18 @@ namespace GameCore
                 case PartsType.Brow: return DEFAULT_BROW;
                 case PartsType.Eyes: return DEFAULT_EYES;
                 case PartsType.Gloves: return DEFAULT_GLOVES;
-
                 case PartsType.Hair_Short: return DEFAULT_HAIR_SHORT;
                 case PartsType.Hair_Hat: return DEFAULT_HAIR_HAT;
-
                 case PartsType.Mouth: return DEFAULT_MOUTH;
                 case PartsType.Top: return DEFAULT_TOP;
                 case PartsType.Skin: return DEFAULT_SKIN;
-
-                default:
-                    return "";
+                default: return "";
             }
         }
 
         /// <summary>
         /// For render only: if rawValue is empty and slot is mandatory -> return default.
-        /// For non-mandatory -> return empty (binder should equip -1).
+        /// For non-mandatory -> return empty.
         /// </summary>
         public string GetVisualForRender(PartsType type, string rawValue)
         {

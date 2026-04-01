@@ -49,8 +49,7 @@ namespace GameCore.UI
 
         public void Refresh()
         {
-            // core + visual вместе (если visual null Ч EquipmentService сам найдЄт VisualEquipmentService.I через твой код, либо передай visual)
-            var total = EquipmentService.GetTotalBaseStats_Combined(visual);
+            var total = EquipmentService.GetTotalVisualStats(visual);
 
             if (atkText) atkText.text = total.Atk.ToString();
             if (defText) defText.text = total.Def.ToString();
@@ -58,4 +57,3 @@ namespace GameCore.UI
         }
     }
 }
-

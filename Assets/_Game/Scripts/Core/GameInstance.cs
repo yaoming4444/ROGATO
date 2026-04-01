@@ -1,17 +1,17 @@
-using GameCore.Items;
 using GameCore.Progression;
 using GameCore.Visual;
 using IDosGames;
-using LayerLab.ArtMaker; // <-- PartsType
+using LayerLab.ArtMaker;
 using System;
 using UnityEngine;
 
 namespace GameCore
 {
     /// <summary>
-    /// Global runtime singleton that stores current PlayerState and exposes game actions:
-    /// - currencies, level, chests
-    /// - equipment operations
+    /// Global runtime singleton that stores current PlayerState and exposes:
+    /// - progression
+    /// - currencies
+    /// - visual equipment state
     /// - autosave (local + server)
     /// </summary>
     public class GameInstance : MonoBehaviour
@@ -23,11 +23,8 @@ namespace GameCore
         /// </summary>
         public PlayerState State { get; private set; }
 
-        // Fired when any state values changed (currencies/level/chests/skin/etc.)
+        // Fired when any state values changed.
         public event Action<PlayerState> StateChanged;
-
-        // Fired when equipment changed (to refresh slot UI/stats)
-        public event Action EquipmentChanged;
 
         [Header("Autosave Local")]
         [SerializeField] private bool localAutosave = true;
@@ -50,14 +47,6 @@ namespace GameCore
         private float _localTimer;
         private float _serverTimer;
 
-        // Chest
-        public bool AutoSellEnabled => State != null && State.AutoSellEnabled;
-
-        // Pending chest reward (player can postpone Equip/Sell decision and return later)
-        public bool HasPendingChestReward => State != null && !string.IsNullOrWhiteSpace(State.pendingChestItemId);
-        public string PendingChestItemId => State != null ? (State.pendingChestItemId ?? "") : "";
-        public int PendingChestItemLevel => State != null ? Mathf.Max(1, State.pendingChestItemLevel) : 1;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void AutoCreate()
         {
@@ -70,7 +59,6 @@ namespace GameCore
 
         private void Awake()
         {
-            // Singleton enforcement
             if (I != null && I != this)
             {
                 Destroy(gameObject);
@@ -80,7 +68,6 @@ namespace GameCore
             I = this;
             DontDestroyOnLoad(gameObject);
 
-            // Auto-load LevelProgression because GameInstance is runtime-created (no Inspector refs)
             if (levelProgression == null)
             {
                 levelProgression = Resources.Load<LevelProgression>(LevelProgResourcePath);
@@ -88,7 +75,6 @@ namespace GameCore
                     Debug.LogError($"[GameInstance] LevelProgression not found: Resources/{LevelProgResourcePath}.asset");
             }
 
-            // Fast bootstrap for UI: load local save (or default)
             ApplyState(SaveSystem.LoadLocalOrDefault(), notify: true);
 
             _dirty = false;
@@ -102,7 +88,6 @@ namespace GameCore
         {
             if (!_dirty) return;
 
-            // Local autosave loop
             if (localAutosave)
             {
                 _localTimer += Time.unscaledDeltaTime;
@@ -110,7 +95,6 @@ namespace GameCore
                     SaveLocalNow();
             }
 
-            // Server autosave loop
             if (serverAutosave)
             {
                 _serverTimer += Time.unscaledDeltaTime;
@@ -133,10 +117,9 @@ namespace GameCore
             // Write local copy after server load (for quick startup next time)
             SaveSystem.SaveLocal(State);
 
-            // Enable server autosaves only when the user is authorized
             serverAutosave = enableServerAutosave;
 
-            Debug.Log($"[GameInstance] Authorized: state applied. Gold={State.Gold} Level={State.Level} Exp={State.Exp} ChestLv={State.ChestLevel} Last={State.LastSavedUnix}");
+            Debug.Log($"[GameInstance] Authorized: state applied. Gold={State.Gold} Level={State.Level} Exp={State.Exp} Last={State.LastSavedUnix}");
         }
 
         /// <summary>
@@ -153,10 +136,7 @@ namespace GameCore
             _serverTimer = 0f;
 
             if (notify)
-            {
                 StateChanged?.Invoke(State);
-                EquipmentChanged?.Invoke();
-            }
         }
 
         // ===================== SAVE =====================
@@ -193,112 +173,32 @@ namespace GameCore
         /// <summary>
         /// Common helper:
         /// - mark dirty
-        /// - notify StateChanged (so UI can update)
+        /// - notify StateChanged
         /// </summary>
         private void Touch(bool notify = true)
         {
             MarkDirty();
-            if (notify) StateChanged?.Invoke(State);
+            if (notify)
+                StateChanged?.Invoke(State);
         }
 
         /// <summary>
-        /// Форснуть обновление всех подписчиков (оба PartsManagerStateBinder в сцене).
-        /// Используй, если ты сделал несколько изменений без notify, а потом хочешь 1 раз обновить UI.
+        /// Force-refresh all subscribers.
         /// </summary>
         public void RaiseStateChanged()
         {
             if (State == null) return;
+
             MarkDirty();
             StateChanged?.Invoke(State);
         }
 
-        // ===================== CHEST (PENDING REWARD) =====================
-
         /// <summary>
-        /// Store pending chest reward so player can decide later (survives restart).
+        /// External helper for systems that only need to refresh current state listeners.
         /// </summary>
-        public void SetPendingChestReward(string itemId, bool immediateSave = false)
+        public void NotifyStateChangedExternal()
         {
-            // Legacy overload (kept for old call sites). Level defaults to 1.
-            SetPendingChestReward(itemId, 1, immediateSave);
-        }
-
-        /// <summary>
-        /// Store pending chest reward so player can decide later (survives restart).
-        /// Also stores itemLevel for core gear.
-        /// </summary>
-        public void SetPendingChestReward(string itemId, int itemLevel, bool immediateSave = false)
-        {
-            if (State == null) return;
-
-            State.pendingChestItemId = itemId ?? "";
-            State.pendingChestItemLevel = Mathf.Max(1, itemLevel);
-
-            MarkDirty();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave)
-                SaveAllNow();
-        }
-
-        /// <summary>
-        /// Clears pending chest reward (called after Equip/Sell).
-        /// </summary>
-        public void ClearPendingChestReward(bool immediateSave = false)
-        {
-            if (State == null) return;
-
-            State.pendingChestItemId = "";
-            State.pendingChestItemLevel = 1;
-
-            MarkDirty();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave)
-                SaveAllNow();
-        }
-
-        /// <summary>
-        /// Equip currently pending chest reward into its slot using stored pending level, then clears pending.
-        /// Returns false if there is no pending reward or item not found.
-        /// </summary>
-        public bool EquipPendingChestReward(bool immediateSave = false)
-        {
-            if (State == null) return false;
-            if (!HasPendingChestReward) return false;
-
-            var db = ItemDatabase.I;
-            if (db == null)
-            {
-                Debug.LogWarning("[GameInstance] EquipPendingChestReward: ItemDatabase is null.");
-                return false;
-            }
-
-            string itemId = PendingChestItemId;
-            var def = db.GetById(itemId);
-            if (def == null)
-            {
-                Debug.LogWarning($"[GameInstance] EquipPendingChestReward: pending item not found: {itemId}");
-                ClearPendingChestReward(immediateSave: immediateSave);
-                return false;
-            }
-
-            int lvl = PendingChestItemLevel;
-
-            // core equip with level
-            EquipItemWithLevel(def.Slot, def.Id, lvl, immediateSave: false);
-
-            // clear pending after equip
-            State.pendingChestItemId = "";
-            State.pendingChestItemLevel = 1;
-
-            MarkDirty();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave)
-                SaveAllNow();
-
-            return true;
+            RaiseStateChanged();
         }
 
         // ===================== VISUAL MUTATIONS =====================
@@ -337,7 +237,8 @@ namespace GameCore
             }
 
             MarkDirty();
-            if (notify) StateChanged?.Invoke(State);
+            if (notify)
+                StateChanged?.Invoke(State);
         }
 
         public void ClearVisual(PartsType type, bool notify = true)
@@ -354,7 +255,8 @@ namespace GameCore
             if (helmet != null) State.visual_helmet = helmet;
 
             MarkDirty();
-            if (notify) StateChanged?.Invoke(State);
+            if (notify)
+                StateChanged?.Invoke(State);
         }
 
         public void SetSkinColor(Color32 c, bool notify = true)
@@ -363,7 +265,9 @@ namespace GameCore
 
             State.SetSkinColor32(c);
             MarkDirty();
-            if (notify) StateChanged?.Invoke(State);
+
+            if (notify)
+                StateChanged?.Invoke(State);
         }
 
         // ===================== ECONOMY / PROGRESSION =====================
@@ -371,9 +275,12 @@ namespace GameCore
         public void AddGold(long amount, bool immediateSave = false)
         {
             if (State == null) return;
+
             State.Gold += amount;
             Touch();
-            if (immediateSave) SaveAllNow();
+
+            if (immediateSave)
+                SaveAllNow();
         }
 
         public bool SpendGold(long amount, bool immediateSave = false)
@@ -384,16 +291,22 @@ namespace GameCore
 
             State.Gold -= amount;
             Touch();
-            if (immediateSave) SaveAllNow();
+
+            if (immediateSave)
+                SaveAllNow();
+
             return true;
         }
 
         public void AddGems(int amount, bool immediateSave = false)
         {
             if (State == null) return;
+
             State.Gems += amount;
             Touch();
-            if (immediateSave) SaveAllNow();
+
+            if (immediateSave)
+                SaveAllNow();
         }
 
         public bool SpendGems(int amount, bool immediateSave = false)
@@ -404,88 +317,22 @@ namespace GameCore
 
             State.Gems -= amount;
             Touch();
-            if (immediateSave) SaveAllNow();
-            return true;
-        }
 
-        public void AddChest(int amount, bool immediateSave = false)
-        {
-            AddChests(amount, immediateSave);
-        }
+            if (immediateSave)
+                SaveAllNow();
 
-        public void AddChests(int amount, bool immediateSave = false)
-        {
-            if (State == null) return;
-            State.Chests += amount;
-            Touch();
-            if (immediateSave) SaveAllNow();
-        }
-
-        public bool SpendChest(int amount, bool immediateSave = false)
-        {
-            if (State == null) return false;
-            if (amount <= 0) return true;
-            if (State.Chests < amount) return false;
-
-            State.Chests -= amount;
-            Touch();
-            if (immediateSave) SaveAllNow();
             return true;
         }
 
         public void LevelUp(bool immediateSave = false)
         {
             if (State == null) return;
+
             State.Level += 1;
             Touch();
-            if (immediateSave) SaveAllNow();
-        }
 
-        public void SetSkin(string skinId, bool immediateSave = false)
-        {
-            if (State == null) return;
-            State.SelectedSkinId = string.IsNullOrWhiteSpace(skinId) ? "default" : skinId;
-            Touch();
-            if (immediateSave) SaveAllNow();
-        }
-
-        public void SetChestLevel(int level, bool immediateSave = false)
-        {
-            if (State == null) return;
-            State.ChestLevel = Mathf.Max(1, level);
-            Touch();
-            if (immediateSave) SaveAllNow();
-        }
-
-        public bool TryUpgradeChest(ChestDropTable table, bool immediateSave = false)
-        {
-            if (State == null || table == null) return false;
-
-            int cur = Mathf.Max(1, State.ChestLevel);
-            if (table.IsMaxLevel(cur)) return false;
-
-            int next = cur + 1;
-            int cost = table.GetUpgradeCostGems(next);
-
-            if (!SpendGems(cost, immediateSave: false))
-                return false;
-
-            State.ChestLevel = next;
-
-            Touch();              // dirty + StateChanged
-            if (immediateSave) SaveAllNow();
-            return true;
-        }
-
-        public void SetAutoSellEnabled(bool enabled, bool immediateSave = false)
-        {
-            if (State == null) return;
-
-            State.AutoSellEnabled = enabled;
-            MarkDirty();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave) SaveAllNow();
+            if (immediateSave)
+                SaveAllNow();
         }
 
         public void AddExp(int amount, bool immediateSave = false)
@@ -501,123 +348,23 @@ namespace GameCore
             }
 
             Touch();
-            if (immediateSave) SaveAllNow();
+
+            if (immediateSave)
+                SaveAllNow();
         }
 
-        // ===================== EQUIPMENT =====================
-
-        public string GetEquippedId(EquipSlot slot)
-            => State?.GetEquippedId(slot) ?? "";
-
-        public int GetEquippedLevel(EquipSlot slot)
-            => State?.GetEquippedLevel(slot) ?? 1;
-
-        public ItemDef GetEquippedDef(EquipSlot slot)
-        {
-            var id = GetEquippedId(slot);
-            if (string.IsNullOrWhiteSpace(id)) return null;
-
-            var db = ItemDatabase.I;
-            if (db == null) return null;
-
-            return db.GetById(id);
-        }
-
-        public bool IsSlotEmpty(EquipSlot slot)
-            => string.IsNullOrWhiteSpace(GetEquippedId(slot));
-
-        public bool EquipItem(EquipSlot slot, string itemId, bool immediateSave = false)
-        {
-            // Legacy overload (kept for old call sites). Level defaults to 1.
-            return EquipItemWithLevel(slot, itemId, 1, immediateSave);
-        }
-
-        public bool EquipItemWithLevel(EquipSlot slot, string itemId, int itemLevel, bool immediateSave = false)
-        {
-            if (State == null) return false;
-
-            var def = ItemDatabase.I ? ItemDatabase.I.GetById(itemId) : null;
-            if (def == null)
-            {
-                Debug.LogError($"[GameInstance] EquipItem failed: itemId not found: {itemId}");
-                return false;
-            }
-
-            if (def.Slot != slot)
-            {
-                Debug.LogError($"[GameInstance] EquipItem failed: slot mismatch. item={def.Id} itemSlot={def.Slot} targetSlot={slot}");
-                return false;
-            }
-
-            // store both id and level (core gear)
-            State.SetEquipped(slot, itemId, Mathf.Max(1, itemLevel));
-
-            MarkDirty();
-            EquipmentChanged?.Invoke();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave) SaveAllNow();
-            return true;
-        }
-
-        public void Unequip(EquipSlot slot, bool immediateSave = false)
+        public void SetSkin(string skinId, bool immediateSave = false)
         {
             if (State == null) return;
 
-            // clear both id and level
-            State.SetEquipped(slot, "", 1);
+            State.SelectedSkinId = string.IsNullOrWhiteSpace(skinId) ? "default" : skinId;
+            Touch();
 
-            MarkDirty();
-            EquipmentChanged?.Invoke();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave) SaveAllNow();
+            if (immediateSave)
+                SaveAllNow();
         }
 
-        public void SellItem(ItemDef item, bool immediateSave = false)
-        {
-            if (State == null || item == null) return;
-
-            State.Gems += item.SellGems;
-
-            MarkDirty();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave) SaveAllNow();
-        }
-
-        public bool TryAutoEquipIfEmpty(ItemDef newItem, bool immediateSave = false)
-        {
-            // Legacy overload: level defaults to 1.
-            return TryAutoEquipIfEmptyWithLevel(newItem, 1, immediateSave);
-        }
-
-        public bool TryAutoEquipIfEmptyWithLevel(ItemDef newItem, int itemLevel, bool immediateSave = false)
-        {
-            if (State == null || newItem == null) return false;
-
-            if (!IsSlotEmpty(newItem.Slot))
-                return false;
-
-            State.SetEquipped(newItem.Slot, newItem.Id, Mathf.Max(1, itemLevel));
-
-            MarkDirty();
-            EquipmentChanged?.Invoke();
-            StateChanged?.Invoke(State);
-
-            if (immediateSave) SaveAllNow();
-            return true;
-        }
-
-        /// <summary>
-        /// ?????? ??? ???????, ????? ???? ?????? ?????? ?? ??????????.
-        /// </summary>
-        public void NotifyStateChangedExternal()
-        {
-            RaiseStateChanged();
-        }
-
-        // VISUAL EQUIPMENT SLOT LEVEL //
+        // ===================== VISUAL EQUIPMENT SLOT LEVEL =====================
 
         public bool UpgradeVisualSlot(EquipmentType slot, int delta = 1, bool saveLocal = true)
         {
@@ -630,7 +377,7 @@ namespace GameCore
             RaiseStateChanged();
 
             if (saveLocal)
-                SaveLocalNow(); // ??? SaveAllNow(), ??? ?? ???????????
+                SaveLocalNow();
 
             return true;
         }
@@ -639,6 +386,17 @@ namespace GameCore
         {
             var st = State;
             return st != null ? st.GetVisualSlotLevel(slot) : 1;
+        }
+
+        public void SetVisualSlotLevel(EquipmentType slot, int level, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.SetVisualSlotLevel(slot, level);
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
         }
 
         public void DevResetProgress(bool enableServerAutosave = true)

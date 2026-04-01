@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
-using GameCore.Items; // EquipmentService
-using GameCore.UI;    // VisualEquipmentService (если он тут) //
+using GameCore.Items;
 
 namespace GameCore
 {
@@ -13,7 +12,7 @@ namespace GameCore
 
         public int BonusAtk { get; private set; }
         public int BonusHp { get; private set; }
-        public int BonusDef { get; private set; } // на будущее
+        public int BonusDef { get; private set; }
 
         [SerializeField] private VisualEquipmentService visual; // можно не назначать
 
@@ -66,7 +65,7 @@ namespace GameCore
 
         public void Recalc()
         {
-            var total = EquipmentService.GetTotalBaseStats_Combined(visual);
+            var total = EquipmentService.GetTotalVisualStats(visual);
 
             BonusAtk = total.Atk;
             BonusHp = total.Hp;
@@ -76,4 +75,3 @@ namespace GameCore
         }
     }
 }
-

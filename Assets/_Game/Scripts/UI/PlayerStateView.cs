@@ -39,7 +39,7 @@ namespace GameCore.UI
         {
             if (s == null)
             {
-                Set(gold: "—", level: "—", gems: "—", exp: "—", chests: "—");
+                Set(gold: "—", level: "—", gems: "—", exp: "—");
                 return;
             }
 
@@ -47,18 +47,18 @@ namespace GameCore.UI
                 gold: s.Gold.ToString(),
                 level: s.Level.ToString(),
                 gems: s.Gems.ToString(),
-                exp: s.Exp.ToString(),
-                chests: s.Chests.ToString()
+                exp: s.Exp.ToString()
+                //chests: s.Chests.ToString()
             );
         }
 
-        private void Set(string gold, string level, string gems, string exp, string chests)
+        private void Set(string gold, string level, string gems, string exp)
         {
             if (goldText) goldText.text = gold;
             if (levelText) levelText.text = level;
             if (gemsText) gemsText.text = gems;
             if (expText) expText.text = exp;
-            if (chestsText) chestsText.text = chests;
+            //if (chestsText) chestsText.text = chests;
         }
     }
 }
