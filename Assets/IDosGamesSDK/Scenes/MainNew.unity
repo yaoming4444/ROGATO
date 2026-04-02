@@ -21120,7 +21120,7 @@ GameObject:
   - component: {fileID: 1097352645}
   - component: {fileID: 1097352648}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ButtonEquipment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30467,101 +30467,87 @@ MonoBehaviour:
   leftTitle: {fileID: 1800025748}
   rightTitle: {fileID: 2111755181}
   leftRows:
-  - rarityText: {fileID: 460803293}
-    percentText: {fileID: 485905181}
-    bgImage: {fileID: 727958125}
-    root: {fileID: 0}
-  - rarityText: {fileID: 1400543033}
-    percentText: {fileID: 1513958293}
-    bgImage: {fileID: 1909077572}
-    root: {fileID: 0}
-  - rarityText: {fileID: 2132521269}
-    percentText: {fileID: 1015462156}
-    bgImage: {fileID: 1823258079}
-    root: {fileID: 0}
-  - rarityText: {fileID: 1524182964}
-    percentText: {fileID: 1339134458}
-    bgImage: {fileID: 809557249}
-    root: {fileID: 0}
-  - rarityText: {fileID: 368046991}
-    percentText: {fileID: 1514797724}
-    bgImage: {fileID: 209717590}
-    root: {fileID: 0}
-  - rarityText: {fileID: 931516028}
-    percentText: {fileID: 1769264039}
-    bgImage: {fileID: 982463417}
-    root: {fileID: 0}
-  - rarityText: {fileID: 581297235}
-    percentText: {fileID: 1951752032}
-    bgImage: {fileID: 1919043734}
-    root: {fileID: 0}
-  - rarityText: {fileID: 107667392}
-    percentText: {fileID: 121254792}
-    bgImage: {fileID: 1242177783}
-    root: {fileID: 0}
-  - rarityText: {fileID: 2146859863}
-    percentText: {fileID: 1950268916}
-    bgImage: {fileID: 1830453119}
-    root: {fileID: 0}
+  - {rarityText: {fileID: 460803293}, percentText: {fileID: 485905181}, bgImage: {fileID: 727958125}, root: {fileID: 0}}
+  - {rarityText: {fileID: 1400543033}, percentText: {fileID: 1513958293}, bgImage: {fileID: 1909077572}, root: {fileID: 0}}
+  - {rarityText: {fileID: 2132521269}, percentText: {fileID: 1015462156}, bgImage: {fileID: 1823258079}, root: {fileID: 0}}
+  - {rarityText: {fileID: 1524182964}, percentText: {fileID: 1339134458}, bgImage: {fileID: 809557249}, root: {fileID: 0}}
+  - {rarityText: {fileID: 368046991}, percentText: {fileID: 1514797724}, bgImage: {fileID: 209717590}, root: {fileID: 0}}
+  - {rarityText: {fileID: 931516028}, percentText: {fileID: 1769264039}, bgImage: {fileID: 982463417}, root: {fileID: 0}}
+  - {rarityText: {fileID: 581297235}, percentText: {fileID: 1951752032}, bgImage: {fileID: 1919043734}, root: {fileID: 0}}
+  - {rarityText: {fileID: 107667392}, percentText: {fileID: 121254792}, bgImage: {fileID: 1242177783}, root: {fileID: 0}}
+  - {rarityText: {fileID: 2146859863}, percentText: {fileID: 1950268916}, bgImage: {fileID: 1830453119}, root: {fileID: 0}}
   rightRows:
-  - rarityText: {fileID: 733841343}
-    percentText: {fileID: 924378305}
-    bgImage: {fileID: 2143826842}
-    root: {fileID: 0}
-  - rarityText: {fileID: 1210290260}
-    percentText: {fileID: 1503175727}
-    bgImage: {fileID: 1770877747}
-    root: {fileID: 0}
-  - rarityText: {fileID: 975398292}
-    percentText: {fileID: 935644619}
-    bgImage: {fileID: 1530962288}
-    root: {fileID: 0}
-  - rarityText: {fileID: 768186731}
-    percentText: {fileID: 1116339305}
-    bgImage: {fileID: 1866317041}
-    root: {fileID: 0}
-  - rarityText: {fileID: 2026331691}
-    percentText: {fileID: 846969487}
-    bgImage: {fileID: 827141518}
-    root: {fileID: 0}
-  - rarityText: {fileID: 272318228}
-    percentText: {fileID: 1628793985}
-    bgImage: {fileID: 1689444532}
-    root: {fileID: 0}
-  - rarityText: {fileID: 951683225}
-    percentText: {fileID: 1041889489}
-    bgImage: {fileID: 1355864562}
-    root: {fileID: 0}
-  - rarityText: {fileID: 192708537}
-    percentText: {fileID: 1177027020}
-    bgImage: {fileID: 1680522208}
-    root: {fileID: 0}
-  - rarityText: {fileID: 509488380}
-    percentText: {fileID: 1403242313}
-    bgImage: {fileID: 1071429300}
-    root: {fileID: 0}
+  - {rarityText: {fileID: 733841343}, percentText: {fileID: 924378305}, bgImage: {fileID: 2143826842}, root: {fileID: 0}}
+  - {rarityText: {fileID: 1210290260}, percentText: {fileID: 1503175727}, bgImage: {fileID: 1770877747}, root: {fileID: 0}}
+  - {rarityText: {fileID: 975398292}, percentText: {fileID: 935644619}, bgImage: {fileID: 1530962288}, root: {fileID: 0}}
+  - {rarityText: {fileID: 768186731}, percentText: {fileID: 1116339305}, bgImage: {fileID: 1866317041}, root: {fileID: 0}}
+  - {rarityText: {fileID: 2026331691}, percentText: {fileID: 846969487}, bgImage: {fileID: 827141518}, root: {fileID: 0}}
+  - {rarityText: {fileID: 272318228}, percentText: {fileID: 1628793985}, bgImage: {fileID: 1689444532}, root: {fileID: 0}}
+  - {rarityText: {fileID: 951683225}, percentText: {fileID: 1041889489}, bgImage: {fileID: 1355864562}, root: {fileID: 0}}
+  - {rarityText: {fileID: 192708537}, percentText: {fileID: 1177027020}, bgImage: {fileID: 1680522208}, root: {fileID: 0}}
+  - {rarityText: {fileID: 509488380}, percentText: {fileID: 1403242313}, bgImage: {fileID: 1071429300}, root: {fileID: 0}}
   upgradeButton: {fileID: 1088136036}
   upgradeButtonText: {fileID: 399461490}
   rarityColors:
   - rarity: 0
-    color: {r: 0.56078434, g: 0.5411765, b: 0.47843137, a: 1}
+    color:
+      r: 0.56078434
+      g: 0.5411765
+      b: 0.47843137
+      a: 1
   - rarity: 1
-    color: {r: 0.37254903, g: 0.68235296, b: 0.30588236, a: 1}
+    color:
+      r: 0.37254903
+      g: 0.68235296
+      b: 0.30588236
+      a: 1
   - rarity: 2
-    color: {r: 0.29411766, g: 0.6509804, b: 0.78431374, a: 1}
+    color:
+      r: 0.29411766
+      g: 0.6509804
+      b: 0.78431374
+      a: 1
   - rarity: 3
-    color: {r: 0.54901963, g: 0.3529412, b: 0.6392157, a: 1}
+    color:
+      r: 0.54901963
+      g: 0.3529412
+      b: 0.6392157
+      a: 1
   - rarity: 4
-    color: {r: 0.7882353, g: 0.5411765, b: 0.22745098, a: 1}
+    color:
+      r: 0.7882353
+      g: 0.5411765
+      b: 0.22745098
+      a: 1
   - rarity: 5
-    color: {r: 0.8980392, g: 0.7607843, b: 0.23137255, a: 1}
+    color:
+      r: 0.8980392
+      g: 0.7607843
+      b: 0.23137255
+      a: 1
   - rarity: 6
-    color: {r: 0.9245283, g: 0.15263437, b: 0.15263437, a: 1}
+    color:
+      r: 0.9245283
+      g: 0.15263437
+      b: 0.15263437
+      a: 1
   - rarity: 7
-    color: {r: 0.24705882, g: 0.7176471, b: 0.6313726, a: 1}
+    color:
+      r: 0.24705882
+      g: 0.7176471
+      b: 0.6313726
+      a: 1
   - rarity: 8
-    color: {r: 0, g: 0.9019608, b: 0.4627451, a: 1}
-  emptyRowColor: {r: 1, g: 1, b: 1, a: 0.15}
+    color:
+      r: 0
+      g: 0.9019608
+      b: 0.4627451
+      a: 1
+  emptyRowColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 0.15
 --- !u!114 &1532914823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42530,9 +42516,23 @@ MonoBehaviour:
   autoSellToggle: {fileID: 1977701260}
   equipButton: {fileID: 1149906395}
   sellButton: {fileID: 785739593}
-  powerPlusColor: {r: 0.2, g: 1, b: 0.2, a: 1}
-  powerMinusColor: {r: 1, g: 0.25, b: 0.25, a: 1}
-  powerNeutralColor: {r: 1, g: 1, b: 1, a: 1}
+  powerPlusColor:
+    r: 0.2
+    g: 1
+    b: 0.2
+    a: 1
+  powerMinusColor:
+    r: 1
+    g: 0.25
+    b: 0.25
+    a: 1
+  powerNeutralColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
+  _newItem: {fileID: 0}
+  _newItemLevel: 1
 --- !u!224 &2099215017 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8176012731768288642, guid: ee1c2864a2bd7a74ba7c06da42a0554a,
@@ -44502,6 +44502,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: a7eeb10c64e2bff47ae1dd1f0e7972a1, type: 3}
   clickButton: {fileID: 393417781269404668}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114173001792791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44522,6 +44523,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 0bbdc5c7b6929884e80d8815ba4869aa, type: 3}
   clickButton: {fileID: 393417780884075466}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114173212774944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44542,6 +44544,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 0812d0574e207c3478fcaa45bcaef79c, type: 3}
   clickButton: {fileID: 393417780516773117}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114173227626847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44562,6 +44565,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 0f3808529f19d9b48814fba6a611ed1f, type: 3}
   clickButton: {fileID: 393417780573044610}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114173813847272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44582,6 +44586,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 2e5419ead21564044b58689597945900, type: 3}
   clickButton: {fileID: 393417782199581237}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114173900796317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44602,6 +44607,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: c4e74c7cd18187e40989bd73ad3a72f0, type: 3}
   clickButton: {fileID: 393417782311567168}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174184228962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44622,6 +44628,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 0c57df00ce255cb478a59f5475f4ed7a, type: 3}
   clickButton: {fileID: 393417782033614527}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174225892228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44642,6 +44649,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: 7574286f63db3eb41b6fc5af7f828ec7, type: 3}
   clickButton: {fileID: 393417782074756441}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174504201590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44662,6 +44670,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: f9d4e7950e735de4aa1548fb598dc039, type: 3}
   clickButton: {fileID: 393417781849744299}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174518150109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44682,6 +44691,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: aeeef466af8f605498104fce08211bf1, type: 3}
   clickButton: {fileID: 393417781830536448}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174583327513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44702,6 +44712,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: dddddcae3d793bb40ae4428571888d59, type: 3}
   clickButton: {fileID: 393417781383611844}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!114 &314114174646652725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44722,6 +44733,7 @@ MonoBehaviour:
   emptyIcon: {fileID: 21300000, guid: dd4dbfabc9b752f49bab7a526fe42461, type: 3}
   clickButton: {fileID: 393417781455847912}
   infoPopup: {fileID: 2091595918}
+  _cachedDef: {fileID: 0}
 --- !u!224 &316850027985862130
 RectTransform:
   m_ObjectHideFlags: 0
