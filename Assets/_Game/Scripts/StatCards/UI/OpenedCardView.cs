@@ -8,17 +8,18 @@ namespace GameCore.UI
     public class OpenedCardView : MonoBehaviour
     {
         [Header("Refs")]
-        [SerializeField] private Image iconImage;
         [SerializeField] private Image frameImage;
+        [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text nameText;
+        [SerializeField] private TMP_Text levelText;
 
-        [Header("Frames By Rarity")]
+        [Header("Rarity Frames")]
         [SerializeField] private Sprite commonFrame;
         [SerializeField] private Sprite rareFrame;
         [SerializeField] private Sprite epicFrame;
         [SerializeField] private Sprite legendaryFrame;
 
-        public void Setup(StatCardDefinition definition)
+        public void Setup(StatCardDefinition definition, int level)
         {
             if (definition == null)
                 return;
@@ -29,22 +30,21 @@ namespace GameCore.UI
             if (nameText != null)
                 nameText.text = definition.DisplayName;
 
+            if (levelText != null)
+                levelText.text = $"Lv. {Mathf.Max(1, level)}";
+
             if (frameImage != null)
-                frameImage.sprite = GetFrame(definition.Rarity);
+                frameImage.sprite = GetFrameByRarity(definition.Rarity);
         }
 
-        private Sprite GetFrame(StatRarity rarity)
+        private Sprite GetFrameByRarity(StatRarity rarity)
         {
             switch (rarity)
             {
-                case StatRarity.Rare:
-                    return rareFrame;
-                case StatRarity.Epic:
-                    return epicFrame;
-                case StatRarity.Legendary:
-                    return legendaryFrame;
-                default:
-                    return commonFrame;
+                case StatRarity.Rare: return rareFrame;
+                case StatRarity.Epic: return epicFrame;
+                case StatRarity.Legendary: return legendaryFrame;
+                default: return commonFrame;
             }
         }
     }

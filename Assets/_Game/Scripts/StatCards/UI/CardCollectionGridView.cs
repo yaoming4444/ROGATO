@@ -1,6 +1,6 @@
-using GameCore.Stats;
 using System.Collections.Generic;
 using UnityEngine;
+using GameCore.Stats;
 
 namespace GameCore.UI
 {
@@ -9,41 +9,54 @@ namespace GameCore.UI
         [Header("Refs")]
         [SerializeField] private Transform contentRoot;
 
-        [Header("Database")]
+        [Header("Data")]
         [SerializeField] private StatRollConfig statRollConfig;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject closedCardPrefab;
         [SerializeField] private GameObject openedCardPrefab;
 
-        [Header("Opened Cards")]
-        [SerializeField] private List<string> unlockedCardIds = new List<string>();
+        private readonly List<GameObject> spawnedCards = new();
+        private readonly HashSet<string> unlockedCardIds = new();
+        private readonly Dictionary<string, int> cardLevels = new();
 
-        private readonly List<GameObject> spawnedCards = new List<GameObject>();
-
-        private void Start()
+        public void SetUnlockedIds(IReadOnlyList<string> ids)
         {
-            Rebuild();
+            unlockedCardIds.Clear();
+
+            if (ids == null)
+                return;
+
+            for (int i = 0; i < ids.Count; i++)
+            {
+                string id = ids[i];
+                if (!string.IsNullOrWhiteSpace(id))
+                    unlockedCardIds.Add(id);
+            }
+        }
+
+        public void SetCardLevels(Dictionary<string, int> levels)
+        {
+            cardLevels.Clear();
+
+            if (levels == null)
+                return;
+
+            foreach (var pair in levels)
+            {
+                if (!string.IsNullOrWhiteSpace(pair.Key))
+                    cardLevels[pair.Key] = Mathf.Max(1, pair.Value);
+            }
         }
 
         public void Rebuild()
         {
             Clear();
 
-            if (contentRoot == null)
-            {
-                Debug.LogWarning("[CardCollectionGridView] Content root is missing.");
+            if (contentRoot == null || statRollConfig == null)
                 return;
-            }
-
-            if (statRollConfig == null)
-            {
-                Debug.LogWarning("[CardCollectionGridView] StatRollConfig is missing.");
-                return;
-            }
 
             IReadOnlyList<StatCardDefinition> cards = statRollConfig.Cards;
-
             for (int i = 0; i < cards.Count; i++)
             {
                 StatCardDefinition definition = cards[i];
@@ -53,54 +66,36 @@ namespace GameCore.UI
                 bool isUnlocked = unlockedCardIds.Contains(definition.CardId);
 
                 if (isUnlocked)
-                    SpawnOpenedCard(definition);
+                    SpawnOpened(definition);
                 else
-                    SpawnClosedCard();
+                    SpawnClosed();
             }
         }
 
-        public void UnlockCard(string cardId)
-        {
-            if (string.IsNullOrWhiteSpace(cardId))
-                return;
-
-            if (!unlockedCardIds.Contains(cardId))
-                unlockedCardIds.Add(cardId);
-
-            Rebuild();
-        }
-
-        public bool IsUnlocked(string cardId)
-        {
-            return unlockedCardIds.Contains(cardId);
-        }
-
-        private void SpawnClosedCard()
+        private void SpawnClosed()
         {
             if (closedCardPrefab == null)
-            {
-                Debug.LogWarning("[CardCollectionGridView] Closed card prefab is missing.");
                 return;
-            }
 
-            GameObject card = Instantiate(closedCardPrefab, contentRoot, false);
-            spawnedCards.Add(card);
+            GameObject go = Instantiate(closedCardPrefab, contentRoot, false);
+            spawnedCards.Add(go);
         }
 
-        private void SpawnOpenedCard(StatCardDefinition definition)
+        private void SpawnOpened(StatCardDefinition definition)
         {
             if (openedCardPrefab == null)
-            {
-                Debug.LogWarning("[CardCollectionGridView] Opened card prefab is missing.");
                 return;
-            }
 
-            GameObject card = Instantiate(openedCardPrefab, contentRoot, false);
-            spawnedCards.Add(card);
+            GameObject go = Instantiate(openedCardPrefab, contentRoot, false);
+            spawnedCards.Add(go);
 
-            OpenedCardView openedView = card.GetComponent<OpenedCardView>();
-            if (openedView != null)
-                openedView.Setup(definition);
+            int level = 1;
+            if (cardLevels.TryGetValue(definition.CardId, out int savedLevel))
+                level = savedLevel;
+
+            OpenedCardView view = go.GetComponent<OpenedCardView>();
+            if (view != null)
+                view.Setup(definition, level);
         }
 
         private void Clear()

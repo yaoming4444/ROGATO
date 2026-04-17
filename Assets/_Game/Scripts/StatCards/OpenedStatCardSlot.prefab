@@ -361,6 +361,7 @@ GameObject:
   - component: {fileID: 5955961899149496742}
   - component: {fileID: 3453459656687933681}
   - component: {fileID: 6904991126257222309}
+  - component: {fileID: 3850427921523293672}
   m_Layer: 0
   m_Name: OpenedStatCardSlot
   m_TagString: Untagged
@@ -473,6 +474,26 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3850427921523293672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5070068647943135882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb101fc8dfa672c469c54c6a7ee07882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameCore.UI.OpenedCardView
+  frameImage: {fileID: 6756998474607888154}
+  iconImage: {fileID: 2990688419628521920}
+  nameText: {fileID: 5602298237170830601}
+  levelText: {fileID: 5807174850814963558}
+  commonFrame: {fileID: 0}
+  rareFrame: {fileID: 0}
+  epicFrame: {fileID: 0}
+  legendaryFrame: {fileID: 0}
 --- !u!1 &5844095541368619418
 GameObject:
   m_ObjectHideFlags: 0
