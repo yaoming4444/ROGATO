@@ -5,6 +5,11 @@ namespace GameCore.Stats
     [CreateAssetMenu(fileName = "StatCardDefinition", menuName = "GameCore/Stats/Stat Card Definition")]
     public class StatCardDefinition : ScriptableObject
     {
+        [Header("UI")]
+        [SerializeField] private Sprite icon;
+
+        public Sprite Icon => icon;
+
         [Header("Identity")]
         [SerializeField] private string cardId;
         [SerializeField] private string displayName;

@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 782d1a28224ed664a9d118610cb1ca85, type: 3}
   m_Name: AttackUp1
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Stats.StatCardDefinition
-  cardId: 
-  displayName: 
-  statType: 0
+  icon: {fileID: 21300000, guid: 1d2554db24725491c9aa32ca3cf9986c, type: 3}
+  cardId: attackup1
+  displayName: Attack UP
+  statType: 1
   rarity: 0
   startValue: 1
   upgradeStep: 1

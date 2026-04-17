@@ -12,4 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52fdc9adc489404db7865438835f48d, type: 3}
   m_Name: ROLL_CONFIG
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Stats.StatRollConfig
-  cards: []
+  cards:
+  - {fileID: 11400000, guid: d521bd883f5fda342bfbbb0bc49d3c4d, type: 2}
+  rarityChances:
+  - rarity: 0
+    chanceWeight: 60
+  - rarity: 1
+    chanceWeight: 25
+  - rarity: 2
+    chanceWeight: 10
+  - rarity: 3
+    chanceWeight: 5
