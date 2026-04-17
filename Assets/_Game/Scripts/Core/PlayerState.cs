@@ -5,6 +5,15 @@ using UnityEngine;
 namespace GameCore
 {
     [Serializable]
+    public class SavedRolledCardData
+    {
+        public int statType;
+        public int rarity;
+        public int level;
+        public float currentValue;
+    }
+
+    [Serializable]
     public class PlayerState
     {
         public int Version = 4;
@@ -23,6 +32,12 @@ namespace GameCore
         // Unix timestamp of last save; used for save conflict logic if needed later.
         public long LastSavedUnix = 0;
 
+        // Stat Cards
+        public int cardRollPrice = 100;
+
+        public System.Collections.Generic.List<string> unlockedCardIds = new System.Collections.Generic.List<string>();
+
+        public System.Collections.Generic.List<SavedRolledCardData> rolledCards = new System.Collections.Generic.List<SavedRolledCardData>();
         // ============================================================
         // VISUAL (Spine skin names) - store full skin names as strings
         // ============================================================
@@ -137,6 +152,12 @@ namespace GameCore
                 SelectedSkinId = "default",
                 LastSavedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 
+                // Stat Cards
+                cardRollPrice = 100,
+                unlockedCardIds = new System.Collections.Generic.List<string>(),
+                rolledCards = new System.Collections.Generic.List<SavedRolledCardData>(),
+
+                // Equipment Slot Level
                 lvl_helmet = 1,
                 lvl_top = 1,
                 lvl_bottom = 1,
@@ -215,6 +236,11 @@ namespace GameCore
             if (hairColorA == 0) hairColorA = 255;
             if (beardColorA == 0) beardColorA = 255;
             if (browColorA == 0) browColorA = 255;
+
+            if (cardRollPrice <= 0) cardRollPrice = 100;
+
+            unlockedCardIds ??= new System.Collections.Generic.List<string>();
+            rolledCards ??= new System.Collections.Generic.List<SavedRolledCardData>();
         }
 
         public int GetVisualSlotLevel(EquipmentType slot)

@@ -411,5 +411,87 @@ namespace GameCore
 
             Debug.Log("[GameInstance] DEV RESET DONE (local+server overwritten)");
         }
+
+        // ===================== STAT CARDS =====================
+
+        public int GetCardRollPrice()
+        {
+            return State != null ? State.cardRollPrice : 100;
+        }
+
+        public void SetCardRollPrice(int value, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.cardRollPrice = Mathf.Max(1, value);
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+        }
+
+        public void IncreaseCardRollPrice(int delta, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.cardRollPrice = Mathf.Max(1, State.cardRollPrice + delta);
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+        }
+
+        public void UnlockCardId(string cardId, bool immediateSave = false)
+        {
+            if (State == null) return;
+            if (string.IsNullOrWhiteSpace(cardId)) return;
+
+            State.unlockedCardIds ??= new System.Collections.Generic.List<string>();
+
+            if (!State.unlockedCardIds.Contains(cardId))
+                State.unlockedCardIds.Add(cardId);
+
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+        }
+
+        public bool IsCardUnlocked(string cardId)
+        {
+            if (State == null || string.IsNullOrWhiteSpace(cardId))
+                return false;
+
+            return State.unlockedCardIds != null && State.unlockedCardIds.Contains(cardId);
+        }
+
+        public System.Collections.Generic.IReadOnlyList<string> GetUnlockedCardIds()
+        {
+            if (State == null)
+                return System.Array.Empty<string>();
+
+            State.unlockedCardIds ??= new System.Collections.Generic.List<string>();
+            return State.unlockedCardIds;
+        }
+
+        public void SetRolledCards(System.Collections.Generic.List<SavedRolledCardData> cards, bool immediateSave = false)
+        {
+            if (State == null) return;
+
+            State.rolledCards = cards ?? new System.Collections.Generic.List<SavedRolledCardData>();
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+        }
+
+        public System.Collections.Generic.List<SavedRolledCardData> GetRolledCards()
+        {
+            if (State == null)
+                return new System.Collections.Generic.List<SavedRolledCardData>();
+
+            State.rolledCards ??= new System.Collections.Generic.List<SavedRolledCardData>();
+            return State.rolledCards;
+        }
     }
 }
