@@ -1,4 +1,3 @@
-using System;
 using GameCore.Stats;
 using TMPro;
 using UnityEngine;
@@ -6,16 +5,20 @@ using UnityEngine.UI;
 
 namespace GameCore.UI
 {
-    public class OpenedCardView : MonoBehaviour
+    public class RolledCardPopupView : MonoBehaviour
     {
-        [Header("Refs")]
+        [Header("Card UI")]
         [SerializeField] private Image rootImg;
         [SerializeField] private Image frameImg;
         [SerializeField] private Image levelLabelImg;
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text levelText;
-        [SerializeField] private Button clickButton;
+        [SerializeField] private TMP_Text valueText;
+
+        [Header("Buttons")]
+        [SerializeField] private Button closeButton;
+        [SerializeField] private Button backgroundCloseButton;
 
         [Header("Common Colors")]
         [SerializeField] private Color commonRootColor = Color.white;
@@ -37,22 +40,36 @@ namespace GameCore.UI
         [SerializeField] private Color legendaryFrameColor = Color.white;
         [SerializeField] private Color legendaryLevelLabelColor = Color.white;
 
-        private string cardId;
-        private Action<string> onClicked;
+        private bool initialized;
 
         private void Awake()
         {
-            if (clickButton != null)
-                clickButton.onClick.AddListener(HandleClick);
+            InitializeIfNeeded();
         }
 
-        public void Setup(StatCardDefinition definition, int level, Action<string> clickCallback)
+        private void InitializeIfNeeded()
         {
-            if (definition == null)
+            if (initialized)
                 return;
 
-            cardId = definition.CardId;
-            onClicked = clickCallback;
+            if (closeButton != null)
+                closeButton.onClick.AddListener(Hide);
+
+            if (backgroundCloseButton != null)
+                backgroundCloseButton.onClick.AddListener(Hide);
+
+            initialized = true;
+        }
+
+        public void Show(StatCardDefinition definition, RolledStatCard runtimeCard, bool isUpgrade)
+        {
+            InitializeIfNeeded();
+
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+
+            if (definition == null || runtimeCard == null)
+                return;
 
             if (iconImage != null)
                 iconImage.sprite = definition.Icon;
@@ -61,17 +78,17 @@ namespace GameCore.UI
                 nameText.text = definition.DisplayName;
 
             if (levelText != null)
-                levelText.text = level.ToString();
+                levelText.text = $"Lv. {runtimeCard.Level}";
+
+            if (valueText != null)
+                valueText.text = FormatValue(definition.StatType, runtimeCard.CurrentValue);
 
             ApplyRarityColors(definition.Rarity);
         }
 
-        private void HandleClick()
+        public void Hide()
         {
-            if (string.IsNullOrWhiteSpace(cardId))
-                return;
-
-            onClicked?.Invoke(cardId);
+            gameObject.SetActive(false);
         }
 
         private void ApplyRarityColors(StatRarity rarity)
@@ -106,6 +123,29 @@ namespace GameCore.UI
 
             if (levelLabelImg != null)
                 levelLabelImg.color = levelColor;
+        }
+
+        private string FormatValue(StatType statType, float value)
+        {
+            switch (statType)
+            {
+                case StatType.Attack:
+                    return $"ATK +{value:0}";
+                case StatType.Health:
+                    return $"HP +{value:0}";
+                case StatType.Defense:
+                    return $"DEF +{value:0}";
+                case StatType.MoveSpeed:
+                    return $"Move Speed +{value:0.##}";
+                case StatType.CritChance:
+                    return $"Crit Chance +{value:0.##}";
+                case StatType.CritDamage:
+                    return $"Crit Damage +{value:0.##}";
+                case StatType.PickupRange:
+                    return $"Pickup Range +{value:0.##}";
+                default:
+                    return $"+{value:0.##}";
+            }
         }
     }
 }

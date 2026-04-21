@@ -51,6 +51,7 @@ namespace OctoberStudio
         private float rolledCritChanceBonus;
         private float rolledCritDamageBonus;
         private float rolledMagnetRadiusBonus;
+        private float rolledSizeBonus;
 
         [Header("References")]
         [SerializeField] protected PlayerHealthbarUI healthbar;
@@ -314,6 +315,7 @@ namespace OctoberStudio
             rolledCritChanceBonus = 0f;
             rolledCritDamageBonus = 0f;
             rolledMagnetRadiusBonus = 0f;
+            rolledSizeBonus = 0f;
 
             if (totals != null)
             {
@@ -334,6 +336,9 @@ namespace OctoberStudio
 
                 if (totals.TryGetValue(GameCore.Stats.StatType.PickupRange, out float pickupRange))
                     rolledMagnetRadiusBonus = pickupRange;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.Size, out float size))
+                    rolledSizeBonus = size;
             }
 
             RecalculateAllStatsFromBonuses();
@@ -381,7 +386,7 @@ namespace OctoberStudio
             RecalculateCooldownMuliplier(1f);
             RecalculateDamageReduction(0);
             RecalculateProjectileSpeedMultiplier(1f);
-            RecalculateSizeMultiplier(1f);
+            RecalculateSizeMultiplier(1f + rolledSizeBonus);
             RecalculateDurationMultiplier(1f);
             RecalculateGoldMultiplier(1f);
             RecalculateCritChance(0.2f + rolledCritChanceBonus);

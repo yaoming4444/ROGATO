@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Stats.StatRollConfig
   cards:
   - {fileID: 11400000, guid: fa2a5618c2d91b941a588deea4a7bb58, type: 2}
-  - {fileID: 11400000, guid: 0460a8fe05efbdd44a55c56086c9833e, type: 2}
   - {fileID: 11400000, guid: d521bd883f5fda342bfbbb0bc49d3c4d, type: 2}
+  - {fileID: 11400000, guid: 73f38301a511f8a4380d3b7643a02a34, type: 2}
+  - {fileID: 11400000, guid: 8dbeb1cabbefebc49b564cd644d39df9, type: 2}
   - {fileID: 11400000, guid: 1b8be49a829f2c44a8835cf76180f698, type: 2}
+  - {fileID: 11400000, guid: 0460a8fe05efbdd44a55c56086c9833e, type: 2}
   rarityChances:
   - rarity: 0
     chanceWeight: 60

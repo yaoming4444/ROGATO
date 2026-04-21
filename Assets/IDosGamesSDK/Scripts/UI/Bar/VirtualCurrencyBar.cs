@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace IDosGames
 {
     public class VirtualCurrencyBar : CurrencyBar
     {
-        [SerializeField] private string _virtualCurrencyID;
+        [SerializeField] private VirtualCurrencyID virtualCurrencyId = VirtualCurrencyID.CO;
 
         private void OnEnable()
         {
@@ -22,7 +21,7 @@ namespace IDosGames
 
         public override void UpdateAmount()
         {
-            Amount = IGSUserData.UserInventory.VirtualCurrency.GetValueOrDefault(_virtualCurrencyID, 0);
+            Amount = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
         }
     }
 }

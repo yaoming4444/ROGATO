@@ -22,7 +22,7 @@ namespace IDosGames
 
         public void GetToken()
         {
-            ClaimRewardSystem.ClaimTokenReward(10, 1);
+            ClaimRewardSystem.ClaimCoinReward(10000, 1);
         }
     }
 }

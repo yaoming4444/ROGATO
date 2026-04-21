@@ -23,7 +23,8 @@ namespace GameCore.Stats
         AttackSpeed = 7,  // Скорость атаки
         Range = 8,        // Радиус / дальность
         PickupRange = 9,  // Радиус подбора
-        Luck = 10         // Удача / шанс на полезные вещи
+        Luck = 10,         // Удача / шанс на полезные вещи
+        Size = 11
     }
 
     /// <summary>

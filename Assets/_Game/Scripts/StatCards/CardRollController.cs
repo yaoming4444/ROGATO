@@ -20,7 +20,11 @@ namespace GameCore.UI
         [Header("UI")]
         [SerializeField] private Button rollButton;
         [SerializeField] private TMP_Text priceText;
-        [SerializeField] private TMP_Text resultText;
+        [SerializeField] private RolledCardPopupView rolledCardPopup;
+
+        [Header("Affordability UI")]
+        [SerializeField] private Color affordablePriceColor = Color.white;
+        [SerializeField] private Color notAffordablePriceColor = Color.red;
 
         [Header("Economy")]
         [SerializeField] private VirtualCurrencyID virtualCurrencyId = VirtualCurrencyID.CO;
@@ -30,6 +34,9 @@ namespace GameCore.UI
         [Header("SDK Refresh Before Charge")]
         [Tooltip("Перед списанием сделать RequestUserInventory, чтобы баланс был актуальный")]
         [SerializeField] private bool refreshInventoryBeforeCharge = true;
+
+        [Tooltip("После успешного списания сделать RequestUserInventory, чтобы UI валюты обновился")]
+        [SerializeField] private bool refreshInventoryAfterCharge = true;
 
         [Tooltip("Таймаут ожидания InventoryUpdated")]
         [SerializeField] private float inventoryRefreshTimeoutSeconds = 3f;
@@ -60,6 +67,8 @@ namespace GameCore.UI
             if (rollButton != null)
                 rollButton.onClick.AddListener(OnRollClicked);
 
+            UserInventory.InventoryUpdated += OnInventoryAmountChanged;
+
             LoadFromState();
             RefreshAllUI();
         }
@@ -68,6 +77,8 @@ namespace GameCore.UI
         {
             if (rollButton != null)
                 rollButton.onClick.RemoveListener(OnRollClicked);
+
+            UserInventory.InventoryUpdated -= OnInventoryAmountChanged;
 
             CleanupServerCurrencyHandlers();
             CleanupInventoryRefreshHandlers();
@@ -80,6 +91,11 @@ namespace GameCore.UI
         {
             CleanupServerCurrencyHandlers();
             CleanupInventoryRefreshHandlers();
+        }
+
+        private void OnInventoryAmountChanged()
+        {
+            RefreshAllUI();
         }
 
         private void LoadFromState()
@@ -151,6 +167,7 @@ namespace GameCore.UI
 
             collectionGridView.SetUnlockedIds(game.GetUnlockedCardIds());
             collectionGridView.SetCardLevels(BuildCardLevelsMap());
+            collectionGridView.SetCardValues(BuildCardValuesMap());
             collectionGridView.Rebuild();
         }
 
@@ -165,27 +182,31 @@ namespace GameCore.UI
             if (priceText == null || game == null)
                 return;
 
-            priceText.text = game.GetCardRollPrice().ToString();
+            int currentPrice = game.GetCardRollPrice();
+            bool canAfford = HasEnoughCurrencyForRoll();
+
+            priceText.text = currentPrice.ToString();
+            priceText.color = canAfford ? affordablePriceColor : notAffordablePriceColor;
         }
 
         private void RefreshRollButtonState()
         {
-            if (rollButton != null)
-                rollButton.interactable = !isRolling;
-        }
+            if (rollButton == null)
+                return;
 
-        private void SetResultText(string text)
-        {
-            if (resultText != null)
-                resultText.text = text;
-
-            Debug.Log($"[CardRollController] {text}");
+            bool canAfford = HasEnoughCurrencyForRoll();
+            rollButton.interactable = !isRolling && canAfford;
         }
 
         public void OnRollClicked()
         {
-            if (!isRolling)
-                StartCoroutine(RollRoutine());
+            if (isRolling)
+                return;
+
+            if (!HasEnoughCurrencyForRoll())
+                return;
+
+            StartCoroutine(RollRoutine());
         }
 
         private IEnumerator RollRoutine()
@@ -203,7 +224,6 @@ namespace GameCore.UI
 
             if (rolledDefinition == null)
             {
-                SetResultText("No cards available");
                 isRolling = false;
                 RefreshRollButtonState();
                 yield break;
@@ -219,9 +239,8 @@ namespace GameCore.UI
 
             if (!spendSuccess)
             {
-                SetResultText("Not enough currency");
                 isRolling = false;
-                RefreshRollButtonState();
+                RefreshAllUI();
                 yield break;
             }
 
@@ -232,9 +251,8 @@ namespace GameCore.UI
 
             if (resultCard == null)
             {
-                SetResultText("Roll failed");
                 isRolling = false;
-                RefreshRollButtonState();
+                RefreshAllUI();
                 yield break;
             }
 
@@ -252,13 +270,18 @@ namespace GameCore.UI
             SyncCollectionFromState();
             RefreshAllUI();
 
-            if (alreadyOwned)
-                SetResultText($"Upgraded: {rolledDefinition.DisplayName} Lv.{resultCard.Level}");
-            else
-                SetResultText($"Unlocked: {rolledDefinition.DisplayName}");
+            ShowRolledCardPopup(rolledDefinition, resultCard, alreadyOwned);
 
             isRolling = false;
             RefreshRollButtonState();
+        }
+
+        private void ShowRolledCardPopup(StatCardDefinition definition, RolledStatCard resultCard, bool alreadyOwned)
+        {
+            if (rolledCardPopup == null || definition == null || resultCard == null)
+                return;
+
+            rolledCardPopup.Show(definition, resultCard, alreadyOwned);
         }
 
         private void SaveOwnedCardsToState()
@@ -304,7 +327,6 @@ namespace GameCore.UI
                 yield break;
             }
 
-            // 1. Перед списанием можно обновить inventory
             if (refreshInventoryBeforeCharge)
             {
                 BeginInventoryRefresh();
@@ -313,7 +335,6 @@ namespace GameCore.UI
                     yield return null;
             }
 
-            // 2. Проверяем локальный кэш после refresh
             int current = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
             if (current < amount)
             {
@@ -321,7 +342,6 @@ namespace GameCore.UI
                 yield break;
             }
 
-            // 3. Подписка на успех/ошибку списания
             CleanupServerCurrencyHandlers();
 
             _chargeInFlight = true;
@@ -350,6 +370,11 @@ namespace GameCore.UI
             _chargeInFlight = false;
             _sdkSpendSuccess = true;
             _sdkSpendFinished = true;
+
+            if (refreshInventoryAfterCharge)
+                UserDataService.RequestUserInventory();
+
+            RefreshAllUI();
         }
 
         private void OnServerChargeError()
@@ -359,6 +384,8 @@ namespace GameCore.UI
             _chargeInFlight = false;
             _sdkSpendSuccess = false;
             _sdkSpendFinished = true;
+
+            RefreshAllUI();
         }
 
         private void CleanupServerCurrencyHandlers()
@@ -368,7 +395,7 @@ namespace GameCore.UI
         }
 
         // =========================
-        // Inventory Refresh Before Charge
+        // Inventory Refresh
         // =========================
         private void BeginInventoryRefresh()
         {
@@ -451,7 +478,33 @@ namespace GameCore.UI
             return result;
         }
 
-        /// SYNC ROLLED STATS TO PLAYER
+        private Dictionary<string, float> BuildCardValuesMap()
+        {
+            Dictionary<string, float> result = new Dictionary<string, float>();
+
+            List<SavedRolledCardData> saved = game.GetRolledCards();
+            if (saved == null || statRollConfig == null)
+                return result;
+
+            for (int i = 0; i < saved.Count; i++)
+            {
+                SavedRolledCardData savedCard = saved[i];
+                if (savedCard == null)
+                    continue;
+
+                StatType statType = (StatType)savedCard.statType;
+                StatRarity rarity = (StatRarity)savedCard.rarity;
+
+                StatCardDefinition definition = FindDefinition(statType, rarity);
+                if (definition == null || string.IsNullOrWhiteSpace(definition.CardId))
+                    continue;
+
+                result[definition.CardId] = savedCard.currentValue;
+            }
+
+            return result;
+        }
+
         private void SyncRolledStatsToPlayer()
         {
             if (cardManager == null)
@@ -468,6 +521,23 @@ namespace GameCore.UI
             player.SetRolledCardBonuses(totals);
 
             Debug.Log("[CardRollController] Rolled stats synced to PlayerBehavior.");
+        }
+
+        private bool HasEnoughCurrencyForRoll()
+        {
+            if (game == null)
+                game = GameInstance.I;
+
+            if (game == null)
+                return false;
+
+            int currentPrice = game.GetCardRollPrice();
+
+            if (useLocalGoldFallbackForTesting)
+                return game.State != null && game.State.Gold >= currentPrice;
+
+            int currentAmount = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
+            return currentAmount >= currentPrice;
         }
     }
 }
