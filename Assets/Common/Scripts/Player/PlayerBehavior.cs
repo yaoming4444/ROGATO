@@ -41,6 +41,17 @@ namespace OctoberStudio
         [SerializeField, Min(1f)] protected float initialCritDamageMultiplier = 1.5f;
         [SerializeField, Range(0f, 0.6f)] protected float initialDodgeMultiplier = 0.2f;
 
+        // ===== Rolled Card Bonus =====
+        [Header("Rolled Card Bonus")]
+        [SerializeField] private bool useRolledCardBonuses = true;
+
+        private float rolledDamageBonus;
+        private float rolledHpBonus;
+        private float rolledMoveSpeedBonus;
+        private float rolledCritChanceBonus;
+        private float rolledCritDamageBonus;
+        private float rolledMagnetRadiusBonus;
+
         [Header("References")]
         [SerializeField] protected PlayerHealthbarUI healthbar;
         [SerializeField] protected Transform centerPoint;
@@ -114,8 +125,8 @@ namespace OctoberStudio
         private float equipDamageBonus; // +к урону (Atk)
         private float equipHpBonus;     // +к hp (Hp)
 
-        private float BaseDamageWithEquip => baseDamage + equipDamageBonus;
-        private float BaseHpWithEquip => baseHP + equipHpBonus;
+        private float BaseDamageWithAllBonuses => baseDamage + equipDamageBonus + rolledDamageBonus;
+        private float BaseHpWithAllBonuses => baseHP + equipHpBonus + rolledHpBonus;
 
         private bool _equipSubscribed;
 
@@ -178,6 +189,9 @@ namespace OctoberStudio
 
             LookDirection = Vector2.right;
             IsMovingAlowed = true;
+
+            // 5.1) Apply rolled bonuses from saved PlayerState/GameInstance
+            LoadRolledBonusesFromState();
 
             // 6) Apply visuals from PlayerState
             if (applyVisualsFromPlayerState)
@@ -287,6 +301,94 @@ namespace OctoberStudio
             _binder.ApplyFromState();
         }
 
+        /// ROLLED STATS
+
+        public void SetRolledCardBonuses(Dictionary<GameCore.Stats.StatType, float> totals)
+        {
+            if (!useRolledCardBonuses)
+                return;
+
+            rolledDamageBonus = 0f;
+            rolledHpBonus = 0f;
+            rolledMoveSpeedBonus = 0f;
+            rolledCritChanceBonus = 0f;
+            rolledCritDamageBonus = 0f;
+            rolledMagnetRadiusBonus = 0f;
+
+            if (totals != null)
+            {
+                if (totals.TryGetValue(GameCore.Stats.StatType.Attack, out float atk))
+                    rolledDamageBonus = atk;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.Health, out float hp))
+                    rolledHpBonus = hp;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.MoveSpeed, out float moveSpeed))
+                    rolledMoveSpeedBonus = moveSpeed;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.CritChance, out float critChance))
+                    rolledCritChanceBonus = critChance;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.CritDamage, out float critDamage))
+                    rolledCritDamageBonus = critDamage;
+
+                if (totals.TryGetValue(GameCore.Stats.StatType.PickupRange, out float pickupRange))
+                    rolledMagnetRadiusBonus = pickupRange;
+            }
+
+            RecalculateAllStatsFromBonuses();
+        }
+
+        private void LoadRolledBonusesFromState()
+        {
+            var gi = GameCore.GameInstance.I;
+            if (gi == null || gi.State == null || charactersSave == null)
+                return;
+
+            var saved = gi.GetRolledCards();
+            if (saved == null || saved.Count == 0)
+            {
+                SetRolledCardBonuses(null);
+                return;
+            }
+
+            Dictionary<GameCore.Stats.StatType, float> totals = new Dictionary<GameCore.Stats.StatType, float>();
+
+            for (int i = 0; i < saved.Count; i++)
+            {
+                var card = saved[i];
+                if (card == null)
+                    continue;
+
+                var statType = (GameCore.Stats.StatType)card.statType;
+
+                if (!totals.ContainsKey(statType))
+                    totals[statType] = 0f;
+
+                totals[statType] += card.currentValue;
+            }
+
+            SetRolledCardBonuses(totals);
+        }
+
+        private void RecalculateAllStatsFromBonuses()
+        {
+            RecalculateMagnetRadius(1f + rolledMagnetRadiusBonus);
+            RecalculateMoveSpeed(1f + rolledMoveSpeedBonus);
+            RecalculateDamage(1f);
+            RecalculateMaxHP(1f);
+            RecalculateXPMuliplier(1f);
+            RecalculateCooldownMuliplier(1f);
+            RecalculateDamageReduction(0);
+            RecalculateProjectileSpeedMultiplier(1f);
+            RecalculateSizeMultiplier(1f);
+            RecalculateDurationMultiplier(1f);
+            RecalculateGoldMultiplier(1f);
+            RecalculateCritChance(0.2f + rolledCritChanceBonus);
+            RecalculateCritDamage(1.5f + rolledCritDamageBonus);
+            RecalculateDodge(0.2f);
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         protected virtual void Update()
@@ -345,12 +447,12 @@ namespace OctoberStudio
 
         public virtual void RecalculateDamage(float damageMultiplier)
         {
-            Damage = BaseDamageWithEquip * damageMultiplier;
+            Damage = BaseDamageWithAllBonuses * damageMultiplier;
         }
 
         public virtual void RecalculateMaxHP(float maxHPMultiplier)
         {
-            healthbar.ChangeMaxHP(BaseHpWithEquip * maxHPMultiplier);
+            healthbar.ChangeMaxHP(BaseHpWithAllBonuses * maxHPMultiplier);
         }
 
         public virtual void RecalculateXPMuliplier(float xpMultiplier)
@@ -410,6 +512,7 @@ namespace OctoberStudio
             // ћожно капнуть, чтобы не было 100% уклонени€
             Dodge = Mathf.Clamp(Dodge, 0f, 0.60f);
         }
+
         public virtual void RestoreHP(float hpPercent)
         {
             healthbar.AddPercentage(hpPercent);

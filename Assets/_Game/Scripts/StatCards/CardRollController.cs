@@ -91,6 +91,7 @@ namespace GameCore.UI
                 return;
 
             LoadOwnedCardsFromState();
+            SyncRolledStatsToPlayer();
             SyncCollectionFromState();
         }
 
@@ -241,6 +242,7 @@ namespace GameCore.UI
                 game.UnlockCardId(rolledDefinition.CardId, immediateSave: false);
 
             SaveOwnedCardsToState();
+            SyncRolledStatsToPlayer();
 
             game.IncreaseCardRollPrice(rollPriceStep, immediateSave: false);
 
@@ -447,6 +449,25 @@ namespace GameCore.UI
             }
 
             return result;
+        }
+
+        /// SYNC ROLLED STATS TO PLAYER
+        private void SyncRolledStatsToPlayer()
+        {
+            if (cardManager == null)
+                return;
+
+            var player = OctoberStudio.PlayerBehavior.Player;
+            if (player == null)
+            {
+                Debug.Log("[CardRollController] PlayerBehavior not found in current scene. Rolled stats saved to state only.");
+                return;
+            }
+
+            Dictionary<StatType, float> totals = cardManager.BuildTotals();
+            player.SetRolledCardBonuses(totals);
+
+            Debug.Log("[CardRollController] Rolled stats synced to PlayerBehavior.");
         }
     }
 }
