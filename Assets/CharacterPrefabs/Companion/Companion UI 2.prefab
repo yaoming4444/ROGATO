@@ -1,0 +1,864 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9064847647018767049
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1769093014815413606}
+  - component: {fileID: 6005209986131409027}
+  - component: {fileID: 4815745701348773877}
+  - component: {fileID: 3313456351057905885}
+  m_Layer: 0
+  m_Name: pistol_companion
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1769093014815413606
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9064847647018767049}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 216413633575009888}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 23, y: 84.1}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &6005209986131409027
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9064847647018767049}
+  m_CullTransparentMesh: 1
+--- !u!114 &4815745701348773877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9064847647018767049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: b1584e1b3c576744c9dabab3c3d43a11, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!95 &3313456351057905885
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9064847647018767049}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 65aeebb76d5ec9a4e87b1e8151ae58d3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &7319591937493258696
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 901614805364481111, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 901614805364481111, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: fallbackBaseSkin
+      value: full_skins
+      objectReference: {fileID: 0}
+    - target: {fileID: 901614805364481111, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: usePlayerSelectedSkinAsBase
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5856223291194144673, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: initialSkinName
+      value: full_skins
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 190
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      propertyPath: m_Name
+      value: Companion UI 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 901614805364481111, guid: 344ca1cf722c45a479e22b71ea425e26, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1769093014815413606}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6176410078854190244}
+    - targetCorrespondingSourceObject: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3056923579563928611}
+    - targetCorrespondingSourceObject: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7955724240807307979}
+    - targetCorrespondingSourceObject: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 932437689149049332}
+  m_SourcePrefab: {fileID: 100100000, guid: 344ca1cf722c45a479e22b71ea425e26, type: 3}
+--- !u!224 &216413633575009888 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
+    type: 3}
+  m_PrefabInstance: {fileID: 7319591937493258696}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1038200681837006087 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7781098735461719247, guid: 344ca1cf722c45a479e22b71ea425e26,
+    type: 3}
+  m_PrefabInstance: {fileID: 7319591937493258696}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6176410078854190244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038200681837006087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d431e92d9f88b4590c94299f776655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpineSkinsPrinter
+--- !u!114 &3056923579563928611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038200681837006087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da04b92b90dab46e580db786db1793dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  back:
+  - back/back_c_1
+  - back/back_c_2
+  - back/back_c_3
+  - back/back_c_4
+  - back/back_c_5
+  - back/back_c_6
+  - back/back_c_7
+  - back/back_c_8
+  - back/back_c_9
+  - back/back_c_10
+  - back/back_c_11
+  - back/back_c_12
+  - back/back_c_13
+  - back/back_c_14
+  - back/back_c_15
+  - back/back_c_16
+  - back/back_c_17
+  - back/back_c_18
+  - back/back_c_19
+  - back/back_c_20
+  - back/back_c_21
+  - back/back_c_22
+  - back/back_c_23
+  - back/back_c_24
+  - back/back_c_25
+  - back/back_c_26
+  - back/back_c_27
+  - back/back_c_28
+  - back/back_c_29
+  - back/back_c_30
+  beard:
+  - beard/beard_c_1
+  - beard/beard_c_2
+  - beard/beard_c_3
+  - beard/beard_c_4
+  - beard/beard_c_5
+  - beard/beard_c_6
+  - beard/beard_c_7
+  - beard/beard_c_8
+  - beard/beard_c_9
+  - beard/beard_c_10
+  boots:
+  - boots/boots_c_1
+  - boots/boots_c_2
+  - boots/boots_c_3
+  - boots/boots_c_4
+  - boots/boots_c_5
+  - boots/boots_c_6
+  - boots/boots_c_7
+  - boots/boots_c_8
+  - boots/boots_c_9
+  - boots/boots_c_10
+  - boots/boots_c_11
+  - boots/boots_c_12
+  - boots/boots_c_13
+  - boots/boots_c_14
+  - boots/boots_c_15
+  - boots/boots_c_16
+  - boots/boots_c_17
+  - boots/boots_c_18
+  - boots/boots_c_19
+  - boots/boots_c_20
+  - boots/boots_c_21
+  - boots/boots_c_22
+  - boots/boots_c_23
+  - boots/boots_c_24
+  - boots/boots_c_25
+  - boots/boots_c_26
+  - boots/boots_c_27
+  - boots/boots_c_28
+  - boots/boots_c_29
+  - boots/boots_c_30
+  bottom:
+  - bottom/bottom_c_1
+  - bottom/bottom_c_2
+  - bottom/bottom_c_3
+  - bottom/bottom_c_4
+  - bottom/bottom_c_5
+  - bottom/bottom_c_6
+  - bottom/bottom_c_7
+  - bottom/bottom_c_8
+  - bottom/bottom_c_9
+  - bottom/bottom_c_10
+  - bottom/bottom_c_11
+  - bottom/bottom_c_12
+  - bottom/bottom_c_13
+  - bottom/bottom_c_14
+  - bottom/bottom_c_15
+  - bottom/bottom_c_16
+  - bottom/bottom_c_17
+  - bottom/bottom_c_18
+  - bottom/bottom_c_19
+  - bottom/bottom_c_20
+  - bottom/bottom_c_21
+  - bottom/bottom_c_22
+  - bottom/bottom_c_23
+  - bottom/bottom_c_24
+  - bottom/bottom_c_25
+  - bottom/bottom_c_26
+  - bottom/bottom_c_27
+  - bottom/bottom_c_28
+  - bottom/bottom_c_29
+  - bottom/bottom_c_30
+  - bottom/bottom_c_31
+  - bottom/bottom_c_32
+  - bottom/bottom_c_33
+  - bottom/bottom_c_34
+  - bottom/bottom_c_35
+  - bottom/bottom_c_36
+  - bottom/bottom_c_37
+  - bottom/bottom_c_38
+  - bottom/bottom_c_39
+  - bottom/bottom_c_40
+  - bottom/bottom_c_41
+  - bottom/bottom_c_42
+  - bottom/bottom_c_43
+  - bottom/bottom_c_44
+  - bottom/bottom_c_45
+  - bottom/bottom_c_46
+  - bottom/bottom_c_47
+  - bottom/bottom_c_48
+  - bottom/bottom_c_49
+  - bottom/bottom_c_50
+  brow:
+  - brow/brow_c_1
+  - brow/brow_c_2
+  - brow/brow_c_3
+  - brow/brow_c_4
+  - brow/brow_c_5
+  - brow/brow_c_6
+  - brow/brow_c_7
+  - brow/brow_c_8
+  - brow/brow_c_9
+  - brow/brow_c_10
+  eye:
+  - eyes/eyes_c_1
+  - eyes/eyes_c_2
+  - eyes/eyes_c_3
+  - eyes/eyes_c_4
+  - eyes/eyes_c_5
+  - eyes/eyes_c_6
+  - eyes/eyes_c_7
+  - eyes/eyes_c_8
+  - eyes/eyes_c_9
+  - eyes/eyes_c_10
+  - eyes/eyes_c_11
+  - eyes/eyes_c_12
+  - eyes/eyes_c_13
+  - eyes/eyes_c_14
+  - eyes/eyes_c_15
+  - eyes/eyes_c_16
+  - eyes/eyes_c_17
+  - eyes/eyes_c_18
+  - eyes/eyes_c_19
+  - eyes/eyes_c_20
+  gloves:
+  - gloves/gloves_c_1
+  - gloves/gloves_c_2
+  - gloves/gloves_c_3
+  - gloves/gloves_c_4
+  - gloves/gloves_c_5
+  - gloves/gloves_c_6
+  - gloves/gloves_c_7
+  - gloves/gloves_c_8
+  - gloves/gloves_c_9
+  - gloves/gloves_c_10
+  - gloves/gloves_c_11
+  - gloves/gloves_c_12
+  - gloves/gloves_c_13
+  - gloves/gloves_c_14
+  - gloves/gloves_c_15
+  - gloves/gloves_c_16
+  - gloves/gloves_c_17
+  - gloves/gloves_c_18
+  - gloves/gloves_c_19
+  - gloves/gloves_c_20
+  - gloves/gloves_c_21
+  - gloves/gloves_c_22
+  - gloves/gloves_c_23
+  - gloves/gloves_c_24
+  - gloves/gloves_c_25
+  - gloves/gloves_c_26
+  - gloves/gloves_c_27
+  - gloves/gloves_c_28
+  - gloves/gloves_c_29
+  - gloves/gloves_c_30
+  hairShort:
+  - hair_short/hair_short_c_1
+  - hair_short/hair_short_c_2
+  - hair_short/hair_short_c_3
+  - hair_short/hair_short_c_4
+  - hair_short/hair_short_c_5
+  - hair_short/hair_short_c_6
+  - hair_short/hair_short_c_7
+  - hair_short/hair_short_c_8
+  - hair_short/hair_short_c_9
+  - hair_short/hair_short_c_10
+  - hair_short/hair_short_c_11
+  - hair_short/hair_short_c_12
+  - hair_short/hair_short_c_13
+  - hair_short/hair_short_c_14
+  - hair_short/hair_short_c_15
+  - hair_short/hair_short_c_16
+  - hair_short/hair_short_c_17
+  - hair_short/hair_short_c_18
+  - hair_short/hair_short_c_19
+  - hair_short/hair_short_c_20
+  - hair_short/hair_short_c_21
+  - hair_short/hair_short_c_22
+  - hair_short/hair_short_c_23
+  - hair_short/hair_short_c_24
+  - hair_short/hair_short_c_25
+  - hair_short/hair_short_c_26
+  - hair_short/hair_short_c_27
+  - hair_short/hair_short_c_28
+  - hair_short/hair_short_c_29
+  - hair_short/hair_short_c_30
+  hairHat:
+  - hair_hat/hair_hat_c_1
+  - hair_hat/hair_hat_c_2
+  - hair_hat/hair_hat_c_3
+  - hair_hat/hair_hat_c_4
+  - hair_hat/hair_hat_c_5
+  - hair_hat/hair_hat_c_6
+  - hair_hat/hair_hat_c_7
+  - hair_hat/hair_hat_c_8
+  - hair_hat/hair_hat_c_9
+  - hair_hat/hair_hat_c_10
+  - hair_hat/hair_hat_c_11
+  - hair_hat/hair_hat_c_12
+  - hair_hat/hair_hat_c_13
+  - hair_hat/hair_hat_c_14
+  - hair_hat/hair_hat_c_15
+  - hair_hat/hair_hat_c_16
+  - hair_hat/hair_hat_c_17
+  - hair_hat/hair_hat_c_18
+  - hair_hat/hair_hat_c_19
+  - hair_hat/hair_hat_c_20
+  - hair_hat/hair_hat_c_21
+  - hair_hat/hair_hat_c_22
+  - hair_hat/hair_hat_c_23
+  - hair_hat/hair_hat_c_24
+  - hair_hat/hair_hat_c_25
+  - hair_hat/hair_hat_c_26
+  - hair_hat/hair_hat_c_27
+  - hair_hat/hair_hat_c_28
+  - hair_hat/hair_hat_c_29
+  - hair_hat/hair_hat_c_30
+  helmet:
+  - helmet/helmet_c_1
+  - helmet/helmet_c_2
+  - helmet/helmet_c_3
+  - helmet/helmet_c_4
+  - helmet/helmet_c_5
+  - helmet/helmet_c_6
+  - helmet/helmet_c_7
+  - helmet/helmet_c_8
+  - helmet/helmet_c_9
+  - helmet/helmet_c_10
+  - helmet/helmet_c_11
+  - helmet/helmet_c_12
+  - helmet/helmet_c_13
+  - helmet/helmet_c_14
+  - helmet/helmet_c_15
+  - helmet/helmet_c_16
+  - helmet/helmet_c_17
+  - helmet/helmet_c_18
+  - helmet/helmet_c_19
+  - helmet/helmet_c_20
+  - helmet/helmet_c_21
+  - helmet/helmet_c_22
+  - helmet/helmet_c_23
+  - helmet/helmet_c_24
+  - helmet/helmet_c_25
+  - helmet/helmet_c_26
+  - helmet/helmet_c_27
+  - helmet/helmet_c_28
+  - helmet/helmet_c_29
+  - helmet/helmet_c_30
+  - helmet/helmet_c_31
+  - helmet/helmet_c_32
+  - helmet/helmet_c_33
+  - helmet/helmet_c_34
+  - helmet/helmet_c_35
+  - helmet/helmet_c_36
+  - helmet/helmet_c_37
+  - helmet/helmet_c_38
+  - helmet/helmet_c_39
+  - helmet/helmet_c_40
+  - helmet/helmet_c_41
+  - helmet/helmet_c_42
+  - helmet/helmet_c_43
+  - helmet/helmet_c_44
+  - helmet/helmet_c_45
+  - helmet/helmet_c_46
+  - helmet/helmet_c_47
+  - helmet/helmet_c_48
+  - helmet/helmet_c_49
+  - helmet/helmet_c_50
+  - helmet/helmet_c_51
+  - helmet/helmet_c_52
+  - helmet/helmet_c_53
+  - helmet/helmet_c_54
+  - helmet/helmet_c_55
+  - helmet/helmet_c_56
+  - helmet/helmet_c_57
+  - helmet/helmet_c_58
+  - helmet/helmet_c_59
+  - helmet/helmet_c_60
+  mouth:
+  - mouth/mouth_c_1
+  - mouth/mouth_c_2
+  - mouth/mouth_c_3
+  - mouth/mouth_c_4
+  - mouth/mouth_c_5
+  - mouth/mouth_c_6
+  - mouth/mouth_c_7
+  - mouth/mouth_c_8
+  - mouth/mouth_c_9
+  - mouth/mouth_c_10
+  eyewear:
+  - eyewear/eyewear_c_1
+  - eyewear/eyewear_c_2
+  - eyewear/eyewear_c_3
+  - eyewear/eyewear_c_4
+  - eyewear/eyewear_c_5
+  - eyewear/eyewear_c_6
+  - eyewear/eyewear_c_7
+  - eyewear/eyewear_c_8
+  - eyewear/eyewear_c_9
+  - eyewear/eyewear_c_10
+  - eyewear/eyewear_c_11
+  - eyewear/eyewear_c_12
+  - eyewear/eyewear_c_13
+  - eyewear/eyewear_c_14
+  - eyewear/eyewear_c_15
+  - eyewear/eyewear_c_16
+  - eyewear/eyewear_c_17
+  - eyewear/eyewear_c_18
+  - eyewear/eyewear_c_19
+  - eyewear/eyewear_c_20
+  - eyewear/eyewear_c_21
+  - eyewear/eyewear_c_22
+  - eyewear/eyewear_c_23
+  - eyewear/eyewear_c_24
+  - eyewear/eyewear_c_25
+  - eyewear/eyewear_c_26
+  - eyewear/eyewear_c_27
+  - eyewear/eyewear_c_28
+  - eyewear/eyewear_c_29
+  - eyewear/eyewear_c_30
+  gearLeft:
+  - gear_left/gear_left_c_1
+  - gear_left/gear_left_c_2
+  - gear_left/gear_left_c_3
+  - gear_left/gear_left_c_4
+  - gear_left/gear_left_c_5
+  - gear_left/gear_left_c_6
+  - gear_left/gear_left_c_7
+  - gear_left/gear_left_c_8
+  - gear_left/gear_left_c_9
+  - gear_left/gear_left_c_10
+  - gear_left/gear_left_c_11
+  - gear_left/gear_left_c_12
+  - gear_left/gear_left_c_13
+  - gear_left/gear_left_c_14
+  - gear_left/gear_left_c_15
+  - gear_left/gear_left_c_16
+  - gear_left/gear_left_c_17
+  - gear_left/gear_left_c_18
+  - gear_left/gear_left_c_19
+  - gear_left/gear_left_c_20
+  - gear_left/gear_left_c_21
+  - gear_left/gear_left_c_22
+  - gear_left/gear_left_c_23
+  - gear_left/gear_left_c_24
+  - gear_left/gear_left_c_25
+  - gear_left/gear_left_c_26
+  - gear_left/gear_left_c_27
+  - gear_left/gear_left_c_28
+  - gear_left/gear_left_c_29
+  - gear_left/gear_left_c_30
+  - gear_left/gear_left_c_31
+  - gear_left/gear_left_c_32
+  - gear_left/gear_left_c_33
+  - gear_left/gear_left_c_34
+  - gear_left/gear_left_c_35
+  - gear_left/gear_left_c_36
+  - gear_left/gear_left_c_37
+  - gear_left/gear_left_c_38
+  - gear_left/gear_left_c_39
+  - gear_left/gear_left_c_40
+  gearRight:
+  - gear_right/gear_right_c_1
+  - gear_right/gear_right_c_2
+  - gear_right/gear_right_c_3
+  - gear_right/gear_right_c_4
+  - gear_right/gear_right_c_5
+  - gear_right/gear_right_c_6
+  - gear_right/gear_right_c_7
+  - gear_right/gear_right_c_10
+  - gear_right/gear_right_c_11
+  - gear_right/gear_right_c_12
+  - gear_right/gear_right_c_13
+  - gear_right/gear_right_c_14
+  - gear_right/gear_right_c_15
+  - gear_right/gear_right_c_16
+  - gear_right/gear_right_c_17
+  - gear_right/gear_right_c_18
+  - gear_right/gear_right_c_19
+  - gear_right/gear_right_c_20
+  - gear_right/gear_right_c_21
+  - gear_right/gear_right_c_22
+  - gear_right/gear_right_c_23
+  - gear_right/gear_right_c_24
+  - gear_right/gear_right_c_25
+  - gear_right/gear_right_c_26
+  - gear_right/gear_right_c_27
+  - gear_right/gear_right_c_28
+  - gear_right/gear_right_c_29
+  - gear_right/gear_right_c_30
+  - gear_right/gear_right_c_31
+  - gear_right/gear_right_c_32
+  - gear_right/gear_right_c_33
+  - gear_right/gear_right_c_34
+  - gear_right/gear_right_c_35
+  - gear_right/gear_right_c_36
+  - gear_right/gear_right_c_37
+  - gear_right/gear_right_c_38
+  - gear_right/gear_right_c_39
+  - gear_right/gear_right_c_40
+  top:
+  - top/top_c_1
+  - top/top_c_2
+  - top/top_c_3
+  - top/top_c_4
+  - top/top_c_5
+  - top/top_c_6
+  - top/top_c_7
+  - top/top_c_8
+  - top/top_c_9
+  - top/top_c_10
+  - top/top_c_11
+  - top/top_c_12
+  - top/top_c_13
+  - top/top_c_14
+  - top/top_c_15
+  - top/top_c_16
+  - top/top_c_17
+  - top/top_c_18
+  - top/top_c_19
+  - top/top_c_20
+  - top/top_c_21
+  - top/top_c_22
+  - top/top_c_23
+  - top/top_c_24
+  - top/top_c_25
+  - top/top_c_26
+  - top/top_c_27
+  - top/top_c_28
+  - top/top_c_29
+  - top/top_c_30
+  - top/top_c_31
+  - top/top_c_32
+  - top/top_c_33
+  - top/top_c_34
+  - top/top_c_35
+  - top/top_c_36
+  - top/top_c_37
+  - top/top_c_38
+  - top/top_c_39
+  - top/top_c_40
+  - top/top_c_41
+  - top/top_c_42
+  - top/top_c_43
+  - top/top_c_44
+  - top/top_c_45
+  - top/top_c_46
+  - top/top_c_47
+  - top/top_c_48
+  - top/top_c_49
+  - top/top_c_50
+  - top/top_c_51
+  - top/top_c_52
+  - top/top_c_53
+  - top/top_c_54
+  - top/top_c_55
+  - top/top_c_56
+  - top/top_c_57
+  - top/top_c_58
+  - top/top_c_59
+  - top/top_c_60
+  skin:
+  - skin/skin_1
+  skeletonAnimation: {fileID: 0}
+  skeletonGraphic: {fileID: 3805847453847496297}
+  <IsOptimizeSkin>k__BackingField: 0
+  autoInit: 0
+--- !u!114 &7955724240807307979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038200681837006087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5275a1648bcfbd04e8f284a81c5fa2dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpineGraphicArmsTool
+  skeletonGraphic: {fileID: 3805847453847496297}
+  removeArms: 1
+  armSlots:
+  - arm_l
+  - arm_r
+  - top_arm_l
+  - top_arm_r
+  - gloves_l
+  - gloves_r
+--- !u!114 &932437689149049332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038200681837006087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73e5edf08706050468ce682c3ba1f47a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameCore.Visual.CompanionAppearanceBinder
+  partsManager: {fileID: 3056923579563928611}
+  appearance: {fileID: 11400000, guid: e8576b55b42a8734382e0f9ce2e961a2, type: 2}
+  autoInit: 1
+  allowPrefixMatch: 1
+  applyOnEnable: 1
+--- !u!114 &3805847453847496297 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5856223291194144673, guid: 344ca1cf722c45a479e22b71ea425e26,
+    type: 3}
+  m_PrefabInstance: {fileID: 7319591937493258696}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038200681837006087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d85b887af7e6c3f45a2e2d2920d641bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: spine-unity::Spine.Unity.SkeletonGraphic
