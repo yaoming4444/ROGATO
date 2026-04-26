@@ -14,6 +14,10 @@ public class CompanionBehaviour : MonoBehaviour
     [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float smoothTime = 0.12f;
 
+    [Header("Formation")]
+    [SerializeField] private Vector3 formationOffset = Vector3.zero;
+    [SerializeField] private bool useFollowTargetRotation = false;
+
     [Header("Visual / Flip")]
     [Tooltip("Transform that contains the visuals (Skeleton, weapon, etc.). Flip happens here, not on the root.")]
     [SerializeField] private Transform visualRoot;
@@ -79,6 +83,11 @@ public class CompanionBehaviour : MonoBehaviour
     private bool _hasEnemyTarget;
     private Vector2 _enemyCenter;      // chosen target center
     private float _nextReacquireTime;
+
+    public void SetFormationOffset(Vector3 offset)
+    {
+        formationOffset = offset;
+    }
 
     private void Awake()
     {
@@ -153,7 +162,12 @@ public class CompanionBehaviour : MonoBehaviour
 
     private void Follow()
     {
-        Vector2 targetPos = followTarget.position;
+        Vector3 worldOffset = formationOffset;
+
+        if (useFollowTargetRotation && followTarget != null)
+            worldOffset = followTarget.TransformDirection(formationOffset);
+
+        Vector2 targetPos = (Vector2)(followTarget.position + worldOffset);
         Vector2 pos = transform.position;
 
         float dist = Vector2.Distance(pos, targetPos);
@@ -372,6 +386,17 @@ public class CompanionBehaviour : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, followDistance);
+
+        if (followTarget != null)
+        {
+            Vector3 worldOffset = formationOffset;
+
+            if (useFollowTargetRotation)
+                worldOffset = followTarget.TransformDirection(formationOffset);
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(followTarget.position + worldOffset, 0.15f);
+        }
     }
 #endif
 }

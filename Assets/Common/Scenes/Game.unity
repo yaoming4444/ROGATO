@@ -18206,8 +18206,10 @@ MonoBehaviour:
   playerRoot: {fileID: 1993539685}
   spawnPointA: {fileID: 424585523}
   spawnPointB: {fileID: 905600797}
-  fallbackOffsetA: {x: -1.5, y: 0, z: -1}
-  fallbackOffsetB: {x: 1.5, y: 0, z: -1}
+  fallbackOffsetA: {x: 1.5, y: 0, z: -1}
+  fallbackOffsetB: {x: -1.5, y: 0, z: -1}
+  followOffsetA: {x: 1, y: 0, z: 0}
+  followOffsetB: {x: -1, y: 0, z: 0}
   spawnOnStart: 1
   respawnOnStateChanged: 0
   parentToPlayer: 0

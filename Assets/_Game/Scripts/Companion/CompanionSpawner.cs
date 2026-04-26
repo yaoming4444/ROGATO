@@ -15,9 +15,13 @@ namespace GameCore.Companions
         [SerializeField] private Transform spawnPointA;
         [SerializeField] private Transform spawnPointB;
 
-        [Header("Fallback Offsets")]
+        [Header("Fallback Spawn Offsets")]
         [SerializeField] private Vector3 fallbackOffsetA = new Vector3(-1.5f, 0f, -1f);
         [SerializeField] private Vector3 fallbackOffsetB = new Vector3(1.5f, 0f, -1f);
+
+        [Header("Follow Formation Offsets")]
+        [SerializeField] private Vector3 followOffsetA = new Vector3(-1.25f, 0f, 0f);
+        [SerializeField] private Vector3 followOffsetB = new Vector3(1.25f, 0f, 0f);
 
         [Header("Options")]
         [SerializeField] private bool spawnOnStart = true;
@@ -136,7 +140,28 @@ namespace GameCore.Companions
             GameObject instance = Instantiate(def.worldPrefab, spawnPosition, spawnRotation, parent);
             instance.name = $"{def.id}_Companion";
 
+            ApplyFormationOffset(instance, slotIndex);
+
             spawnedCompanions.Add(instance);
+        }
+
+        private void ApplyFormationOffset(GameObject instance, int slotIndex)
+        {
+            if (instance == null)
+                return;
+
+            var behaviour = instance.GetComponent<CompanionBehaviour>();
+            if (behaviour == null)
+                behaviour = instance.GetComponentInChildren<CompanionBehaviour>();
+
+            if (behaviour == null)
+            {
+                Debug.LogWarning("[CompanionSpawner] Spawned companion has no CompanionBehaviour.", instance);
+                return;
+            }
+
+            Vector3 offset = slotIndex == 0 ? followOffsetA : followOffsetB;
+            behaviour.SetFormationOffset(offset);
         }
     }
 }
