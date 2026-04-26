@@ -14,6 +14,11 @@ public class CompanionBehaviour : MonoBehaviour
     [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float smoothTime = 0.12f;
 
+    [Header("Follow Start Delay")]
+    [SerializeField] private float baseStartMoveDelay = 0.18f;
+    [SerializeField] private float maxCatchupDistance = 3.5f;
+    [SerializeField] private float farDistanceDelayMultiplier = 0.2f;
+
     [Header("Formation")]
     [SerializeField] private Vector3 formationOffset = Vector3.zero;
     [SerializeField] private bool useFollowTargetRotation = false;
@@ -78,6 +83,7 @@ public class CompanionBehaviour : MonoBehaviour
     private string _currentAnim;
 
     private float _visualBaseScaleX;
+    private float _moveDelayTimer;
 
     // Enemy facing data (no dynamic/object)
     private bool _hasEnemyTarget;
@@ -117,6 +123,7 @@ public class CompanionBehaviour : MonoBehaviour
 
         PlayAnim(idleAnim);
         _isRunning = false;
+        _moveDelayTimer = 0f;
     }
 
     private void OnEnable()
@@ -142,11 +149,9 @@ public class CompanionBehaviour : MonoBehaviour
         float dt = Mathf.Max(Time.deltaTime, 0.0001f);
         _currentSpeed = (after - before).magnitude / dt;
 
-        // 1) Update stable enemy target (center only)
         if (faceEnemyWhenPossible)
             UpdateEnemyTargetStable();
 
-        // 2) Flip logic: face enemy if exists, otherwise fallback to movement
         if (_hasEnemyTarget)
         {
             Vector2 dirToEnemy = _enemyCenter - (Vector2)transform.position;
@@ -172,26 +177,33 @@ public class CompanionBehaviour : MonoBehaviour
 
         float dist = Vector2.Distance(pos, targetPos);
 
-        if (dist > followDistance)
-        {
-            Vector2 dirToTarget = (targetPos - pos).normalized;
-            Vector2 desired = targetPos - dirToTarget * stopDistance;
-
-            Vector2 newPos = Vector2.SmoothDamp(pos, desired, ref _velRef, smoothTime, moveSpeed);
-            transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
-        }
-        else
+        if (dist <= followDistance)
         {
             _velRef = Vector2.zero;
+            _moveDelayTimer = 0f;
+            return;
         }
+
+        float distanceOverThreshold = dist - followDistance;
+        float normalizedCatchup = Mathf.Clamp01(distanceOverThreshold / Mathf.Max(0.01f, maxCatchupDistance));
+
+        float delayMultiplier = Mathf.Lerp(1f, farDistanceDelayMultiplier, normalizedCatchup);
+        float requiredDelay = baseStartMoveDelay * delayMultiplier;
+
+        if (_moveDelayTimer < requiredDelay)
+        {
+            _moveDelayTimer += Time.deltaTime;
+            _velRef = Vector2.zero;
+            return;
+        }
+
+        Vector2 dirToTarget = (targetPos - pos).normalized;
+        Vector2 desired = targetPos - dirToTarget * stopDistance;
+
+        Vector2 newPos = Vector2.SmoothDamp(pos, desired, ref _velRef, smoothTime, moveSpeed);
+        transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
     }
 
-    /// <summary>
-    /// Stabilized target picking:
-    /// - Reacquire no more often than targetReacquireInterval
-    /// - Switch only if new target is closer by switchDistanceBias
-    /// Stores only enemy.Center (Vector2), no references needed.
-    /// </summary>
     private void UpdateEnemyTargetStable()
     {
         _hasEnemyTarget = false;
@@ -201,7 +213,6 @@ public class CompanionBehaviour : MonoBehaviour
 
         Vector2 origin = firePoint ? (Vector2)firePoint.position : (Vector2)transform.position;
 
-        // If we already have a target and it's too soon to reacquire, keep it
         if (Time.time < _nextReacquireTime && _enemyCenter != Vector2.zero)
         {
             if (maxTargetDistance > 0f && Vector2.Distance(origin, _enemyCenter) > maxTargetDistance)
@@ -231,15 +242,13 @@ public class CompanionBehaviour : MonoBehaviour
             return;
         }
 
-        // If we had a previous center, only switch if candidate is meaningfully closer
         if (_enemyCenter != Vector2.zero)
         {
             float currentDist = Vector2.Distance(origin, _enemyCenter);
             float candDist = Vector2.Distance(origin, candidateCenter);
 
             if (candDist + switchDistanceBias < currentDist)
-                _enemyCenter = candidateCenter; // switch
-            // else keep old
+                _enemyCenter = candidateCenter;
         }
         else
         {
@@ -254,8 +263,6 @@ public class CompanionBehaviour : MonoBehaviour
         if (visualRoot == null) return;
         if (Mathf.Abs(dirToEnemy.x) < flipDeadZone) return;
 
-        // Base companion art faces LEFT at positive scale.
-        // Enemy on the RIGHT -> negative scale to face RIGHT.
         float sign = dirToEnemy.x >= 0f ? -1f : 1f;
 
         var s = visualRoot.localScale;
@@ -275,7 +282,6 @@ public class CompanionBehaviour : MonoBehaviour
         if (Mathf.Abs(_lastMoveDir.x) < flipDeadZone)
             return;
 
-        // Same base-facing-left convention:
         float sign = _lastMoveDir.x >= 0f ? -1f : 1f;
 
         var s = visualRoot.localScale;
@@ -311,7 +317,6 @@ public class CompanionBehaviour : MonoBehaviour
         _currentAnim = animName;
     }
 
-    // ---------------- Shooting ----------------
     private IEnumerator ShootLoop()
     {
         yield return null;
@@ -353,7 +358,6 @@ public class CompanionBehaviour : MonoBehaviour
         float angle = Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg;
         angle += weaponAngleOffset;
 
-        // Your proven fix:
         bool flipped = visualRoot != null && visualRoot.lossyScale.x < 0f;
         if (enableFlipAimFix && !flipped)
             angle += 180f;
