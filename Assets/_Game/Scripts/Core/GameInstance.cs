@@ -1,8 +1,10 @@
+using GameCore.Companions;
 using GameCore.Progression;
 using GameCore.Visual;
 using IDosGames;
 using LayerLab.ArtMaker;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameCore
@@ -492,6 +494,181 @@ namespace GameCore
 
             State.rolledCards ??= new System.Collections.Generic.List<SavedRolledCardData>();
             return State.rolledCards;
+        }
+
+        // ===================== COMPANIONS =====================
+
+        public OwnedCompanionState GetOwnedCompanion(string companionId)
+        {
+            if (State == null || string.IsNullOrWhiteSpace(companionId))
+                return null;
+
+            State.ownedCompanions ??= new List<OwnedCompanionState>();
+
+            for (int i = 0; i < State.ownedCompanions.Count; i++)
+            {
+                var entry = State.ownedCompanions[i];
+                if (entry == null) continue;
+
+                if (entry.companionId == companionId)
+                    return entry;
+            }
+
+            return null;
+        }
+
+        public bool IsCompanionUnlocked(string companionId)
+        {
+            var entry = GetOwnedCompanion(companionId);
+            return entry != null && entry.unlocked;
+        }
+
+        public int GetCompanionLevel(string companionId)
+        {
+            var entry = GetOwnedCompanion(companionId);
+            return entry != null ? Mathf.Max(1, entry.level) : 0;
+        }
+
+        public bool UnlockCompanion(string companionId, bool immediateSave = false)
+        {
+            if (State == null) return false;
+            if (string.IsNullOrWhiteSpace(companionId)) return false;
+
+            State.ownedCompanions ??= new List<OwnedCompanionState>();
+
+            var entry = GetOwnedCompanion(companionId);
+            if (entry != null)
+            {
+                if (!entry.unlocked)
+                    entry.unlocked = true;
+
+                if (entry.level < 1)
+                    entry.level = 1;
+            }
+            else
+            {
+                State.ownedCompanions.Add(new OwnedCompanionState(companionId, true, 1));
+            }
+
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+
+            return true;
+        }
+
+        public bool UpgradeCompanion(string companionId, int delta = 1, bool immediateSave = false)
+        {
+            if (State == null) return false;
+            if (string.IsNullOrWhiteSpace(companionId)) return false;
+            if (delta <= 0) return false;
+
+            var entry = GetOwnedCompanion(companionId);
+            if (entry == null || !entry.unlocked)
+                return false;
+
+            entry.level = Mathf.Max(1, entry.level + delta);
+
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+
+            return true;
+        }
+
+        public string GetEquippedCompanionId(CompanionEquipSlot slot)
+        {
+            if (State == null)
+                return string.Empty;
+
+            return slot == CompanionEquipSlot.SlotA
+                ? (State.equippedCompanionSlotA ?? string.Empty)
+                : (State.equippedCompanionSlotB ?? string.Empty);
+        }
+
+        public bool IsCompanionEquipped(string companionId)
+        {
+            if (State == null || string.IsNullOrWhiteSpace(companionId))
+                return false;
+
+            return State.equippedCompanionSlotA == companionId ||
+                   State.equippedCompanionSlotB == companionId;
+        }
+
+        public bool EquipCompanion(string companionId, CompanionEquipSlot slot, bool immediateSave = false)
+        {
+            if (State == null) return false;
+            if (string.IsNullOrWhiteSpace(companionId)) return false;
+
+            var entry = GetOwnedCompanion(companionId);
+            if (entry == null || !entry.unlocked)
+                return false;
+
+            // Убираем из другого слота, чтобы один и тот же компаньон не стоял в A и B одновременно
+            if (State.equippedCompanionSlotA == companionId)
+                State.equippedCompanionSlotA = "";
+
+            if (State.equippedCompanionSlotB == companionId)
+                State.equippedCompanionSlotB = "";
+
+            switch (slot)
+            {
+                case CompanionEquipSlot.SlotA:
+                    State.equippedCompanionSlotA = companionId;
+                    break;
+
+                case CompanionEquipSlot.SlotB:
+                    State.equippedCompanionSlotB = companionId;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+
+            return true;
+        }
+
+        public bool UnequipCompanion(CompanionEquipSlot slot, bool immediateSave = false)
+        {
+            if (State == null) return false;
+
+            bool changed = false;
+
+            switch (slot)
+            {
+                case CompanionEquipSlot.SlotA:
+                    if (!string.IsNullOrEmpty(State.equippedCompanionSlotA))
+                    {
+                        State.equippedCompanionSlotA = "";
+                        changed = true;
+                    }
+                    break;
+
+                case CompanionEquipSlot.SlotB:
+                    if (!string.IsNullOrEmpty(State.equippedCompanionSlotB))
+                    {
+                        State.equippedCompanionSlotB = "";
+                        changed = true;
+                    }
+                    break;
+            }
+
+            if (!changed)
+                return false;
+
+            Touch();
+
+            if (immediateSave)
+                SaveAllNow();
+
+            return true;
         }
     }
 }

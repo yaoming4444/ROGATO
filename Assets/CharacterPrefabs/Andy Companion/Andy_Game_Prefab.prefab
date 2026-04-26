@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 2711734132178663641}
   - component: {fileID: 8072023388813569165}
   m_Layer: 0
-  m_Name: Companion
+  m_Name: Andy_Game_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
