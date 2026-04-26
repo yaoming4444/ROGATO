@@ -18,7 +18,7 @@ namespace GameCore
     [Serializable]
     public class PlayerState
     {
-        public int Version = 4;
+        public int Version = 5;
 
         // -------- Core progression --------
         public int Level = 1;

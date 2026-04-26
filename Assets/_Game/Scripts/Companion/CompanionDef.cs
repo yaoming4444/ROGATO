@@ -19,8 +19,16 @@ namespace GameCore.Companions
         [Header("World")]
         public GameObject worldPrefab;
 
-        [Header("Economy")]
-        public int unlockCost = 1000;
+        [Header("Unlock / Hard Currency")]
+        [Tooltip("Unlock cost in hard/server currency (for now CO).")]
+        public int hardCurrencyUnlockCost = 100;
+
+        [Header("Platform Purchase Product IDs")]
+        public string tgMiniAppProductId;
+        public string appStoreProductId;
+        public string googlePlayProductId;
+
+        [Header("Upgrade")]
         public int upgradeCostBase = 250;
 
         [Header("Progression")]

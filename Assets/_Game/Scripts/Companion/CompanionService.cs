@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IDosGames;
 
 namespace GameCore.Companions
 {
@@ -14,13 +16,41 @@ namespace GameCore.Companions
     {
         public static CompanionService I { get; private set; }
 
+        [Header("Data")]
         [SerializeField] private CompanionDatabase database;
+
+        [Header("Economy")]
+        [SerializeField] private VirtualCurrencyID virtualCurrencyId = VirtualCurrencyID.CO;
+        [SerializeField] private bool saveImmediatelyAfterPurchase = true;
+
+        [Header("SDK Refresh Before Charge")]
+        [Tooltip("Перед списанием сделать RequestUserInventory, чтобы баланс был актуальный")]
+        [SerializeField] private bool refreshInventoryBeforeCharge = true;
+
+        [Tooltip("После успешного списания сделать RequestUserInventory, чтобы currency bars/UI обновились")]
+        [SerializeField] private bool refreshInventoryAfterCharge = true;
+
+        [Tooltip("Таймаут ожидания InventoryUpdated")]
+        [SerializeField] private float inventoryRefreshTimeoutSeconds = 3f;
+
+        [Header("Debug / Temporary")]
+        [SerializeField] private bool useLocalGoldFallbackForTesting = false;
 
         public event Action OnChanged;
 
         public CompanionDatabase Database => database;
 
         private GameInstance Game => GameInstance.I;
+
+        // SDK charge flow
+        private bool _chargeInFlight;
+        private bool _sdkSpendFinished;
+        private bool _sdkSpendSuccess;
+
+        // inventory refresh flow
+        private bool _waitingInventoryRefresh;
+        private bool _inventoryRefreshFinished;
+        private Coroutine _inventoryTimeoutCoroutine;
 
         private void Awake()
         {
@@ -36,10 +66,28 @@ namespace GameCore.Companions
                 Game.StateChanged += HandleStateChanged;
         }
 
+        private void OnEnable()
+        {
+            UserInventory.InventoryUpdated += OnInventoryAmountChanged;
+        }
+
+        private void OnDisable()
+        {
+            UserInventory.InventoryUpdated -= OnInventoryAmountChanged;
+
+            CleanupServerCurrencyHandlers();
+            CleanupInventoryRefreshHandlers();
+
+            _chargeInFlight = false;
+        }
+
         private void OnDestroy()
         {
             if (Game != null)
                 Game.StateChanged -= HandleStateChanged;
+
+            CleanupServerCurrencyHandlers();
+            CleanupInventoryRefreshHandlers();
 
             if (I == this)
                 I = null;
@@ -49,6 +97,15 @@ namespace GameCore.Companions
         {
             OnChanged?.Invoke();
         }
+
+        private void OnInventoryAmountChanged()
+        {
+            OnChanged?.Invoke();
+        }
+
+        // =========================
+        // Data access
+        // =========================
 
         public IReadOnlyList<CompanionDef> GetAllDefs()
         {
@@ -79,6 +136,7 @@ namespace GameCore.Companions
             {
                 var entry = list[i];
                 if (entry == null) continue;
+
                 if (string.Equals(entry.companionId, companionId, StringComparison.Ordinal))
                     return entry;
             }
@@ -130,21 +188,86 @@ namespace GameCore.Companions
             return string.Equals(GetEquippedId(slot), companionId, StringComparison.Ordinal);
         }
 
+        // =========================
+        // Purchase / unlock
+        // =========================
+
+        public bool IsPurchaseInFlight()
+        {
+            return _chargeInFlight;
+        }
+
+        public bool CanBuy(string companionId)
+        {
+            var def = GetDef(companionId);
+            if (def == null || IsUnlocked(companionId))
+                return false;
+
+            if (useLocalGoldFallbackForTesting)
+                return Game != null && Game.State != null && Game.State.Gold >= def.hardCurrencyUnlockCost;
+
+            int currentAmount = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
+            return currentAmount >= def.hardCurrencyUnlockCost;
+        }
+
+        public void Buy(string companionId, Action<bool> onComplete = null, bool immediateSave = true)
+        {
+            if (!gameObject.activeInHierarchy)
+            {
+                onComplete?.Invoke(false);
+                return;
+            }
+
+            StartCoroutine(BuyCoroutine(companionId, onComplete, immediateSave));
+        }
+
+        private IEnumerator BuyCoroutine(string companionId, Action<bool> onComplete, bool immediateSave)
+        {
+            var def = GetDef(companionId);
+            if (def == null)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            if (IsUnlocked(companionId))
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            bool chargeSuccess = false;
+            yield return ChargeCurrencyCoroutine(def.hardCurrencyUnlockCost, success => chargeSuccess = success);
+
+            if (!chargeSuccess)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            bool unlockResult = false;
+
+            if (Game != null)
+                unlockResult = Game.UnlockCompanion(companionId, immediateSave || saveImmediatelyAfterPurchase);
+
+            if (unlockResult)
+            {
+                if (Game != null)
+                    Game.RaiseStateChanged();
+
+                OnChanged?.Invoke();
+            }
+
+            onComplete?.Invoke(unlockResult);
+        }
+
+        // =========================
+        // Equip / unequip
+        // =========================
+
         public bool Unlock(string companionId, bool immediateSave = false)
         {
             if (Game == null) return false;
-            return Game.UnlockCompanion(companionId, immediateSave);
-        }
-
-        public bool Buy(string companionId, bool immediateSave = false)
-        {
-            var def = GetDef(companionId);
-            if (def == null) return false;
-            if (IsUnlocked(companionId)) return false;
-
-            if (!Game.SpendGold(def.unlockCost, immediateSave: false))
-                return false;
-
             return Game.UnlockCompanion(companionId, immediateSave);
         }
 
@@ -167,6 +290,10 @@ namespace GameCore.Companions
 
             return Equip(companionId, slot, immediateSave);
         }
+
+        // =========================
+        // Upgrade
+        // =========================
 
         public bool Upgrade(string companionId, bool immediateSave = false)
         {
@@ -210,6 +337,153 @@ namespace GameCore.Companions
                 return false;
 
             return Game != null && Game.State != null && Game.State.Gold >= GetUpgradeCost(companionId);
+        }
+
+        // =========================
+        // Currency charge flow
+        // =========================
+
+        private IEnumerator ChargeCurrencyCoroutine(int amount, Action<bool> onComplete)
+        {
+            bool success = false;
+
+            if (useLocalGoldFallbackForTesting)
+            {
+                success = Game != null && Game.SpendGold(amount, immediateSave: false);
+                onComplete?.Invoke(success);
+                yield break;
+            }
+
+            if (_chargeInFlight)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            if (refreshInventoryBeforeCharge)
+            {
+                BeginInventoryRefresh();
+
+                while (!_inventoryRefreshFinished)
+                    yield return null;
+            }
+
+            int current = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
+            if (current < amount)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            CleanupServerCurrencyHandlers();
+
+            _chargeInFlight = true;
+            _sdkSpendFinished = false;
+            _sdkSpendSuccess = false;
+
+            UserInventory.SuccessSubtractVirtualCurrency += OnServerChargeSuccess;
+            UserInventory.ErrorSubtractVirtualCurrency += OnServerChargeError;
+
+            UserInventory.SubtractVirtualCurrency(virtualCurrencyId, amount);
+
+            while (!_sdkSpendFinished)
+                yield return null;
+
+            success = _sdkSpendSuccess;
+            onComplete?.Invoke(success);
+        }
+
+        // =========================
+        // SDK charge callbacks
+        // =========================
+
+        private void OnServerChargeSuccess()
+        {
+            CleanupServerCurrencyHandlers();
+
+            _chargeInFlight = false;
+            _sdkSpendSuccess = true;
+            _sdkSpendFinished = true;
+
+            if (refreshInventoryAfterCharge)
+                UserDataService.RequestUserInventory();
+
+            OnChanged?.Invoke();
+        }
+
+        private void OnServerChargeError()
+        {
+            CleanupServerCurrencyHandlers();
+
+            _chargeInFlight = false;
+            _sdkSpendSuccess = false;
+            _sdkSpendFinished = true;
+
+            OnChanged?.Invoke();
+        }
+
+        private void CleanupServerCurrencyHandlers()
+        {
+            UserInventory.SuccessSubtractVirtualCurrency -= OnServerChargeSuccess;
+            UserInventory.ErrorSubtractVirtualCurrency -= OnServerChargeError;
+        }
+
+        // =========================
+        // Inventory refresh
+        // =========================
+
+        private void BeginInventoryRefresh()
+        {
+            CleanupInventoryRefreshHandlers();
+
+            _waitingInventoryRefresh = true;
+            _inventoryRefreshFinished = false;
+
+            UserInventory.InventoryUpdated += OnInventoryUpdated;
+            UserDataService.RequestUserInventory();
+
+            _inventoryTimeoutCoroutine = StartCoroutine(InventoryRefreshTimeoutCoroutine());
+        }
+
+        private void OnInventoryUpdated()
+        {
+            if (!_waitingInventoryRefresh)
+                return;
+
+            CleanupInventoryRefreshHandlers();
+            _inventoryRefreshFinished = true;
+        }
+
+        private IEnumerator InventoryRefreshTimeoutCoroutine()
+        {
+            float timer = 0f;
+
+            while (_waitingInventoryRefresh && timer < inventoryRefreshTimeoutSeconds)
+            {
+                timer += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (!_waitingInventoryRefresh)
+                yield break;
+
+            Debug.LogWarning("[CompanionService] Inventory refresh timeout. Continue with current cache.");
+
+            CleanupInventoryRefreshHandlers();
+            _inventoryRefreshFinished = true;
+        }
+
+        private void CleanupInventoryRefreshHandlers()
+        {
+            _waitingInventoryRefresh = false;
+
+            UserInventory.InventoryUpdated -= OnInventoryUpdated;
+
+            if (_inventoryTimeoutCoroutine != null)
+            {
+                StopCoroutine(_inventoryTimeoutCoroutine);
+                _inventoryTimeoutCoroutine = null;
+            }
         }
     }
 }

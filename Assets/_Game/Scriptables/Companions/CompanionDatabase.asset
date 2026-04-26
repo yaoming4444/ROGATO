@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 515367a1b22057444ac774773d14af9b, type: 3}
   m_Name: CompanionDatabase
   m_EditorClassIdentifier: Assembly-CSharp::GameCore.Companions.CompanionDatabase
-  companions: []
+  companions:
+  - {fileID: 11400000, guid: 450729facf8bbeb45934ec60d6ff307a, type: 2}
+  - {fileID: 11400000, guid: 69a660588faee3447b6623475511e579, type: 2}
