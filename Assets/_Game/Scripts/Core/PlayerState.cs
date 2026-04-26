@@ -1,5 +1,7 @@
+using GameCore.Companions;
 using LayerLab.ArtMaker;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameCore
@@ -38,6 +40,12 @@ namespace GameCore
         public System.Collections.Generic.List<string> unlockedCardIds = new System.Collections.Generic.List<string>();
 
         public System.Collections.Generic.List<SavedRolledCardData> rolledCards = new System.Collections.Generic.List<SavedRolledCardData>();
+
+        // Companions
+        public List<OwnedCompanionState> ownedCompanions = new();
+        public string equippedCompanionSlotA;
+        public string equippedCompanionSlotB;
+
         // ============================================================
         // VISUAL (Spine skin names) - store full skin names as strings
         // ============================================================
@@ -157,6 +165,11 @@ namespace GameCore
                 unlockedCardIds = new System.Collections.Generic.List<string>(),
                 rolledCards = new System.Collections.Generic.List<SavedRolledCardData>(),
 
+                // Companions
+                ownedCompanions = new List<OwnedCompanionState>(),
+                equippedCompanionSlotA = "",
+                equippedCompanionSlotB = "",
+
                 // Equipment Slot Level
                 lvl_helmet = 1,
                 lvl_top = 1,
@@ -241,6 +254,25 @@ namespace GameCore
 
             unlockedCardIds ??= new System.Collections.Generic.List<string>();
             rolledCards ??= new System.Collections.Generic.List<SavedRolledCardData>();
+
+            ownedCompanions ??= new List<OwnedCompanionState>();
+
+            equippedCompanionSlotA ??= "";
+            equippedCompanionSlotB ??= "";
+
+            for (int i = ownedCompanions.Count - 1; i >= 0; i--)
+            {
+                var entry = ownedCompanions[i];
+
+                if (entry == null)
+                {
+                    ownedCompanions.RemoveAt(i);
+                    continue;
+                }
+
+                entry.companionId ??= "";
+                if (entry.level < 1) entry.level = 1;
+            }
         }
 
         public int GetVisualSlotLevel(EquipmentType slot)
