@@ -4,7 +4,7 @@ public class SpeedTimeTest : MonoBehaviour
 {
     public void SpeedTime()
     {
-        Time.timeScale = 5f;
+        Time.timeScale = 8f;
     }
 
     public void ResetTime()
