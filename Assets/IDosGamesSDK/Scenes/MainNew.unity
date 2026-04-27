@@ -15442,7 +15442,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.0000314853}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 470}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &752143514
 MonoBehaviour:
@@ -38628,6 +38628,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Stat Name Text (TMP)
       objectReference: {fileID: 0}
+    - target: {fileID: 3453459656687933681, guid: bcd33e468bb47c14aa8cf00e67f71ec5,
+        type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5070068647943135882, guid: bcd33e468bb47c14aa8cf00e67f71ec5,
         type: 3}
       propertyPath: m_Name
@@ -38753,8 +38758,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6756998474607888154, guid: bcd33e468bb47c14aa8cf00e67f71ec5,
+        type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3850427921523293672, guid: bcd33e468bb47c14aa8cf00e67f71ec5, type: 3}
+    - {fileID: 6904991126257222309, guid: bcd33e468bb47c14aa8cf00e67f71ec5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6453405708806096211, guid: bcd33e468bb47c14aa8cf00e67f71ec5,

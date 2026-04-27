@@ -129,7 +129,7 @@ PrefabInstance:
     - target: {fileID: 5856223291194144673, guid: 344ca1cf722c45a479e22b71ea425e26,
         type: 3}
       propertyPath: startingAnimation
-      value: Idle2
+      value: Attack2
       objectReference: {fileID: 0}
     - target: {fileID: 7391727620340281256, guid: 344ca1cf722c45a479e22b71ea425e26,
         type: 3}
@@ -824,7 +824,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038200681837006087}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5275a1648bcfbd04e8f284a81c5fa2dd, type: 3}
   m_Name: 
