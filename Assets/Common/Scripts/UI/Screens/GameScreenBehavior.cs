@@ -32,6 +32,13 @@ namespace OctoberStudio
         [Header("Top UI")]
         [SerializeField] CanvasGroup topUI;
 
+        [Header("Boss Mode Hidden UI")]
+        [Tooltip("Only this UI will be hidden during boss fight. Player HP and weapon icons stay visible.")]
+        [SerializeField] CanvasGroup experienceBar;
+
+        [Tooltip("Only this UI will be hidden during boss fight. Player HP and weapon icons stay visible.")]
+        [SerializeField] CanvasGroup timer;
+
         [Header("Pause")]
         [SerializeField] Button pauseButton;
         [SerializeField] PauseWindowBehavior pauseWindow;
@@ -89,7 +96,10 @@ namespace OctoberStudio
         public void HideBossFightWarning()
         {
             bossfightWarning.DoAlpha(0f, 0.3f).SetOnFinish(() => bossfightWarning.gameObject.SetActive(false));
-            topUI.DoAlpha(0, 0.3f);
+
+            // Boss mode starts after warning:
+            // hide only XP bar and timer, not the whole top UI.
+            SetBossModeUI(true);
         }
 
         public void ShowBossHealthBar(BossfightData data)
@@ -101,12 +111,32 @@ namespace OctoberStudio
         public void HideBossHealthbar()
         {
             bossHealthbar.Hide();
-            topUI.DoAlpha(1, 0.3f);
+
+            // Boss mode ends:
+            // show XP bar and timer back.
+            SetBossModeUI(false);
         }
 
         public void LinkBossToHealthbar(EnemyBehavior enemy)
         {
             bossHealthbar.SetBoss(enemy);
+        }
+
+        private void SetBossModeUI(bool isBossMode)
+        {
+            float targetAlpha = isBossMode ? 0f : 1f;
+
+            SetCanvasGroupVisible(experienceBar, targetAlpha, !isBossMode);
+            SetCanvasGroupVisible(timer, targetAlpha, !isBossMode);
+        }
+
+        private void SetCanvasGroupVisible(CanvasGroup canvasGroup, float targetAlpha, bool enableInput)
+        {
+            if (canvasGroup == null) return;
+
+            canvasGroup.DoAlpha(targetAlpha, 0.3f);
+            canvasGroup.interactable = enableInput;
+            canvasGroup.blocksRaycasts = enableInput;
         }
 
         public void ShowAbilitiesPanel(List<AbilityData> abilities, bool isLevelUp)
@@ -172,10 +202,10 @@ namespace OctoberStudio
 
             GameController.InputManager.InputAsset.UI.Settings.performed -= OnSettingsInputClicked;
         }
-        
+
         private void OnPauseWindowClosed()
         {
-            if(GameController.InputManager.ActiveInput == Input.InputType.UIJoystick)
+            if (GameController.InputManager.ActiveInput == Input.InputType.UIJoystick)
             {
                 joystick.Enable();
             }

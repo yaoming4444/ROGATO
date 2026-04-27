@@ -7,27 +7,70 @@ namespace OctoberStudio.Bossfight
 {
     public class BossfightHealthbarBehavior : MonoBehaviour
     {
-        [SerializeField] RectMask2D rectMask;
-        [SerializeField] TMP_Text bossNameLabel;
-        [SerializeField] CanvasGroup canvasGroup;
+        [Header("Optional")]
+        [SerializeField] private CanvasGroup canvasGroup;
 
-        public EnemyBehavior Boss { get ; private set; }
+        [Header("New Slider Bar")]
+        [SerializeField] private Slider slider;          // Boss HP Slider
+
+        public EnemyBehavior Boss { get; private set; }
+
+        private void Awake()
+        {
+            if (!canvasGroup)
+                canvasGroup = GetComponent<CanvasGroup>();
+
+            if (!slider)
+                slider = GetComponentInChildren<Slider>(true);
+
+            // Чтобы игрок не мог двигать ползунок
+            if (slider)
+            {
+                slider.minValue = 0f;
+                slider.maxValue = 1f;
+                slider.wholeNumbers = false;
+                slider.interactable = false;
+                slider.value = 1f;
+            }
+        }
 
         public void Show()
         {
             gameObject.SetActive(true);
-            canvasGroup.alpha = 0f;
-            canvasGroup.DoAlpha(1f, 0.3f);
+
+            if (canvasGroup)
+            {
+                canvasGroup.alpha = 0f;
+                canvasGroup.DoAlpha(1f, 0.3f);
+            }
         }
 
         public void Hide()
         {
-            canvasGroup.DoAlpha(0f, 0.3f).SetOnFinish(() => gameObject.SetActive(false));
+            if (canvasGroup)
+            {
+                canvasGroup.DoAlpha(0f, 0.3f).SetOnFinish(() => gameObject.SetActive(false));
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         public void SetBoss(EnemyBehavior boss)
         {
+            // На всякий случай отписываемся от старого босса,
+            // если этот healthbar был переиспользован.
+            if (Boss != null)
+            {
+                Boss.onEnemyDied -= OnBossDied;
+                Boss.onHealthChanged -= OnBossHealthChanged;
+            }
+
             Boss = boss;
+
+            if (Boss == null)
+                return;
 
             Boss.onEnemyDied += OnBossDied;
             Boss.onHealthChanged += OnBossHealthChanged;
@@ -35,27 +78,35 @@ namespace OctoberStudio.Bossfight
 
         private void OnBossHealthChanged(float hp, float maxHP)
         {
-            SetProgress(hp / maxHP);
+            float progress = maxHP > 0f ? hp / maxHP : 0f;
+
+            SetProgress(progress);
         }
 
         private void OnBossDied(EnemyBehavior enemy)
         {
-            Boss.onEnemyDied -= OnBossDied;
-            Boss.onHealthChanged -= OnBossHealthChanged;
+            if (Boss != null)
+            {
+                Boss.onEnemyDied -= OnBossDied;
+                Boss.onHealthChanged -= OnBossHealthChanged;
+            }
+
+            Boss = null;
+            SetProgress(0f);
         }
 
         public void Init(BossfightData data)
         {
-            bossNameLabel.text = data.DisplayName;
-
-            SetProgress(1);
+            SetProgress(1f);
         }
 
+        /// <param name="progress">0..1</param>
         private void SetProgress(float progress)
         {
-            Vector4 padding = rectMask.padding;
-            padding.z = rectMask.rectTransform.rect.width * (1 - progress);
-            rectMask.padding = padding;
+            if (!slider)
+                return;
+
+            slider.value = Mathf.Clamp01(progress);
         }
     }
 }

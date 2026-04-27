@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6dc8c45fae4b7ea45850295d1a669523, type: 3}
-  m_Name: CompanionAppearance
+  m_Name: Andy_CompanionAppearance
   m_EditorClassIdentifier: Assembly-CSharp::CompanionAppearance
   parts:
   - Category: 1
-    SkinKey: back/back_c_1
+    SkinKey: 
   - Category: 2
     SkinKey: 
   - Category: 3
