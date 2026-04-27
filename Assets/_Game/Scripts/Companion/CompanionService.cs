@@ -261,15 +261,29 @@ namespace GameCore.Companions
             onComplete?.Invoke(unlockResult);
         }
 
-        // =========================
-        // Equip / unequip
-        // =========================
-
         public bool Unlock(string companionId, bool immediateSave = false)
         {
             if (Game == null) return false;
             return Game.UnlockCompanion(companionId, immediateSave);
         }
+
+        public bool UnlockFromPlatform(string companionId, bool immediateSave = true)
+        {
+            if (Game == null) return false;
+
+            bool result = Game.UnlockCompanion(companionId, immediateSave);
+            if (result)
+            {
+                Game.RaiseStateChanged();
+                OnChanged?.Invoke();
+            }
+
+            return result;
+        }
+
+        // =========================
+        // Equip / unequip
+        // =========================
 
         public bool Equip(string companionId, CompanionEquipSlot slot, bool immediateSave = false)
         {
@@ -295,24 +309,6 @@ namespace GameCore.Companions
         // Upgrade
         // =========================
 
-        public bool Upgrade(string companionId, bool immediateSave = false)
-        {
-            var def = GetDef(companionId);
-            var owned = GetOwnedState(companionId);
-
-            if (def == null || owned == null || !owned.unlocked)
-                return false;
-
-            if (owned.level >= def.maxLevel)
-                return false;
-
-            int cost = GetUpgradeCost(companionId);
-            if (!Game.SpendGold(cost, immediateSave: false))
-                return false;
-
-            return Game.UpgradeCompanion(companionId, 1, immediateSave);
-        }
-
         public int GetUpgradeCost(string companionId)
         {
             var def = GetDef(companionId);
@@ -337,6 +333,100 @@ namespace GameCore.Companions
                 return false;
 
             return Game != null && Game.State != null && Game.State.Gold >= GetUpgradeCost(companionId);
+        }
+
+        public bool CanUpgradeWithServerCurrency(string companionId)
+        {
+            var def = GetDef(companionId);
+            var owned = GetOwnedState(companionId);
+
+            if (def == null || owned == null || !owned.unlocked)
+                return false;
+
+            if (owned.level >= def.maxLevel)
+                return false;
+
+            int cost = GetUpgradeCost(companionId);
+
+            if (useLocalGoldFallbackForTesting)
+                return Game != null && Game.State != null && Game.State.Gold >= cost;
+
+            int currentAmount = UserInventory.GetVirtualCurrencyAmount(virtualCurrencyId);
+            return currentAmount >= cost;
+        }
+
+        public void UpgradeWithServerCurrency(string companionId, Action<bool> onComplete = null, bool immediateSave = true)
+        {
+            if (!gameObject.activeInHierarchy)
+            {
+                onComplete?.Invoke(false);
+                return;
+            }
+
+            StartCoroutine(UpgradeWithServerCurrencyCoroutine(companionId, onComplete, immediateSave));
+        }
+
+        private IEnumerator UpgradeWithServerCurrencyCoroutine(string companionId, Action<bool> onComplete, bool immediateSave)
+        {
+            var def = GetDef(companionId);
+            var owned = GetOwnedState(companionId);
+
+            if (def == null || owned == null || !owned.unlocked)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            if (owned.level >= def.maxLevel)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            int cost = GetUpgradeCost(companionId);
+
+            bool chargeSuccess = false;
+            yield return ChargeCurrencyCoroutine(cost, success => chargeSuccess = success);
+
+            if (!chargeSuccess)
+            {
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
+            bool upgradeResult = false;
+
+            if (Game != null)
+                upgradeResult = Game.UpgradeCompanion(companionId, 1, immediateSave);
+
+            if (upgradeResult)
+            {
+                if (Game != null)
+                    Game.RaiseStateChanged();
+
+                OnChanged?.Invoke();
+            }
+
+            onComplete?.Invoke(upgradeResult);
+        }
+
+        // Оставил старый метод на всякий случай, если где-то еще используется локальный flow
+        public bool Upgrade(string companionId, bool immediateSave = false)
+        {
+            var def = GetDef(companionId);
+            var owned = GetOwnedState(companionId);
+
+            if (def == null || owned == null || !owned.unlocked)
+                return false;
+
+            if (owned.level >= def.maxLevel)
+                return false;
+
+            int cost = GetUpgradeCost(companionId);
+            if (!Game.SpendGold(cost, immediateSave: false))
+                return false;
+
+            return Game.UpgradeCompanion(companionId, 1, immediateSave);
         }
 
         // =========================

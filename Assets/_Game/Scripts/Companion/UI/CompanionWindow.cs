@@ -13,6 +13,9 @@ namespace GameCore.Companions
         [SerializeField] private Transform previewRootA;
         [SerializeField] private Transform previewRootB;
 
+        [Header("Popup")]
+        [SerializeField] private CompanionUpgradePopup upgradePopup;
+
         [Header("Behavior")]
         [SerializeField] private bool autoEquipAfterPurchase = false;
 
@@ -40,6 +43,9 @@ namespace GameCore.Companions
         private void HandleCompanionsChanged()
         {
             RefreshAll();
+
+            if (upgradePopup != null && upgradePopup.gameObject.activeSelf)
+                upgradePopup.Refresh();
         }
 
         public void ToggleSelection(string companionId)
@@ -53,6 +59,17 @@ namespace GameCore.Companions
                 selectedCompanionId = companionId;
 
             RefreshCards();
+        }
+
+        public void OpenUpgradePopup(string companionId)
+        {
+            if (string.IsNullOrWhiteSpace(companionId))
+                return;
+
+            if (upgradePopup == null)
+                return;
+
+            upgradePopup.Open(companionId);
         }
 
         public void HandleEquipPressed(string companionId)
@@ -109,24 +126,10 @@ namespace GameCore.Companions
             if (service == null)
                 return;
 
-            if (_purchaseInFlight || service.IsPurchaseInFlight())
-                return;
-
             if (!service.IsUnlocked(companionId))
-            {
-                _purchaseInFlight = true;
-
-                service.Buy(companionId, success =>
-                {
-                    _purchaseInFlight = false;
-                    RefreshAll();
-                }, immediateSave: true);
-
                 return;
-            }
 
-            service.Upgrade(companionId, immediateSave: true);
-            RefreshAll();
+            OpenUpgradePopup(companionId);
         }
 
         [ContextMenu("Rebuild")]

@@ -89,7 +89,7 @@ namespace GameCore.Companions
                 return;
             }
 
-            RefreshUnlockedState(service, atMaxLevel, equipped);
+            RefreshUnlockedState(atMaxLevel, equipped);
         }
 
         private void RefreshLockedState(bool supportsPlatformPurchase)
@@ -98,7 +98,9 @@ namespace GameCore.Companions
                 upgradeButtonRoot.SetActive(supportsPlatformPurchase);
 
             if (upgradeButtonImage)
-                upgradeButtonImage.sprite = upgradeRealMoneySprite != null ? upgradeRealMoneySprite : upgradeButtonImage.sprite;
+                upgradeButtonImage.sprite = upgradeRealMoneySprite != null
+                    ? upgradeRealMoneySprite
+                    : upgradeButtonImage.sprite;
 
             if (upgradeButtonText)
             {
@@ -121,32 +123,30 @@ namespace GameCore.Companions
                 equipButtonText.text = def.hardCurrencyUnlockCost.ToString();
         }
 
-        private void RefreshUnlockedState(CompanionService service, bool atMaxLevel, bool equipped)
+        private void RefreshUnlockedState(bool atMaxLevel, bool equipped)
         {
             if (upgradeButtonRoot)
                 upgradeButtonRoot.SetActive(true);
 
             if (upgradeButtonImage)
-                upgradeButtonImage.sprite = upgradeNormalSprite != null ? upgradeNormalSprite : upgradeButtonImage.sprite;
+                upgradeButtonImage.sprite = upgradeNormalSprite != null
+                    ? upgradeNormalSprite
+                    : upgradeButtonImage.sprite;
 
             if (upgradeButtonText)
             {
                 if (atMaxLevel)
-                {
                     upgradeButtonText.text = "Max";
-                }
                 else
-                {
-                    int cost = service.GetUpgradeCost(def.id);
-                    upgradeButtonText.text = $"Upgrade {cost}";
-                }
+                    upgradeButtonText.text = "Upgrade";
             }
 
+            // ВАЖНО:
+            // На карточке upgrade-кнопка должна открывать popup,
+            // а не проверять валюту заранее. Поэтому она кликабельна всегда,
+            // кроме max level.
             if (upgradeButton)
-            {
-                bool canUpgrade = service.CanUpgrade(def.id);
-                upgradeButton.interactable = canUpgrade && !atMaxLevel;
-            }
+                upgradeButton.interactable = !atMaxLevel;
 
             if (equipCurrencyRoot)
                 equipCurrencyRoot.SetActive(false);

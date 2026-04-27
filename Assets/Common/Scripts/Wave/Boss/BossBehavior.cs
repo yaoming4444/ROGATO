@@ -41,7 +41,7 @@ namespace OctoberStudio.Timeline.Bossfight
 
                 var bossSpawnPosition = StageController.FieldManager.SpawnFence(BossType, BossSpawnOffset);
 
-                // Переносим игрока в арену босса после спавна ворот
+                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 TeleportPlayerToBossArena(bossSpawnPosition);
 
                 if (StageController.Stage.RemovePropFromBossfight && StageController.Stage.SpawnProp)
@@ -87,7 +87,7 @@ namespace OctoberStudio.Timeline.Bossfight
 
             ForceMovePlayer(player, targetPosition);
 
-            // На следующий кадр повторяем, если какой-то movement/controller перезаписал позицию в этот же кадр.
+            // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅ movement/controller пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ.
             EasingManager.DoNextFrame().SetOnFinish(() =>
             {
                 if (player != null)
@@ -132,7 +132,7 @@ namespace OctoberStudio.Timeline.Bossfight
 
             if (rb2D != null)
             {
-                rb2D.velocity = Vector2.zero;
+                rb2D.linearVelocity = Vector2.zero;
                 rb2D.angularVelocity = 0f;
                 rb2D.position = targetPosition;
             }
