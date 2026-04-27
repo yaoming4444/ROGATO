@@ -14,6 +14,13 @@ public class CompanionBehaviour : MonoBehaviour
     [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float smoothTime = 0.12f;
 
+    [Header("Movement Bounds")]
+    [Tooltip("Same idea as PlayerBehavior fence offset. Used to prevent companion from walking outside the field/boss fence.")]
+    [SerializeField] private Vector2 fenceOffset = new Vector2(0.35f, 0.35f);
+
+    [Tooltip("If enabled, companion movement is limited by StageFieldManager.ValidatePosition, same as the player.")]
+    [SerializeField] private bool useFieldBounds = true;
+
     [Header("Follow Start Delay")]
     [SerializeField] private float baseStartMoveDelay = 0.18f;
     [SerializeField] private float maxCatchupDistance = 3.5f;
@@ -201,7 +208,52 @@ public class CompanionBehaviour : MonoBehaviour
         Vector2 desired = targetPos - dirToTarget * stopDistance;
 
         Vector2 newPos = Vector2.SmoothDamp(pos, desired, ref _velRef, smoothTime, moveSpeed);
-        transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
+
+        MoveWithFieldBounds(newPos);
+    }
+
+    private void MoveWithFieldBounds(Vector2 desiredPosition)
+    {
+        Vector2 currentPosition = transform.position;
+        Vector2 frameMovement = desiredPosition - currentPosition;
+
+        if (frameMovement.sqrMagnitude <= 0.000001f)
+            return;
+
+        if (!useFieldBounds || StageController.FieldManager == null)
+        {
+            transform.position = new Vector3(desiredPosition.x, desiredPosition.y, transform.position.z);
+            return;
+        }
+
+        bool movedX = false;
+        bool movedY = false;
+
+        Vector2 nextX = currentPosition + Vector2.right * frameMovement.x;
+
+        if (StageController.FieldManager.ValidatePosition(nextX, fenceOffset))
+        {
+            transform.position = new Vector3(nextX.x, transform.position.y, transform.position.z);
+            movedX = true;
+        }
+
+        Vector2 afterXPosition = transform.position;
+        Vector2 nextY = afterXPosition + Vector2.up * frameMovement.y;
+
+        if (StageController.FieldManager.ValidatePosition(nextY, fenceOffset))
+        {
+            transform.position = new Vector3(transform.position.x, nextY.y, transform.position.z);
+            movedY = true;
+        }
+
+        // If movement was blocked by the field/fence, clear SmoothDamp velocity.
+        // Otherwise SmoothDamp will keep pushing into the wall and can cause jitter.
+        if (!movedX && !movedY)
+            _velRef = Vector2.zero;
+        else if (!movedX)
+            _velRef.x = 0f;
+        else if (!movedY)
+            _velRef.y = 0f;
     }
 
     private void UpdateEnemyTargetStable()
